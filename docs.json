@@ -26,17 +26,11 @@
             "pages": [
               "api-reference/overview",
               {
-                "group": "Search",
+                "group": "Browse",
                 "pages": [
-                  "api-reference/endpoints/search/agentic-search",
-                  "api-reference/endpoints/search/agentic-search-mini",
-                  "api-reference/endpoints/search/regular-search"
-                ]
-              },
-              {
-                "group": "Feed",
-                "pages": [
-                  "api-reference/endpoints/feed/get-feed"
+                  "api-reference/endpoints/browse/list-vendors",
+                  "api-reference/endpoints/browse/list-collections",
+                  "api-reference/endpoints/browse/list-listings"
                 ]
               },
               {
@@ -47,9 +41,11 @@
                 ]
               },
               {
-                "group": "Usage",
+                "group": "Search",
                 "pages": [
-                  "api-reference/endpoints/usage/get-usage"
+                  "api-reference/endpoints/search/agentic-search",
+                  "api-reference/endpoints/search/agentic-search-mini",
+                  "api-reference/endpoints/search/regular-search"
                 ]
               },
               {
@@ -59,11 +55,9 @@
                 ]
               },
               {
-                "group": "Summaries",
+                "group": "Usage",
                 "pages": [
-                  "api-reference/endpoints/summaries/list-vendors",
-                  "api-reference/endpoints/summaries/list-collections",
-                  "api-reference/endpoints/summaries/list-listings"
+                  "api-reference/endpoints/usage/get-usage"
                 ]
               }
             ]
@@ -71,8 +65,9 @@
           {
             "group": "Guides",
             "pages": [
-              "guides/filtering",
-              "guides/pagination"
+              "guides/pagination",
+              "guides/product-index",
+              "guides/filtering"
             ]
           }
         ]

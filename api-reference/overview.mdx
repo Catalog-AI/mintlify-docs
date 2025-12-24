@@ -17,7 +17,7 @@ https://api.getcatalog.ai
 All requests require your API key in the `x-api-key` header. [Get your API key](mailto:founders@getcatalog.ai) if you don't have one yet.
 
 ```bash
-curl -H "x-api-key: YOUR_API_KEY" https://api.getcatalog.ai/api/search
+curl -H "x-api-key: YOUR_API_KEY" https://api.getcatalog.ai/v1/search
 ```
 
 <Note>
@@ -26,12 +26,24 @@ Keep your API key secure and never expose it in client-side code. Store it in en
 
 ## What endpoints are available?
 
-### Feed
+### Browse
 
-<Card title="Get Feed" icon="rss" href="/api-reference/endpoints/feed/get-feed">
-  **GET** `/api/feed`
+<Card title="List Vendors" icon="store" href="/api-reference/endpoints/browse/list-vendors">
+  **GET** `/api/vendors`
   
-  Retrieve customizable product feeds for commerce applications.
+  Retrieve vendor summaries with product counts and latest update timestamps.
+</Card>
+
+<Card title="List Collections" icon="folder" href="/api-reference/endpoints/browse/list-collections">
+  **POST** `/v1/collections`
+  
+  Retrieve collections from a specific vendor with pagination.
+</Card>
+
+<Card title="List All Products (Listings)" icon="list" href="/api-reference/endpoints/browse/list-listings">
+  **POST** `/v1/listings`
+  
+  Retrieve collection products with pagination and filtering options.
 </Card>
 
 ### Product
@@ -40,14 +52,6 @@ Keep your API key secure and never expose it in client-side code. Store it in en
   **POST** `/api/product`
   
   Get detailed information about a specific product by URL.
-</Card>
-
-### Vendors
-
-<Card title="List Vendors" icon="store" href="/api-reference/endpoints/vendors/list-vendors">
-  **GET** `/api/vendors`
-  
-  List all available vendors and their metadata.
 </Card>
 
 ### Search

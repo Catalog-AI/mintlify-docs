@@ -1,6 +1,6 @@
 ---
 title: "Get Product by URL"
-api: "POST https://api.getcatalog.ai/api/product"
+api: "POST https://api.getcatalog.ai/v1/product"
 description: "Get detailed information about a specific product by URL"
 ---
 
@@ -265,14 +265,34 @@ Retrieve comprehensive details about a specific product by providing its URL. Th
       Echo back the requested URL
     </ResponseField>
     
-
+    <ResponseField name="outcome" type="string" optional>
+      Optional machine-readable reason describing why the product was not found or could not be fully processed when <code>found</code> is <code>false</code>. This field is only present when a specific non-generic reason is available.
+    </ResponseField>
   </Expandable>
 </ResponseField>
+
+## Error Responses
+
+<ResponseField name="error" type="string">
+  Error message describing what went wrong (for example, malformed JSON body or invalid URL)
+</ResponseField>
+
+<ResponseField name="details" type="string" optional>
+  Additional details about the error, when available
+</ResponseField>
+
+<Note>
+<strong>Error modes</strong>:
+- <strong>401 Unauthorized</strong>: Returned when the <code>x-api-key</code> header is missing or invalid. The response includes an <code>error</code> message.
+- <strong>400 Bad Request</strong>: Returned when the request body is missing or contains malformed JSON, or when the <code>url</code> field is missing or not a string. The response includes an <code>error</code> message (and optionally <code>details</code>).
+- <strong>200 OK (logical errors)</strong>: When the product cannot be found or processed (for example, unsupported vendor or blocked domain), the response still returns <code>200 OK</code> with <code>product = null</code>, <code>meta.found = false</code>, and, when a specific non-generic reason is available, <code>meta.outcome</code> describing that reason.
+- <strong>200 OK (non-fatal validation)</strong>: If <code>country_code</code> is missing, invalid, or not supported, the request does not fail; the API logs a warning internally and normalizes the country to <code>"us"</code>. The response status remains <code>200 OK</code>, and <code>meta.found</code> reflects whether a product was ultimately found.
+</Note>
 
 <RequestExample>
 
 ```bash cURL
-curl -X POST https://api.getcatalog.ai/api/product \
+curl -X POST https://api.getcatalog.ai/v1/product \
   -H "Content-Type: application/json" \
   -H "x-api-key: YOUR_API_KEY" \
   -d '{
@@ -283,7 +303,7 @@ curl -X POST https://api.getcatalog.ai/api/product \
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.getcatalog.ai/api/product', {
+const response = await fetch('https://api.getcatalog.ai/v1/product', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -303,7 +323,7 @@ const data = await response.json();
 import requests
 
 response = requests.post(
-    'https://api.getcatalog.ai/api/product',
+    'https://api.getcatalog.ai/v1/product',
     headers={
         'Content-Type': 'application/json',
         'x-api-key': 'YOUR_API_KEY'

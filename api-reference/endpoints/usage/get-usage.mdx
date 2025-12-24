@@ -1,6 +1,6 @@
 ---
 title: "Get API Usage Statistics"
-api: "GET https://api.getcatalog.ai/api/usage"
+api: "GET https://api.getcatalog.ai/v1/usage"
 description: "Retrieve API usage statistics for your account grouped by endpoint path"
 ---
 
@@ -32,7 +32,7 @@ Get detailed usage analytics for your API key showing request counts grouped by 
   
   <Expandable title="Usage Statistics">
     <ResponseField name="path" type="string">
-      API endpoint path (e.g., "/api/search", "/api/product")
+      API endpoint path (e.g., "/v1/search", "/v1/product")
     </ResponseField>
     
     <ResponseField name="total_calls" type="number">
@@ -48,12 +48,12 @@ Get detailed usage analytics for your API key showing request counts grouped by 
 <RequestExample>
 
 ```bash cURL
-curl -X GET "https://api.getcatalog.ai/api/usage?period=7d" \
+curl -X GET "https://api.getcatalog.ai/v1/usage?period=7d" \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.getcatalog.ai/api/usage?period=7d', {
+const response = await fetch('https://api.getcatalog.ai/v1/usage?period=7d', {
   method: 'GET',
   headers: {
     'x-api-key': 'YOUR_API_KEY'
@@ -67,7 +67,7 @@ const data = await response.json();
 import requests
 
 response = requests.get(
-    'https://api.getcatalog.ai/api/usage?period=7d',
+    'https://api.getcatalog.ai/v1/usage?period=7d',
     headers={
         'x-api-key': 'YOUR_API_KEY'
     }
@@ -84,15 +84,15 @@ data = response.json()
 {
   "usage": [
     {
-      "path": "/api/search",
+      "path": "/v1/search",
       "total_calls": 1247
     },
     {
-      "path": "/api/product",
+      "path": "/v1/product",
       "total_calls": 856
     },
     {
-      "path": "/api/products",
+      "path": "/v1/products",
       "total_calls": 234
     },
     {
@@ -100,7 +100,7 @@ data = response.json()
       "total_calls": 89
     },
     {
-      "path": "/api/feed",
+      "path": "/v1/feed",
       "total_calls": 45
     }
   ],

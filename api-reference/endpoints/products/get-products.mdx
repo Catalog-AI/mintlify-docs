@@ -273,6 +273,10 @@ Retrieve comprehensive details for multiple products by providing an array of UR
         </ResponseField>
       </Expandable>
     </ResponseField>
+
+    <ResponseField name="outcome" type="string" optional>
+      Optional machine-readable reason describing why processing failed for this URL when <code>success</code> is <code>false</code>. This field is only present when a specific non-generic reason is available (for example, unsupported vendor or non-product URL).
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -297,6 +301,24 @@ Retrieve comprehensive details for multiple products by providing an array of UR
     </ResponseField>
   </Expandable>
 </ResponseField>
+
+## Error Responses
+
+<ResponseField name="error" type="string">
+  Error message describing what went wrong (for example, malformed JSON body or invalid <code>urls</code> payload)
+</ResponseField>
+
+<ResponseField name="details" type="string" optional>
+  Additional details about the error, when available
+</ResponseField>
+
+<Note>
+<strong>Error modes</strong>:
+- <strong>401 Unauthorized</strong>: Returned when the <code>x-api-key</code> header is missing or invalid. The response includes an <code>error</code> message.
+- <strong>400 Bad Request</strong>: Returned when the request body is missing or contains malformed JSON, when the <code>urls</code> field is missing or not a non-empty array of strings, when any entry in <code>urls</code> is invalid (empty or non-string), or when the number of URLs exceeds the allowed maximum. The response includes an <code>error</code> message (and optionally <code>details</code>).
+- <strong>200 OK (per-URL logical errors)</strong>: When an individual URL cannot be processed (for example, unsupported vendor or non-product URL), the response still returns <code>200 OK</code>. That URL's entry has <code>success = false</code>, <code>product = null</code>, and, when a specific non-generic reason is available, <code>outcome</code> describing that reason.
+- <strong>200 OK (non-fatal validation)</strong>: If <code>country_code</code> is missing, invalid, or not supported, the request does not fail; the API logs a warning internally and normalizes the country to <code>"us"</code>. The response status remains <code>200 OK</code>, and success/failure is reported per URL via the <code>success</code> and optional <code>outcome</code> fields.
+</Note>
 
 <RequestExample>
 
