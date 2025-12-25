@@ -18,7 +18,8 @@
             "group": "Get Started",
             "pages": [
               "welcome",
-              "quickstart"
+              "quickstart",
+              "authentication"
             ]
           },
           {
@@ -34,7 +35,7 @@
                 ]
               },
               {
-                "group": "Product",
+                "group": "Products",
                 "pages": [
                   "api-reference/endpoints/products/get-product",
                   "api-reference/endpoints/products/get-products"
@@ -48,18 +49,8 @@
                   "api-reference/endpoints/search/regular-search"
                 ]
               },
-              {
-                "group": "Affiliate",
-                "pages": [
-                  "api-reference/endpoints/affiliate/generate-links"
-                ]
-              },
-              {
-                "group": "Usage",
-                "pages": [
-                  "api-reference/endpoints/usage/get-usage"
-                ]
-              }
+              "api-reference/endpoints/affiliate/generate-links",
+              "api-reference/endpoints/usage/get-usage"
             ]
           },
           {
@@ -68,6 +59,13 @@
               "guides/pagination",
               "guides/product-index",
               "guides/filtering"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "resources/error-codes",
+              "resources/rate-limits"
             ]
           }
         ]

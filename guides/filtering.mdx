@@ -1,13 +1,13 @@
 ---
-title: "Product Filtering Guide"
-description: "Master advanced filtering techniques for precise product discovery. Learn price filters, attribute filtering, vendor filtering, and how to combine multiple filters effectively."
+title: "Product Filtering"
+description: "Master advanced filtering techniques for precise product discovery"
 ---
 
-The Catalog API provides powerful filtering capabilities to help you find exactly the products you need. Learn how to combine different filter types for precise results and build sophisticated product discovery experiences.
+The Catalog API provides powerful filtering capabilities to help you find exactly the products you need. Combine different filter types for precise results.
 
-## What types of filters are available?
+## Available filters
 
-The Catalog API supports multiple filter types that can be combined for precise product discovery. All filters work with any [search endpoint](/api-reference/overview#what-endpoints-are-available).
+All filters work with [Search](/api-reference/endpoints/search/regular-search) and [Agentic Search](/api-reference/endpoints/search/agentic-search) endpoints.
 
 ### Price Filters
 
@@ -505,6 +505,17 @@ The API is optimized for real-time filtering with sub-100ms response times. All 
 
 ## Related resources
 
-- **[Quickstart Guide](/quickstart)** - Learn basic filtering with your first API request
-- **[API Reference](/api-reference/overview)** - Complete parameter documentation for all endpoints
-- **[Pagination Guide](/guides/pagination)** - Handle large filtered result sets effectively
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Learn basic filtering with your first request
+  </Card>
+  <Card title="Pagination" icon="chevrons-right" href="/guides/pagination">
+    Handle large filtered result sets
+  </Card>
+  <Card title="Search API" icon="magnifying-glass" href="/api-reference/endpoints/search/regular-search">
+    Complete filter parameters reference
+  </Card>
+  <Card title="Error Codes" icon="triangle-exclamation" href="/resources/error-codes">
+    Handle filter validation errors
+  </Card>
+</CardGroup>

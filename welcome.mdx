@@ -1,67 +1,70 @@
 ---
-title: "Catalog API Documentation"
-description: "Modern product discovery and intelligence API for agentic commerce. Build intelligent shopping experiences with AI-powered search, filtering, and real-time product data."
+title: "Catalog API"
+description: "Modern product discovery and intelligence API for agentic commerce"
 ---
 
-Catalog enables developers to build intelligent shopping experiences with powerful product search, filtering, and discovery capabilities. Get real-time product data, natural language search, and AI-powered insights from thousands of commerce sources.
+Catalog provides real-time product data, AI-powered search, and comprehensive filtering across thousands of commerce sources. Build intelligent shopping experiences in minutes.
 
 <CardGroup cols={2}>
-  <Card
-    title="Browse Listings"
-    icon="list"
-    href="/api-reference/endpoints/browse/list-vendors"
-  >
-    Browse vendors, collections, and product listings
+  <Card title="/vendors" icon="store" href="/api-reference/endpoints/browse/list-vendors">
+    Browse available vendors and product counts
   </Card>
-  <Card
-    title="Get Product Details"
-    icon="box"
-    href="/api-reference/endpoints/products/get-product"
-  >
-    Retrieve detailed product information and metadata
+    <Card title="/product" icon="box" href="/api-reference/endpoints/products/get-product">
+    Get detailed product information by URL
   </Card>
-  <Card
-    title="Search Products"
-    icon="magnifying-glass"
-    href="/api-reference/endpoints/search/agentic-search"
-  >
-    Intelligent semantic search with natural language understanding
+  <Card title="/search" icon="magnifying-glass" href="/api-reference/endpoints/search/agentic-search">
+    AI-powered semantic search with natural language understanding
   </Card>
-  <Card
-    title="Usage & Analytics"
-    icon="chart-bar"
-    href="/api-reference/endpoints/usage/get-usage"
-  >
-    Monitor API usage and understand your consumption
+  <Card title="/affiliate" icon="link" href="/api-reference/endpoints/affiliate/generate-links">
+    Generate affiliate tracking links
   </Card>
 </CardGroup>
 
-## What can you build with the Catalog API?
-
-- **AI Shopping Assistants** - Build conversational shopping experiences with natural language understanding
-- **Product Comparison Tools** - Compare products across vendors with detailed attribute analysis  
-- **Smart Recommendation Engines** - Power personalized product recommendations with rich product data
-- **Commerce Intelligence Dashboards** - Analyze trends, pricing, and availability across markets
-
-## How do you get started?
+## Get started
 
 <Steps>
   <Step title="Get your API key">
-    [Contact our team](mailto:founders@getcatalog.ai) to obtain your API key
+    [Contact our team](mailto:founders@getcatalog.ai) to obtain your API key.
   </Step>
   <Step title="Make your first request">
-    Follow our [quickstart guide](/quickstart) to make your first API call
+    Follow our [Quickstart guide](/quickstart) to search for products in under 5 minutes.
   </Step>
   <Step title="Explore the API">
-    Browse our [API reference](/api-reference/overview) to see what's possible
+    Browse the [API Reference](/api-reference/overview) to discover all capabilities.
   </Step>
 </Steps>
 
+## What can you build?
 
-## Need help getting started?
+- **AI Shopping Assistants** — Conversational commerce with natural language understanding
+- **Product Comparison Tools** — Compare products across vendors with detailed attributes
+- **Smart Recommendations** — Personalized product suggestions powered by rich metadata
+- **Commerce Dashboards** — Analyze trends, pricing, and availability across markets
 
-Ready to build with Catalog? [Get your API key](mailto:founders@getcatalog.ai) or explore our comprehensive [API reference](/api-reference/overview).
+## API capabilities
+
+| Capability | Description |
+|------------|-------------|
+| **Semantic Search** | Natural language queries like "minimalist summer dresses under $100" |
+| **Product Enrichment** | AI-powered attribute extraction (color, material, occasion, etc.) |
+| **Real-time Data** | Live pricing, availability, and inventory from thousands of stores |
+| **Filtering** | Precise filters for price, brand, color, size, and 20+ attributes |
+| **Bulk Operations** | Fetch up to 50 products in a single request |
+
+## Quick links
+
+<CardGroup cols={3}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    First request in 5 min
+  </Card>
+  <Card title="Authentication" icon="key" href="/authentication">
+    API key setup
+  </Card>
+  <Card title="Error Codes" icon="triangle-exclamation" href="/resources/error-codes">
+    Troubleshooting guide
+  </Card>
+</CardGroup>
 
 <Note>
-Have questions? Our team is here to help you build amazing shopping experiences. [Contact us](mailto:founders@getcatalog.ai) for personalized support.
+Questions? [Contact our team](mailto:founders@getcatalog.ai) for personalized support.
 </Note>

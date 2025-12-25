@@ -4,7 +4,11 @@ api: "POST https://api.getcatalog.ai/v1/listings"
 description: "Retrieve collection products with pagination and filtering options"
 ---
 
-Retrieve collection products (listings) from a specific vendor with optional filtering by collection URLs. This endpoint provides paginated results with metadata for efficient browsing of large product catalogs.
+Retrieve products from a vendor with optional collection filtering. Returns paginated results with metadata.
+
+<Tip>
+**When to use:** Browse or index all products from a vendor. For full product details, pass the URLs to [Get Products](/api-reference/endpoints/products/get-products).
+</Tip>
 
 ## Request
 

@@ -4,24 +4,19 @@ api: "POST https://api.getcatalog.ai/v1/agentic-search-mini"
 description: "Fast unbounded product discovery with AI-powered attribute enrichment. Get up to 10 products with detailed attributes in milliseconds."
 ---
 
-The Agentic Search Mini endpoint provides fast, intelligent product discovery enhanced with AI-powered attribute analysis. This lightweight endpoint is optimized for speed while still providing detailed product attributes through optional AI enrichment.
+Fast, intelligent product discovery with optional AI-powered attribute enrichment. Returns up to 10 products optimized for speed.
 
-## When to use Agentic Search Mini
+<Tip>
+**When to use:** Ideal for autocomplete, quick previews, or when you need fast AI-enriched results with a small result set. For larger result sets, use [Agentic Search](/api-reference/endpoints/search/agentic-search).
+</Tip>
 
-Use this endpoint when you need:
-- **Fast product discovery** with sub-second response times
-- **Limited result set** of up to 10 high-quality products
-- **AI-powered attribute enrichment** for detailed product analysis
-
-For larger result sets or more comprehensive search capabilities, consider using the [full Agentic Search endpoint](/api-reference/endpoints/search/agentic-search) instead.
-
-## How to authenticate requests
+## Request
 
 <ParamField header="x-api-key" type="string" required>
   Your API key for authentication. [Get your API key](mailto:founders@getcatalog.ai) if you don't have one yet.
 </ParamField>
 
-## What parameters can you send?
+### Request Body
 
 <ParamField body="query" type="string" required>
   Natural language search query for product discovery
@@ -46,9 +41,7 @@ For larger result sets or more comprehensive search capabilities, consider using
   - You need rich product data for AI-powered recommendations
 </ParamField>
 
-## What does the API response include?
-
-The API returns up to 10 products with detailed information and optional AI-enriched attributes. Each response includes both product data and metadata about the search results.
+## Response
 
 <ResponseField name="products" type="array">
   Array of discovered products with enriched data (limited to 10 results for optimal performance)
@@ -120,7 +113,7 @@ The API returns up to 10 products with detailed information and optional AI-enri
   </Expandable>
 </ResponseField>
 
-## How does this compare to other search endpoints?
+## Comparison
 
 | Feature | Agentic Search Mini | [Regular Search](/api-reference/endpoints/search/regular-search) | [Full Agentic Search](/api-reference/endpoints/search/agentic-search) |
 | --- | --- | --- | --- |
@@ -129,7 +122,6 @@ The API returns up to 10 products with detailed information and optional AI-enri
 | **AI Enrichment** | ✅ Optional | ❌ No | ✅ Advanced |
 | **Best For** | Fast discovery | High-volume searches | Comprehensive analysis |
 
-## Example implementation
 
 <RequestExample>
 
