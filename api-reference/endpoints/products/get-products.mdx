@@ -1,14 +1,18 @@
 ---
-title: "Get Multiple Products by URLs"
+title: "Get Multiple Products by URLs (Async Batch)"
 api: "POST https://api.getcatalog.ai/v1/products"
-description: "Process multiple product URLs in parallel to retrieve detailed product information"
+description: "Start asynchronous batch processing of product URLs to retrieve detailed product information"
 ---
 
-Retrieve comprehensive details for multiple products in a single request. Processes up to 50 URLs concurrently.
+Start asynchronous batch processing for multiple product URLs. This endpoint returns immediately with an `execution_id` that you can use to check status and retrieve results. Supports processing 1 to 1000 URLs per request.
 
 <Tip>
-**When to use:** Bulk fetch product details for indexing, syncing, or batch processing. For single products, use [Get Product](/api-reference/endpoints/products/get-product).
+**When to use:** Bulk fetch product details for large-scale indexing, syncing, or batch processing. For single products, use [Get Product](/api-reference/endpoints/products/get-product). For synchronous processing of smaller batches (up to 50 URLs), consider the synchronous endpoint if available.
 </Tip>
+
+<Note>
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Execution Status](/api-reference/endpoints/products/get-execution-status) endpoint to check progress and retrieve results when processing completes.
+</Note>
 
 ## Request
 
@@ -18,8 +22,13 @@ Retrieve comprehensive details for multiple products in a single request. Proces
 
 ### Request Body
 
-<ParamField body="urls" type="array" required>
-  Array of product URLs to process (maximum 50 URLs per request)
+<ParamField body="urls" type="string[]" required>
+  Array of product URLs to process (1 to 1000 URLs per request)
+  
+  **Requirements:**
+  - Must be a non-empty array
+  - Each entry must be a non-empty string
+  - Maximum 1000 URLs per request
   
   **Example:**
   ```json
@@ -29,6 +38,8 @@ Retrieve comprehensive details for multiple products in a single request. Proces
     "https://www.example-store.com/product/123"
   ]
   ```
+  
+  **Note:** You can send a single URL in an array: `["https://example.com/product"]`
 </ParamField>
 
 <ParamField body="enable_enrichment" type="boolean" default="true">
@@ -42,10 +53,47 @@ Retrieve comprehensive details for multiple products in a single request. Proces
   nl, ca, si, co, by, ee, no, br, us, de, es, vn, il, th, gb, ph, kg, in, ru, fr, hk, ua, jp, at, mm, my, pl, au, nz, ro, tw, mx, id, dk, ng, ch, hu, sg, sa, ae, cn, ar, cl, it, tr, lv, gh, sk, gr, eg, lu, bg, se, lt, lk, kz, hr, bd, kr, cz, fi, ie, be, pt, za
 </ParamField>
 
+<ParamField body="enable_reviews" type="boolean" default="false">
+  Whether to enable product reviews processing
+</ParamField>
+
+<ParamField body="enable_image_tags" type="boolean" default="false">
+  Whether to enable AI-generated image tags and descriptions
+</ParamField>
+
+<ParamField body="regenerate_description_html" type="boolean" default="true">
+  Whether to regenerate HTML-formatted product descriptions
+</ParamField>
+
+<ParamField body="populate_description_html_from_html" type="boolean" default="true">
+  Whether to populate description HTML from existing HTML content
+</ParamField>
+
 ## Response
 
+<ResponseField name="success" type="boolean">
+  Whether the batch processing request was successfully started
+</ResponseField>
+
+<ResponseField name="execution_id" type="string">
+  Unique execution identifier for this batch processing job. Use this ID with the [Get Execution Status](/api-reference/endpoints/products/get-execution-status) endpoint to check progress and retrieve results.
+  
+  **Format:** `products-batch-{uuid}`
+</ResponseField>
+
+<Note>
+**Getting Results:** The POST endpoint returns immediately with an `execution_id`. Processing happens asynchronously. To get your results:
+1. Use the `execution_id` to poll the [Get Execution Status](/api-reference/endpoints/products/get-execution-status) endpoint
+2. Check the `status` field - when it's `"completed"`, results are available
+3. Use pagination parameters (`page`, `limit`) to retrieve results in chunks
+</Note>
+
+## Execution Status Response
+
+When you query the execution status endpoint, you'll receive the following structure:
+
 <ResponseField name="products" type="array">
-  Array of product results, one for each input URL
+  Array of product results, one for each input URL (only available when status is "completed")
   
   <Expandable title="Product Result">
     <ResponseField name="url" type="string">
@@ -317,11 +365,7 @@ Retrieve comprehensive details for multiple products in a single request. Proces
 </ResponseField>
 
 <Note>
-<strong>Error modes</strong>:
-- <strong>401 Unauthorized</strong>: Returned when the <code>x-api-key</code> header is missing or invalid. The response includes an <code>error</code> message.
-- <strong>400 Bad Request</strong>: Returned when the request body is missing or contains malformed JSON, when the <code>urls</code> field is missing or not a non-empty array of strings, when any entry in <code>urls</code> is invalid (empty or non-string), or when the number of URLs exceeds the allowed maximum. The response includes an <code>error</code> message (and optionally <code>details</code>).
-- <strong>200 OK (per-URL logical errors)</strong>: When an individual URL cannot be processed (for example, unsupported vendor or non-product URL), the response still returns <code>200 OK</code>. That URL's entry has <code>success = false</code>, <code>product = null</code>, and, when a specific non-generic reason is available, <code>outcome</code> describing that reason.
-- <strong>200 OK (non-fatal validation)</strong>: If <code>country_code</code> is missing, invalid, or not supported, the request does not fail; the API logs a warning internally and normalizes the country to <code>"us"</code>. The response status remains <code>200 OK</code>, and success/failure is reported per URL via the <code>success</code> and optional <code>outcome</code> fields.
+**Per-URL Errors:** When you retrieve results via the execution status endpoint, individual URLs that cannot be processed (for example, unsupported vendor or non-product URL) will have <code>success = false</code>, <code>product = null</code>, and, when a specific non-generic reason is available, <code>outcome</code> describing that reason.
 </Note>
 
 <RequestExample>
@@ -341,6 +385,7 @@ curl -X POST https://api.getcatalog.ai/v1/products \
 ```
 
 ```javascript JavaScript
+// Start async batch processing
 const response = await fetch('https://api.getcatalog.ai/v1/products', {
   method: 'POST',
   headers: {
@@ -353,16 +398,22 @@ const response = await fetch('https://api.getcatalog.ai/v1/products', {
       'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
     ],
     enable_enrichment: true,
-    country_code: 'us'
+    country_code: 'us',
+    enable_reviews: false,
+    enable_image_tags: false
   })
 });
 
-const data = await response.json();
+const { execution_id } = await response.json();
+
+// Poll for results using the execution_id
+// See Get Execution Status endpoint documentation for details
 ```
 
 ```python Python
 import requests
 
+# Start async batch processing
 response = requests.post(
     'https://api.getcatalog.ai/v1/products',
     headers={
@@ -375,24 +426,48 @@ response = requests.post(
             'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
         ],
         'enable_enrichment': True,
-        'country_code': 'us'
+        'country_code': 'us',
+        'enable_reviews': False,
+        'enable_image_tags': False
     }
 )
 
 data = response.json()
+execution_id = data['execution_id']
+
+# Poll for results using the execution_id
+# See Get Execution Status endpoint documentation for details
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json Success Response
+```json POST Response (Immediate)
 {
-  "products": [
-    {
-      "url": "https://www.net-a-porter.com/en-us/shop/product/loeffler-randall/shoes/loafers/franco-leather-boat-shoes/46376663162925963",
-      "success": true,
-      "product": {
+  "success": true,
+  "execution_id": "products-batch-550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+```json Execution Status Response (When Completed)
+{
+  "status": "completed",
+  "progress": {
+    "products_processed": 2,
+    "urls_completed": 2,
+    "total_urls": 2,
+    "percent_complete": 100
+  },
+  "start_date": "2025-01-15T10:30:00.000Z",
+  "stop_date": "2025-01-15T10:32:15.000Z",
+  "duration_ms": 135000,
+  "results": {
+    "products": [
+      {
+        "url": "https://www.net-a-porter.com/en-us/shop/product/loeffler-randall/shoes/loafers/franco-leather-boat-shoes/46376663162925963",
+        "success": true,
+        "product": {
         "id": "fec26b49-66f8-480e-8cbb-cfc823af1d33",
         "url": "https://www.net-a-porter.com/en-us/shop/product/loeffler-randall/shoes/loafers/franco-leather-boat-shoes/46376663162925963",
         "tags": ["SHOES"],
@@ -482,24 +557,38 @@ data = response.json()
     {
       "url": "https://www.example-store.com/invalid-product",
       "success": false,
-      "product": null
+        "product": null
+      }
+    ],
+    "meta": {
+      "total_requested": 2,
+      "total_successful": 1,
+      "total_failed": 1
     }
-  ],
-  "meta": {
-    "total_requested": 2,
-    "total_successful": 1,
-    "total_failed": 1,
-    "urls_processed": [
-      "https://www.net-a-porter.com/en-us/shop/product/loeffler-randall/shoes/loafers/franco-leather-boat-shoes/46376663162925963",
-      "https://www.example-store.com/invalid-product"
-    ]
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total_items": 2,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
   }
 }
 ```
 
 </ResponseExample>
 
+## Workflow
+
+1. **Start Processing:** Send a POST request with your URLs to start async batch processing
+2. **Get Execution ID:** Receive an `execution_id` immediately in the response
+3. **Check Status:** Poll the [Get Execution Status](/api-reference/endpoints/products/get-execution-status) endpoint using the `execution_id`
+4. **Retrieve Results:** When `status` is `"completed"`, results are available with pagination support
+
 ## Features
-- **High concurrency** - Processes up to 50 URLs simultaneously
-- **Optimized performance** - Batch processing reduces total processing time
+- **Large-scale processing** - Handles 1 to 1000 URLs per batch
+- **Asynchronous execution** - Returns immediately, process runs in background
+- **Real-time progress tracking** - Monitor progress via execution status endpoint
+- **Paginated results** - Retrieve results in chunks for large batches
 - **Partial failures** - Individual URL failures don't affect other URLs in the batch

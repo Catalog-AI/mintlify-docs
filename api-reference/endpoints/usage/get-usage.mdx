@@ -1,6 +1,6 @@
 ---
 title: "Get API Usage Statistics"
-api: "GET https://api.getcatalog.ai/v1/usage"
+api: "GET https://api.getcatalog.ai/api/usage"
 description: "Retrieve API usage statistics for your account grouped by endpoint path"
 ---
 
@@ -36,7 +36,7 @@ Get usage analytics for your API key showing request counts by endpoint.
   
   <Expandable title="Usage Statistics">
     <ResponseField name="path" type="string">
-      API endpoint path (e.g., "/v1/search", "/v1/product")
+      API endpoint path (e.g., "/v1/agentic-search", "/v1/products")
     </ResponseField>
     
     <ResponseField name="total_calls" type="number">
@@ -52,12 +52,12 @@ Get usage analytics for your API key showing request counts by endpoint.
 <RequestExample>
 
 ```bash cURL
-curl -X GET "https://api.getcatalog.ai/v1/usage?period=7d" \
+curl -X GET "https://api.getcatalog.ai/api/usage?period=7d" \
   -H "x-api-key: YOUR_API_KEY"
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.getcatalog.ai/v1/usage?period=7d', {
+const response = await fetch('https://api.getcatalog.ai/api/usage?period=7d', {
   method: 'GET',
   headers: {
     'x-api-key': 'YOUR_API_KEY'
@@ -71,7 +71,7 @@ const data = await response.json();
 import requests
 
 response = requests.get(
-    'https://api.getcatalog.ai/v1/usage?period=7d',
+    'https://api.getcatalog.ai/api/usage?period=7d',
     headers={
         'x-api-key': 'YOUR_API_KEY'
     }

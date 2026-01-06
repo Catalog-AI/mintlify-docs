@@ -15,26 +15,7 @@ https://api.getcatalog.ai
 
 All requests require an API key in the `x-api-key` header. See [Authentication](/authentication) for details.
 
-```bash
-curl -H "x-api-key: YOUR_API_KEY" https://api.getcatalog.ai/v1/search
-```
-
 ## Endpoints
-
-### Search
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| [`/v1/agentic-search`](/api-reference/endpoints/search/agentic-search) | POST | AI-powered search with customer profile personalization |
-| [`/v1/agentic-search-mini`](/api-reference/endpoints/search/agentic-search-mini) | POST | Fast AI search returning up to 10 products |
-| [`/v1/search`](/api-reference/endpoints/search/regular-search) | POST | High-performance semantic search |
-
-### Products
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| [`/v1/product`](/api-reference/endpoints/products/get-product) | POST | Get product details by URL |
-| [`/api/products`](/api-reference/endpoints/products/get-products) | POST | Bulk fetch up to 50 products |
 
 ### Browse
 
@@ -43,6 +24,20 @@ curl -H "x-api-key: YOUR_API_KEY" https://api.getcatalog.ai/v1/search
 | [`/v1/vendors`](/api-reference/endpoints/browse/list-vendors) | GET | List all vendors with product counts |
 | [`/v1/collections`](/api-reference/endpoints/browse/list-collections) | POST | List collections for a vendor |
 | [`/v1/listings`](/api-reference/endpoints/browse/list-listings) | POST | List products from a vendor or collection |
+
+### Products
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/products`](/api-reference/endpoints/products/get-products) | POST | Start async batch processing of product URLs (1-1000 URLs) |
+| [`/v1/products/executions/{execution_id}`](/api-reference/endpoints/products/get-execution-status) | GET | Check status and retrieve results for a batch processing job |
+
+### Search
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v1/agentic-search`](/api-reference/endpoints/search/agentic-search) | POST | AI-powered search with customer profile personalization |
+| [`/v1/agentic-search-mini`](/api-reference/endpoints/search/agentic-search-mini) | POST | Fast AI search returning up to 10 products |
 
 ### Affiliate
 
@@ -78,15 +73,8 @@ Errors return appropriate HTTP status codes with details:
 
 ```json
 {
-  "error": {
-    "code": "INVALID_PARAMETER",
-    "message": "The 'query' parameter must be a string",
-    "details": {
-      "parameter": "query",
-      "expected": "string",
-      "received": "number"
-    }
-  }
+  "error": String,
+  "status": Number
 }
 ```
 
@@ -101,9 +89,9 @@ See [Error Codes](/resources/error-codes) for the complete reference.
 
 ## Rate limits
 
-Standard accounts: 60 requests/minute, 10,000 requests/day.
+Default policy: 50 requests per 4-second sliding window, counted per IP with a global fallback.
 
-See [Rate Limits](/resources/rate-limits) for details and how to handle `429` responses.
+See [Rate Limits](/resources/rate-limits) for headers, what `429` means, and pacing guidance.
 
 ## Pagination
 

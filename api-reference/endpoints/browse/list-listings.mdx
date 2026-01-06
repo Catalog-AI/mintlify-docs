@@ -85,11 +85,11 @@ Retrieve products from a vendor with optional collection filtering. Returns pagi
         </ResponseField>
         
         <ResponseField name="current_value" type="number">
-          Current price value
+          Current price value (the price a shopper would pay now)
         </ResponseField>
         
         <ResponseField name="compare_at_value" type="number" optional>
-          Compare at price value (null if no comparison price)
+          Original or reference price. When no separate reference price exists, this will match `current_value`. Example: if there is a sale, changing the price from 50 to 45, `compare_at_value` is 50 and `current_value` is 45.
         </ResponseField>
       </Expandable>
     </ResponseField>

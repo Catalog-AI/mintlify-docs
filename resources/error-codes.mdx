@@ -65,7 +65,7 @@ All error responses follow a consistent structure:
 
 | Code | HTTP Status | Description | Resolution |
 |------|-------------|-------------|------------|
-| `RATE_LIMITED` | 429 | Too many requests | Implement rate limiting, use exponential backoff, or contact support for higher limits |
+| `RATE_LIMITED` | 429 | Too many requests in a short window | Respect `Retry-After`, pace requests using `X-RateLimit-Remaining`, and back off (exponential recommended). Contact support if you need higher limits. |
 
 ### Server errors
 
