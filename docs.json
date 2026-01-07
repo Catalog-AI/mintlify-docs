@@ -12,74 +12,153 @@
   },
   "favicon": "/logo/catalog-logo-black.svg",
   "navigation": {
-    "anchors": [
+    "versions": [
       {
-        "anchor": "Documentation",
-        "icon": "book-open",
-        "groups": [
+        "version": "v1",
+        "default": true,
+        "anchors": [
           {
-            "group": "Get Started",
-            "pages": [
-              "welcome",
-              "quickstart",
-              "authentication"
-            ]
-          },
-          {
-            "group": "API Reference",
-            "pages": [
-              "api-reference/overview",
+            "anchor": "Documentation",
+            "icon": "book-open",
+            "groups": [
               {
-                "group": "Browse",
+                "group": "Get Started",
                 "pages": [
-                  "api-reference/endpoints/browse/list-vendors",
-                  "api-reference/endpoints/browse/list-collections",
-                  "api-reference/endpoints/browse/list-listings"
+                  "welcome",
+                  "quickstart",
+                  "authentication"
                 ]
               },
               {
-                "group": "Products",
+                "group": "API Reference",
                 "pages": [
-                  "api-reference/endpoints/products/get-products",
-                  "api-reference/endpoints/products/get-execution-status"
+                  "api-reference/overview",
+                  {
+                    "group": "Listings",
+                    "pages": [
+                      "api-reference/v1/browse/list-vendors",
+                      "api-reference/v1/browse/list-collections",
+                      "api-reference/v1/browse/list-listings"
+                    ]
+                  },
+                  {
+                    "group": "Products",
+                    "pages": [
+                      "api-reference/v1/products/get-products",
+                      "api-reference/v1/products/get-execution-status"
+                    ]
+                  },
+                  {
+                    "group": "Search",
+                    "pages": [
+                      "api-reference/v1/search/agentic-search",
+                      "api-reference/v1/search/agentic-search-mini"
+                    ]
+                  },
+                  "api-reference/v1/affiliate/generate-links",
+                  "api-reference/v1/usage/get-usage"
                 ]
               },
               {
-                "group": "Search",
+                "group": "Guides",
                 "pages": [
-                  "api-reference/endpoints/search/agentic-search",
-                  "api-reference/endpoints/search/agentic-search-mini"
+                  "guides/pagination",
+                  "guides/product-index"
                 ]
               },
-              "api-reference/endpoints/affiliate/generate-links",
-              "api-reference/endpoints/usage/get-usage"
+              {
+                "group": "Resources",
+                "pages": [
+                  "resources/error-codes",
+                  "resources/rate-limits"
+                ]
+              }
             ]
           },
           {
-            "group": "Guides",
-            "pages": [
-              "guides/pagination",
-              "guides/product-index"
-            ]
+            "anchor": "Website",
+            "href": "https://www.getcatalog.ai",
+            "icon": "globe"
           },
           {
-            "group": "Resources",
-            "pages": [
-              "resources/error-codes",
-              "resources/rate-limits"
-            ]
+            "anchor": "Support",
+            "href": "mailto:founders@getcatalog.ai",
+            "icon": "envelope"
           }
         ]
       },
       {
-        "anchor": "Website",
-        "href": "https://www.getcatalog.ai",
-        "icon": "globe"
-      },
-      {
-        "anchor": "Support",
-        "href": "mailto:founders@getcatalog.ai",
-        "icon": "envelope"
+        "version": "v2",
+        "anchors": [
+          {
+            "anchor": "Documentation",
+            "icon": "book-open",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "welcome",
+                  "quickstart",
+                  "authentication"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "api-reference/overview",
+                  {
+                    "group": "Listings",
+                    "pages": [
+                      "api-reference/v2/browse/list-vendors",
+                      "api-reference/v2/browse/list-collections",
+                      "api-reference/v2/browse/list-listings"
+                    ]
+                  },
+                  {
+                    "group": "Products",
+                    "pages": [
+                      "api-reference/v2/products/get-products",
+                      "api-reference/v2/products/get-execution-status"
+                    ]
+                  },
+                  {
+                    "group": "Search",
+                    "pages": [
+                      "api-reference/v2/search/agentic-search",
+                      "api-reference/v2/search/agentic-search-mini"
+                    ]
+                  },
+                  "api-reference/v2/affiliate/generate-links",
+                  "api-reference/v2/usage/get-usage"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "guides/pagination",
+                  "guides/product-index"
+                ]
+              },
+              {
+                "group": "Resources",
+                "pages": [
+                  "resources/error-codes",
+                  "resources/rate-limits"
+                ]
+              }
+            ]
+          },
+          {
+            "anchor": "Website",
+            "href": "https://www.getcatalog.ai",
+            "icon": "globe"
+          },
+          {
+            "anchor": "Support",
+            "href": "mailto:founders@getcatalog.ai",
+            "icon": "envelope"
+          }
+        ]
       }
     ]
   },

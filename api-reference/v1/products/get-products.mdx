@@ -1,0 +1,594 @@
+---
+title: "Get Products by URLs"
+api: "POST https://api.getcatalog.ai/v1/products"
+description: "Start asynchronous batch processing of product URLs to retrieve detailed product information"
+---
+
+Start asynchronous batch processing for multiple product URLs. This endpoint returns immediately with an `execution_id` that you can use to check status and retrieve results. Supports processing 1 to 1000 URLs per request.
+
+<Tip>
+**When to use:** Bulk fetch product details for large-scale indexing, syncing, or batch processing. For single products, use [Get Product](/api-reference/endpoints/products/get-product). For synchronous processing of smaller batches (up to 50 URLs), consider the synchronous endpoint if available.
+</Tip>
+
+<Note>
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Execution Status](/api-reference/endpoints/products/get-execution-status) endpoint to check progress and retrieve results when processing completes.
+</Note>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+### Request Body
+
+<ParamField body="urls" type="string[]" required>
+  Array of product URLs to process (1 to 1000 URLs per request)
+  
+  **Requirements:**
+  - Must be a non-empty array
+  - Each entry must be a non-empty string
+  - Maximum 1000 URLs per request
+  
+  **Example:**
+  ```json
+  [
+    "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+    "https://www.adidas.com/us/gazelle-shoes/BB5476.html",
+    "https://www.example-store.com/product/123"
+  ]
+  ```
+  
+  **Note:** You can send a single URL in an array: `["https://example.com/product"]`
+</ParamField>
+
+<ParamField body="enable_enrichment" type="boolean" default="true">
+  Whether to enable AI enrichment for products. When enabled, products are enhanced with additional attributes and categorization.
+</ParamField>
+
+<ParamField body="country_code" type="string" default="us">
+  ISO 2-letter country code for localization (e.g., "us", "ca", "gb", "de")
+  
+  **Supported Country Codes:**
+  nl, ca, si, co, by, ee, no, br, us, de, es, vn, il, th, gb, ph, kg, in, ru, fr, hk, ua, jp, at, mm, my, pl, au, nz, ro, tw, mx, id, dk, ng, ch, hu, sg, sa, ae, cn, ar, cl, it, tr, lv, gh, sk, gr, eg, lu, bg, se, lt, lk, kz, hr, bd, kr, cz, fi, ie, be, pt, za
+</ParamField>
+
+<ParamField body="enable_reviews" type="boolean" default="false">
+  Whether to enable product reviews processing
+</ParamField>
+
+<ParamField body="enable_image_tags" type="boolean" default="false">
+  Whether to enable AI-generated image tags and descriptions
+</ParamField>
+
+<ParamField body="regenerate_description_html" type="boolean" default="true">
+  Whether to regenerate HTML-formatted product descriptions
+</ParamField>
+
+<ParamField body="populate_description_html_from_html" type="boolean" default="true">
+  Whether to populate description HTML from existing HTML content
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the batch processing request was successfully started
+</ResponseField>
+
+<ResponseField name="execution_id" type="string">
+  Unique execution identifier for this batch processing job. Use this ID with the [Get Execution Status](/api-reference/endpoints/products/get-execution-status) endpoint to check progress and retrieve results.
+  
+  **Format:** `products-batch-{uuid}`
+</ResponseField>
+
+<Note>
+**Getting Results:** The POST endpoint returns immediately with an `execution_id`. Processing happens asynchronously. To get your results:
+1. Use the `execution_id` to poll the [Get Execution Status](/api-reference/endpoints/products/get-execution-status) endpoint
+2. Check the `status` field - when it's `"completed"`, results are available
+3. Use pagination parameters (`page`, `limit`) to retrieve results in chunks
+</Note>
+
+## Execution Status Response
+
+When you query the execution status endpoint, you'll receive the following structure:
+
+<ResponseField name="products" type="array">
+  Array of product results, one for each input URL (only available when status is "completed")
+  
+  <Expandable title="Product Result">
+    <ResponseField name="url" type="string">
+      Original URL that was processed
+    </ResponseField>
+    
+    <ResponseField name="success" type="boolean">
+      Whether the product was successfully processed
+    </ResponseField>
+    
+    <ResponseField name="product" type="object | null">
+      Product data (null if processing failed)
+      
+      <Expandable title="Product Properties">
+        <ResponseField name="id" type="string">
+          Unique product identifier
+        </ResponseField>
+        
+        <ResponseField name="title" type="string">
+          Product title
+        </ResponseField>
+        
+        <ResponseField name="description" type="string">
+          Detailed product description
+        </ResponseField>
+        
+        <ResponseField name="vendor" type="string">
+          Store/retailer name (e.g., "net-a-porter", "Nike")
+        </ResponseField>
+        
+        <ResponseField name="brand" type="string | null">
+          Product brand name (e.g., "LOEFFLER RANDALL", "Nike")
+        </ResponseField>
+        
+        <ResponseField name="url" type="string">
+          Product URL
+        </ResponseField>
+        
+        <ResponseField name="handle" type="string">
+          Product handle/slug
+        </ResponseField>
+        
+        <ResponseField name="is_available" type="boolean">
+          Product availability status
+        </ResponseField>
+        
+        <ResponseField name="price_amount" type="number | null">
+          Price in dollars
+        </ResponseField>
+        
+        <ResponseField name="price_currency" type="string | null">
+          Currency code (e.g., "USD")
+        </ResponseField>
+        
+        <ResponseField name="min_price" type="number | null">
+          Minimum price for variants
+        </ResponseField>
+        
+        <ResponseField name="max_price" type="number | null">
+          Maximum price for variants
+        </ResponseField>
+        
+        <ResponseField name="images" type="array">
+          Array of product images
+          
+          <Expandable title="Image Properties">
+            <ResponseField name="id" type="string">
+              Unique image identifier
+            </ResponseField>
+            
+            <ResponseField name="url" type="string">
+              Image URL
+            </ResponseField>
+            
+            <ResponseField name="width" type="number">
+              Image width in pixels
+            </ResponseField>
+            
+            <ResponseField name="height" type="number">
+              Image height in pixels
+            </ResponseField>
+            
+            <ResponseField name="altText" type="string">
+              Alt text for the image
+            </ResponseField>
+            
+            <ResponseField name="position" type="number">
+              Display position/order of the image
+            </ResponseField>
+            
+            <ResponseField name="variantIDs" type="array">
+              Array of variant IDs that use this image
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="options" type="array">
+          Array of product options (size, color, etc.)
+          
+          <Expandable title="Option Properties">
+            <ResponseField name="name" type="string">
+              Option name (e.g., "Size", "Color")
+            </ResponseField>
+            
+            <ResponseField name="values" type="array">
+              Array of available values for this option
+            </ResponseField>
+            
+            <ResponseField name="position" type="number">
+              Display position of the option
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="variants" type="array">
+          Array of product variants with detailed information
+          
+          <Expandable title="Variant Properties">
+            <ResponseField name="id" type="string">
+              Unique variant identifier
+            </ResponseField>
+            
+            <ResponseField name="SKU" type="string">
+              Stock Keeping Unit identifier
+            </ResponseField>
+            
+            <ResponseField name="image" type="object">
+              Variant-specific image information
+              
+              <Expandable title="Variant Image Properties">
+                <ResponseField name="id" type="string">
+                  Image identifier
+                </ResponseField>
+                
+                <ResponseField name="url" type="string">
+                  Image URL
+                </ResponseField>
+                
+                <ResponseField name="width" type="number">
+                  Image width in pixels
+                </ResponseField>
+                
+                <ResponseField name="height" type="number">
+                  Image height in pixels
+                </ResponseField>
+                
+                <ResponseField name="altText" type="string">
+                  Alt text for the variant image
+                </ResponseField>
+                
+                <ResponseField name="position" type="number">
+                  Image position
+                </ResponseField>
+                
+                <ResponseField name="variantIDs" type="array">
+                  Array of variant IDs using this image
+                </ResponseField>
+              </Expandable>
+            </ResponseField>
+            
+            <ResponseField name="price" type="string">
+              Variant price as string
+            </ResponseField>
+            
+            <ResponseField name="title" type="string">
+              Full variant title including options
+            </ResponseField>
+            
+            <ResponseField name="option1" type="string">
+              First option value (e.g., size)
+            </ResponseField>
+            
+            <ResponseField name="isAvailable" type="boolean">
+              Variant availability status
+            </ResponseField>
+            
+            <ResponseField name="compareAtPrice" type="string">
+              Compare at price (original/MSRP price)
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="store_canonical_url" type="string | null">
+          Canonical store URL
+        </ResponseField>
+        
+        <ResponseField name="store_domain" type="string">
+          Store domain
+        </ResponseField>
+        
+        <ResponseField name="platform" type="string | null">
+          E-commerce platform (null if not identified)
+        </ResponseField>
+        
+        <ResponseField name="platform_id" type="string | null">
+          Platform-specific ID
+        </ResponseField>
+        
+        <ResponseField name="description_html" type="string | null">
+          HTML-formatted description
+        </ResponseField>
+        
+        <ResponseField name="product_type" type="string | null">
+          Product type/category
+        </ResponseField>
+        
+        <ResponseField name="google_product_category_id" type="string | null">
+          Google product category identifier
+        </ResponseField>
+        
+        <ResponseField name="google_product_category_path" type="string | null">
+          Full Google product category path
+        </ResponseField>
+        
+        <ResponseField name="tags" type="array">
+          Array of product tags/categories
+        </ResponseField>
+        
+        <ResponseField name="video_url" type="string | null">
+          Product video URL (if available)
+        </ResponseField>
+        
+        <ResponseField name="updated_at" type="string">
+          Last update timestamp (ISO 8601)
+        </ResponseField>
+        
+        <ResponseField name="attributes" type="object">
+          Comprehensive product attributes (when AI enrichment is enabled)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+
+    <ResponseField name="outcome" type="string" optional>
+      Optional machine-readable reason describing why processing failed for this URL when <code>success</code> is <code>false</code>. This field is only present when a specific non-generic reason is available (for example, unsupported vendor or non-product URL).
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Processing metadata and summary statistics
+  
+  <Expandable title="Meta Properties">
+    <ResponseField name="total_requested" type="number">
+      Total number of URLs requested for processing
+    </ResponseField>
+    
+    <ResponseField name="total_successful" type="number">
+      Number of URLs successfully processed
+    </ResponseField>
+    
+    <ResponseField name="total_failed" type="number">
+      Number of URLs that failed to process
+    </ResponseField>
+    
+    <ResponseField name="urls_processed" type="array">
+      List of all URLs that were processed (for reference)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+## Error Responses
+
+<ResponseField name="error" type="string">
+  Error message describing what went wrong (for example, malformed JSON body or invalid <code>urls</code> payload)
+</ResponseField>
+
+<ResponseField name="details" type="string" optional>
+  Additional details about the error, when available
+</ResponseField>
+
+<Note>
+**Per-URL Errors:** When you retrieve results via the execution status endpoint, individual URLs that cannot be processed (for example, unsupported vendor or non-product URL) will have <code>success = false</code>, <code>product = null</code>, and, when a specific non-generic reason is available, <code>outcome</code> describing that reason.
+</Note>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.getcatalog.ai/v1/products \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -d '{
+    "urls": [
+      "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+      "https://www.adidas.com/us/gazelle-shoes/BB5476.html"
+    ],
+    "enable_enrichment": true,
+    "country_code": "us"
+  }'
+```
+
+```javascript JavaScript
+// Start async batch processing
+const response = await fetch('https://api.getcatalog.ai/v1/products', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_API_KEY'
+  },
+  body: JSON.stringify({
+    urls: [
+      'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+      'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+    ],
+    enable_enrichment: true,
+    country_code: 'us',
+    enable_reviews: false,
+    enable_image_tags: false
+  })
+});
+
+const { execution_id } = await response.json();
+
+// Poll for results using the execution_id
+// See Get Execution Status endpoint documentation for details
+```
+
+```python Python
+import requests
+
+# Start async batch processing
+response = requests.post(
+    'https://api.getcatalog.ai/v1/products',
+    headers={
+        'Content-Type': 'application/json',
+        'x-api-key': 'YOUR_API_KEY'
+    },
+    json={
+        'urls': [
+            'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+            'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+        ],
+        'enable_enrichment': True,
+        'country_code': 'us',
+        'enable_reviews': False,
+        'enable_image_tags': False
+    }
+)
+
+data = response.json()
+execution_id = data['execution_id']
+
+# Poll for results using the execution_id
+# See Get Execution Status endpoint documentation for details
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json POST Response (Immediate)
+{
+  "success": true,
+  "execution_id": "products-batch-550e8400-e29b-41d4-a716-446655440000"
+}
+```
+
+```json Execution Status Response (When Completed)
+{
+  "status": "completed",
+  "progress": {
+    "products_processed": 2,
+    "urls_completed": 2,
+    "total_urls": 2,
+    "percent_complete": 100
+  },
+  "start_date": "2025-01-15T10:30:00.000Z",
+  "stop_date": "2025-01-15T10:32:15.000Z",
+  "duration_ms": 135000,
+  "results": {
+    "products": [
+      {
+        "url": "https://www.net-a-porter.com/en-us/shop/product/loeffler-randall/shoes/loafers/franco-leather-boat-shoes/46376663162925963",
+        "success": true,
+        "product": {
+        "id": "fec26b49-66f8-480e-8cbb-cfc823af1d33",
+        "url": "https://www.net-a-porter.com/en-us/shop/product/loeffler-randall/shoes/loafers/franco-leather-boat-shoes/46376663162925963",
+        "tags": ["SHOES"],
+        "brand": "LOEFFLER RANDALL",
+        "title": "Franco Leather Boat Shoes",
+        "handle": "46376663162925963",
+        "images": [
+          {
+            "id": "img-1756348783902-0",
+            "url": "https://www.net-a-porter.com/variants/images/46376663162925963/in/w2000_q60.jpg",
+            "width": 2000,
+            "height": 2667,
+            "altText": "Franco leather boat shoes product image (primary)",
+            "position": 1,
+            "variantIDs": [
+              "variant-1756348783903-0",
+              "variant-1756348783903-1"
+            ]
+          }
+        ],
+        "vendor": "net-a-porter",
+        "options": [
+          {
+            "name": "Size",
+            "values": ["US5", "US5.5", "US6", "US6.5", "US7", "US7.5", "US8", "US8.5", "US9", "US9.5", "US10", "US10.5", "US11"],
+            "position": 1
+          }
+        ],
+        "platform": null,
+        "variants": [
+          {
+            "id": "variant-1756348783903-0",
+            "SKU": "0400666700588",
+            "image": {
+              "id": "img-variant-variant-1756348783903-0",
+              "url": "https://www.net-a-porter.com/variants/images/46376663162925963/in/w2000_q60.jpg",
+              "width": 2000,
+              "height": 2667,
+              "altText": "Franco leather boat shoes - US5 variant image",
+              "position": 1,
+              "variantIDs": ["variant-1756348783903-0"]
+            },
+            "price": "325",
+            "title": "Franco Leather Boat Shoes - Us5",
+            "option1": "US5",
+            "isAvailable": true,
+            "compareAtPrice": "325"
+          }
+        ],
+        "max_price": 325,
+        "min_price": 325,
+        "video_url": null,
+        "attributes": {
+          "mood": ["elegant", "relaxed"],
+          "color": {
+            "iscc_family": "brown",
+            "merchant_label": "Espresso"
+          },
+          "style": ["casual", "classic"],
+          "gender": "unisex",
+          "season": ["spring", "summer", "fall"],
+          "summary": "Modern leather boat shoes with classic design elements",
+          "features": "Soft leather construction, unique patina develops over time",
+          "material": {
+            "primary": "leather",
+            "merchant_label": "Soft leather"
+          },
+          "occasion": ["casual", "weekend", "work"],
+          "closure_type": "lace-up",
+          "care_instructions": "Wipe clean with a damp cloth, store in a cool dry place",
+          "additional_attributes": ["handmade", "contrasting stitching", "striped cord laces"]
+        },
+        "updated_at": "2025-08-28T02:39:49.827+00:00",
+        "description": "Loeffler Randall's 'Franco' boat shoes are traced with contrasting stitching and striped cord laces, giving the classic style a modern feel.",
+        "platform_id": "46376663162925963",
+        "is_available": true,
+        "price_amount": 325,
+        "product_type": "SHOES",
+        "store_domain": "www.net-a-porter.com",
+        "price_currency": "USD",
+        "description_html": "<p>Loeffler Randall's 'Franco' boat shoes are traced with contrasting stitching and striped cord laces, giving the classic style a modern feel.</p>",
+        "store_canonical_url": "https://www.net-a-porter.com/",
+        "google_product_category_id": "187",
+        "google_product_category_path": "Apparel & Accessories > Shoes"
+      }
+    },
+    {
+      "url": "https://www.example-store.com/invalid-product",
+      "success": false,
+        "product": null
+      }
+    ],
+    "meta": {
+      "total_requested": 2,
+      "total_successful": 1,
+      "total_failed": 1
+    }
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total_items": 2,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  }
+}
+```
+
+</ResponseExample>
+
+## Workflow
+
+1. **Start Processing:** Send a POST request with your URLs to start async batch processing
+2. **Get Execution ID:** Receive an `execution_id` immediately in the response
+3. **Check Status:** Poll the [Get Execution Status](/api-reference/endpoints/products/get-execution-status) endpoint using the `execution_id`
+4. **Retrieve Results:** When `status` is `"completed"`, results are available with pagination support
+
+## Features
+- **Large-scale processing** - Handles 1 to 1000 URLs per batch
+- **Asynchronous execution** - Returns immediately, process runs in background
+- **Real-time progress tracking** - Monitor progress via execution status endpoint
+- **Paginated results** - Retrieve results in chunks for large batches
+- **Partial failures** - Individual URL failures don't affect other URLs in the batch

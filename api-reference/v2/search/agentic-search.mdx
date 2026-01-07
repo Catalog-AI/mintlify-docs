@@ -1,0 +1,516 @@
+---
+title: "Agentic Search"
+api: "POST https://api.getcatalog.ai/v2/agentic-search"
+description: "Intelligent product search powered by AI agents"
+---
+
+Perform advanced product searches that reason through natural language queries and customer preferences.
+
+<Tip>
+**When to use:** Best for personalized shopping experiences where you have customer profile data and need comprehensive product information. For faster searches with up to 10 results, use [Agentic Search Mini](/api-reference/endpoints/search/agentic-search-mini).
+</Tip>
+
+<Note>
+**Performance:** This endpoint provides comprehensive AI-powered analysis and typically responds in 10 seconds. Use Agentic Search Mini if you need sub-second response times.
+</Note>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+### Request Body
+
+<ParamField body="query" type="string" required>
+  Natural language search query for product discovery
+  
+  **Examples:**
+  - `"performance activewear for HIIT workouts in humid climates"`
+  - `"versatile capsule wardrobe pieces for European business travel"`
+  - `"statement jewelry that complements a maximalist aesthetic"`
+</ParamField>
+
+<ParamField body="customer_profile" type="object">
+  Optional customer profile information to personalize search results. This field accepts any JSON structure, allowing you to provide custom customer attributes and preferences.
+</ParamField>
+
+## Response
+
+<ResponseField name="products" type="array">
+  Array of products matching the search query with comprehensive product information
+  
+  <Expandable title="Product Properties">
+    <ResponseField name="id" type="string">
+      Unique product identifier
+    </ResponseField>
+    
+    <ResponseField name="title" type="string">
+      Product title
+    </ResponseField>
+    
+    <ResponseField name="description" type="string">
+      Product description
+    </ResponseField>
+    
+    <ResponseField name="description_html" type="string">
+      Product description with HTML formatting
+    </ResponseField>
+    
+    <ResponseField name="url" type="string">
+      Product URL
+    </ResponseField>
+    
+    <ResponseField name="brand" type="string">
+      Product brand name
+    </ResponseField>
+    
+    <ResponseField name="vendor" type="string">
+      Product vendor/retailer
+    </ResponseField>
+    
+    <ResponseField name="handle" type="string">
+      URL-friendly product identifier
+    </ResponseField>
+    
+    <ResponseField name="tags" type="array">
+      Product category tags
+    </ResponseField>
+    
+    <ResponseField name="product_type" type="string">
+      Main product category
+    </ResponseField>
+    
+    <ResponseField name="price_amount" type="number">
+      Base price amount in decimal format
+    </ResponseField>
+    
+    <ResponseField name="price_currency" type="string">
+      Currency code (e.g., "USD", "EUR")
+    </ResponseField>
+    
+    <ResponseField name="min_price" type="number">
+      Minimum price across all variants
+    </ResponseField>
+    
+    <ResponseField name="max_price" type="number">
+      Maximum price across all variants
+    </ResponseField>
+    
+    <ResponseField name="is_available" type="boolean">
+      Product availability status
+    </ResponseField>
+    
+    <ResponseField name="platform_id" type="string">
+      Platform-specific product ID
+    </ResponseField>
+    
+    <ResponseField name="store_domain" type="string">
+      Domain of the retailer
+    </ResponseField>
+    
+    <ResponseField name="store_canonical_url" type="string">
+      Canonical URL of the store
+    </ResponseField>
+    
+    <ResponseField name="google_product_category_id" type="string">
+      Google product category identifier
+    </ResponseField>
+    
+    <ResponseField name="google_product_category_path" type="string">
+      Full Google product category path
+    </ResponseField>
+    
+    <ResponseField name="updated_at" type="string">
+      Last update timestamp
+    </ResponseField>
+    
+    <ResponseField name="images" type="array">
+      Product images with metadata including URL, dimensions, alt text, and variant associations
+    </ResponseField>
+    
+    <ResponseField name="variants" type="array">
+      Product variants with pricing, availability, and sizing information
+    </ResponseField>
+    
+    <ResponseField name="options" type="array">
+      Available product options (size, color, etc.)
+    </ResponseField>
+    
+    <ResponseField name="attributes" type="object">
+      Rich product attributes including style, mood, color, material, season, occasion, and care instructions
+    </ResponseField>
+    
+    <ResponseField name="video_url" type="string">
+      Product video URL (if available)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Search metadata and result information
+  
+  <Expandable title="Meta Properties">
+    <ResponseField name="totalItems" type="number">
+      Total number of products found
+    </ResponseField>
+    
+    <ResponseField name="urls" type="array">
+      Array of all product URLs in the result set
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.getcatalog.ai/v2/agentic-search \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -d '{
+    "query": "A Barbour jacket suitable for the office",
+    "customer_profile": {
+      "style": {
+        "fit": "casual with a refined, creative edge",
+        "avoid": [
+          "large logos",
+          "loud streetwear",
+          "technical performancewear"
+        ],
+        "color": "prefers earth tones, neutrals, black",
+        "aesthetic": [
+          "minimal and cool"
+        ],
+        "silhouette": [
+          "relaxed",
+          "cropped",
+          "unstructured"
+        ]
+      },
+      "preferences": {
+        "in_stock_only": true,
+        "comfort_priority": true
+      },
+      "usage_context": {
+        "activities": [
+          "office",
+          "coffee runs",
+          "after-work events"
+        ],
+        "environment": "urban, mild climate",
+        "travel_friendly": true,
+        "durability_priority": true
+      },
+      "purchase_behavior": {
+        "value": "distinctive, expressive pieces",
+        "buying_frequency": "occasional, style-driven"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_API_KEY'
+  },
+  body: JSON.stringify({
+    query: 'A popular Barbour jacket to wear to the office',
+    customer_profile: {
+      style: {
+        fit: 'elevated casual with artistic flair',
+        avoid: [
+          'flashy logos',
+          'overt streetwear',
+          'overly techy sportswear'
+        ],
+        color: 'prefers earth tones, neutrals, and black',
+        aesthetic: [
+          'understated cool'
+        ],
+        silhouette: [
+          'loose',
+          'cropped',
+          'unstructured'
+        ]
+      },
+      preferences: {
+        in_stock_only: true,
+        comfort_priority: true
+      },
+      usage_context: {
+        activities: [
+          'office',
+          'coffee runs',
+          'after work events'
+        ],
+        environment: 'urban, temperate climate',
+        travel_friendly: true,
+        durability_priority: true
+      },
+      purchase_behavior: {
+        value: 'unique and expressive pieces',
+        buying_frequency: 'occasional, style-driven purchases'
+      }
+    }
+  })
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://api.getcatalog.ai/v2/agentic-search',
+    headers={
+        'Content-Type': 'application/json',
+        'x-api-key': 'YOUR_API_KEY'
+    },
+    json={
+        'query': 'A popular Barbour jacket to wear to the office',
+        'customer_profile': {
+            'style': {
+                'fit': 'elevated casual with artistic flair',
+                'avoid': [
+                    'flashy logos',
+                    'overt streetwear',
+                    'overly techy sportswear'
+                ],
+                'color': 'prefers earth tones, neutrals, and black',
+                'aesthetic': [
+                    'understated cool'
+                ],
+                'silhouette': [
+                    'loose',
+                    'cropped',
+                    'unstructured'
+                ]
+            },
+            'preferences': {
+                'in_stock_only': True,
+                'comfort_priority': True
+            },
+            'usage_context': {
+                'activities': [
+                    'office',
+                    'coffee runs',
+                    'after work events'
+                ],
+                'environment': 'urban, temperate climate',
+                'travel_friendly': True,
+                'durability_priority': True
+            },
+            'purchase_behavior': {
+                'value': 'unique and expressive pieces',
+                'buying_frequency': 'occasional, style-driven purchases'
+            }
+        }
+    }
+)
+
+data = response.json()
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "meta": {
+    "urls": [
+      "https://www.barbour.com/us/safari-relaxed-long-sleeved-shirt-LSH1357MI5214.html",
+      "https://www.barbour.com/us/otterburn-gilet-LGI0003BE71.html",
+      "https://www.barbour.com/us/elsie-wide-leg-trousers-LTR0385NY99.html",
+      "https://www.barbour.com/us/abbey-casual-jacket-LCA0362WH1114.html"
+    ],
+    "totalItems": 4
+  },
+  "products": [
+    {
+      "id": "c9d57a2c-2017-4b67-94f0-65744d029e84",
+      "url": "https://www.barbour.com/us/safari-relaxed-long-sleeved-shirt-LSH1357MI5214.html",
+      "tags": ["SHIRTS"],
+      "brand": "Barbour",
+      "title": "Safari Relaxed Long-Sleeved Shirt",
+      "handle": "safari-relaxed-long-sleeved-shirt-lsh1357mi5214",
+      "vendor": "barbour",
+      "platform_id": "LSH1357MI5214",
+      "is_available": true,
+      "price_amount": 115,
+      "product_type": "SHIRTS",
+      "store_domain": "www.barbour.com",
+      "price_currency": "USD",
+      "min_price": 115,
+      "max_price": 115,
+      "description": "Meet the Safari shirt with its 100% cotton construction and relaxed fit. This cotton-blend garment is imagined in an all-over pattern, offering a feminine option for weekend looks.",
+      "description_html": "Meet the Safari shirt with its 100% cotton construction and relaxed fit. This cotton-blend garment is imagined in an all-over pattern, offering a feminine option for weekend looks. <p class=\"pt-3\">SKU: LSH1357MI5214</p>",
+      "store_canonical_url": "https://www.barbour.com/",
+      "google_product_category_id": "212",
+      "google_product_category_path": "Apparel & Accessories > Clothing > Shirts & Tops",
+      "updated_at": "2025-08-05T12:27:51.896Z",
+      "video_url": null,
+      "images": [
+        {
+          "id": "img-1754396866999-0",
+          "url": "https://images.salsify.com/image/upload/s--qi5RyAOF--/a37a100905bd45f9069b666bf211c4b066532e33.jpg",
+          "width": 1500,
+          "height": 1836,
+          "altText": "Safari Relaxed Long-Sleeved Shirt product image (primary)",
+          "position": 1
+        }
+      ],
+      "variants": [
+        {
+          "id": "variant-1754396867009-0",
+          "SKU": "LSH1357MI5214",
+          "price": "115",
+          "title": "Safari Relaxed Long-Sleeved Shirt - Us 4",
+          "option1": "US 4",
+          "isAvailable": true,
+          "compareAtPrice": "115"
+        }
+      ],
+      "options": [
+        {
+          "name": "Size",
+          "values": ["US 4", "US 6", "US 8", "US 10", "US 12", "US 14"],
+          "position": 1
+        }
+      ],
+      "attributes": {
+        "mood": ["playful", "cheerful", "relaxed"],
+        "color": {
+          "iscc_shade": "null",
+          "iscc_family": "white",
+          "merchant_label": "all-over pattern"
+        },
+        "style": ["casual", "relaxed-fit", "futuristic"],
+        "gender": "female",
+        "season": ["spring", "summer", "fall", "year-round"],
+        "pattern": "allover",
+        "summary": "Feminine relaxed long-sleeved shirt made from 100% cotton.",
+        "features": "Comfortable and stylish for weekend looks.",
+        "material": {
+          "primary": "cotton",
+          "merchant_label": "100% cotton"
+        },
+        "occasion": ["everyday", "casual", "weekend"],
+        "care_instructions": "Machine wash cold"
+      }
+    }
+  ]
+}
+```
+
+</ResponseExample>
+
+## Examples
+
+### Basic Search
+
+Simple product search with natural language:
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.getcatalog.ai/v2/agentic-search \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -d '{"query": "sustainable minimalist sneakers for everyday wear"}'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_API_KEY'
+  },
+  body: JSON.stringify({
+    query: 'sustainable minimalist sneakers for everyday wear'
+  })
+});
+```
+
+</CodeGroup>
+
+### Personalized Search
+
+Search with customer profile for personalized results:
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST https://api.getcatalog.ai/v2/agentic-search \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: YOUR_API_KEY" \
+  -d '{
+    "query": "sophisticated athleisure for urban commuting",
+    "customer_profile": {
+      "style": {
+        "fit": "tailored yet comfortable",
+        "color": "neutral tones with subtle accents",
+        "aesthetic": ["modern professional", "athletic chic"],
+        "silhouette": ["streamlined", "functional"]
+      },
+      "preferences": {
+        "in_stock_only": true,
+        "comfort_priority": true
+      },
+      "usage_context": {
+        "activities": ["commuting", "work", "gym", "casual meetings"],
+        "environment": "urban, variable weather",
+        "travel_friendly": true,
+        "durability_priority": true
+      },
+      "purchase_behavior": {
+        "value": "versatile pieces that work across contexts",
+        "buying_frequency": "considered purchases, quality over quantity"
+      }
+    }
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_API_KEY'
+  },
+  body: JSON.stringify({
+    query: 'sophisticated athleisure for urban commuting',
+    customer_profile: {
+      style: {
+        fit: 'tailored yet comfortable',
+        color: 'neutral tones with subtle accents',
+        aesthetic: ['modern professional', 'athletic chic'],
+        silhouette: ['streamlined', 'functional']
+      },
+      preferences: {
+        in_stock_only: true,
+        comfort_priority: true
+      },
+      usage_context: {
+        activities: ['commuting', 'work', 'gym', 'casual meetings'],
+        environment: 'urban, variable weather',
+        travel_friendly: true,
+        durability_priority: true
+      },
+      purchase_behavior: {
+        value: 'versatile pieces that work across contexts',
+        buying_frequency: 'considered purchases, quality over quantity'
+      }
+    }
+  })
+});
+```
+
+</CodeGroup>
+
+

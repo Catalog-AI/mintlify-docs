@@ -6,7 +6,7 @@ description: "How to build and maintain your own product index using the Catalog
 Build and maintain your own product index using Catalog's browse and product endpoints. Choose between vendor discovery or curating your own URL list.
 
 <Note>
-This guide covers both approaches: discovering products via [List Vendors](/api-reference/endpoints/browse/list-vendors) and collections, or indexing a self-selected set of URLs via [Get Products](/api-reference/endpoints/products/get-products).
+This guide covers both approaches: discovering products via [Get Vendors](/api-reference/endpoints/browse/list-vendors) and collections, or indexing a self-selected set of URLs via [Get Products](/api-reference/endpoints/products/get-products).
 </Note>
 
 ## Option 1: Build an index from vendors and collections
@@ -15,7 +15,7 @@ This approach is best when you want to keep an up-to-date index for many product
 
 ### Step 1: Discover vendors
 
-Use the **List Vendors** endpoint to discover which vendors are available and how many products they have.
+Use the **Get Vendors** endpoint to discover which vendors are available and how many products they have.
 
 - **Endpoint**: `GET /v1/vendors`
 
@@ -128,13 +128,13 @@ In practice, many integrations combine both:
 ## Related endpoints
 
 <CardGroup cols={2}>
-  <Card title="List Vendors" icon="store" href="/api-reference/endpoints/browse/list-vendors">
+  <Card title="Get Vendors" icon="store" href="/api-reference/endpoints/browse/list-vendors">
     Discover available vendors
   </Card>
-  <Card title="List Collections" icon="folder" href="/api-reference/endpoints/browse/list-collections">
+  <Card title="Get Collections" icon="folder" href="/api-reference/endpoints/browse/list-collections">
     Browse vendor collections
   </Card>
-  <Card title="List Listings" icon="list" href="/api-reference/endpoints/browse/list-listings">
+  <Card title="Get All Products" icon="list" href="/api-reference/endpoints/browse/list-listings">
     Get products from a vendor
   </Card>
   <Card title="Get Products" icon="box" href="/api-reference/endpoints/products/get-products">

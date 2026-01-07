@@ -14,28 +14,8 @@ The Catalog platform uses a global, IP-scoped rate limit to keep traffic fair an
 ## Identification and scope
 
 - We use standard IP headers where available (`x-forwarded-for`, `x-real-ip`, `cf-connecting-ip`).
-- Internal workflow traffic (e.g., Upstash/QStash) is excluded so customer traffic is prioritized.
 
 ## Headers and responses
 
 - Successful requests include: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` (ISO timestamp).
 - Exceeded requests return `429 Too Many Requests` with a brief JSON error, plus the headers above and `Retry-After` (seconds). Content-Type is `application/json`.
-
-## Enabling and behavior
-
-- If rate limiting is unavailable, requests are allowed to proceed (fail-open) to avoid blocking your traffic.
-
-## Admin access
-
-- `/admin` is protected by a password gate; rate-limit headers may still be present but do not affect access.
-
-## Failure tolerance
-
-- If the limiter cannot run, we do not block requests. Logging may occur for operational visibility.
-
-## Best practices
-
-- Monitor `X-RateLimit-Remaining` to pace requests.
-- Back off and retry after the `Retry-After` duration when you see 429 responses.
-- Batch requests when possible (for example, use bulk endpoints) to reduce call volume.
-
