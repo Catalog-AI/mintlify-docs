@@ -4,13 +4,19 @@ api: "GET https://api.getcatalog.ai/v1/products/{execution_id}"
 description: "Check the status and retrieve results for an asynchronous product batch processing job"
 ---
 
-Retrieve the status, progress, and results for an asynchronous batch processing job started via the [Get Products by URLs](/v1/api-reference/endpoints/products/retrieve-products) endpoint.
+Retrieve the status, progress, and results for an asynchronous batch processing job started via the [Get Products by URLs](/v1/api-reference/endpoints/extract/retrieve-products) endpoint.
 
 <Tip>
 **When to use:** After starting a batch processing job with the POST endpoint, use this endpoint to:
 - Check if processing is complete
 - Monitor real-time progress
 - Retrieve paginated results when processing completes
+</Tip>
+
+<Tip>
+**Managing Executions:** 
+- **View All Executions:** Use the [List Product Executions](/v1/api-reference/endpoints/extract/list-products-executions) endpoint to see all your processing jobs
+- **Cancel Running Executions:** If you need to stop a running execution, use the [Cancel Product Execution](/v1/api-reference/endpoints/extract/cancel-products-execution) endpoint
 </Tip>
 
 <Note>
@@ -24,7 +30,7 @@ Retrieve the status, progress, and results for an asynchronous batch processing 
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID returned from the [Get Products by URLs](/v1/api-reference/endpoints/products/retrieve-products) POST endpoint
+  The execution ID returned from the [Get Products by URLs](/v1/api-reference/endpoints/extract/retrieve-products) POST endpoint
   
   **Format:** `products-batch-{uuid}`
   
@@ -424,4 +430,3 @@ For best results when waiting for completion:
 2. **Polling Interval:** Wait 5-10 seconds between polls for running executions
 3. **Exponential Backoff:** Consider increasing wait time for long-running jobs
 4. **Timeout:** Set a maximum wait time based on your batch size
-

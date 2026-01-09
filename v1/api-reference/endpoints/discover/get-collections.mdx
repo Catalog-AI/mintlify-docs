@@ -1,13 +1,13 @@
 ---
 title: "Get Collections"
-api: "POST https://api.getcatalog.ai/v2/collections"
+api: "POST https://api.getcatalog.ai/v1/collections"
 description: "Retrieve collections from a specific vendor with pagination"
 ---
 
 Retrieve collections from a specific vendor with pagination. Collections are ordered by product count (highest first).
 
 <Tip>
-**When to use:** Browse vendor collections before fetching products. Use with [Get All Products](/v2/api-reference/endpoints/listings/get-products) to get products from specific collections.
+**When to use:** Browse vendor collections before fetching products. Use with [Get All Products](/v1/api-reference/endpoints/discover/get-products) to get products from specific collections.
 </Tip>
 
 ## Request
@@ -25,12 +25,12 @@ Retrieve collections from a specific vendor with pagination. Collections are ord
 </ParamField>
 
 <ParamField body="page_size" type="number" optional>
-  Number of collections per page (minimum: 1, maximum: 100, default: 20)
+  Number of collections per page (minimum: 1, maximum: 100, default: 10)
 </ParamField>
 
 ## Response
 
-<ResponseField name="data" type="array">
+<ResponseField name="collections" type="array">
   Array of collection objects
   
   <Expandable title="Collection Object">
@@ -52,24 +52,24 @@ Retrieve collections from a specific vendor with pagination. Collections are ord
   </Expandable>
 </ResponseField>
 
-<ResponseField name="pagination" type="object">
+<ResponseField name="meta" type="object">
   Pagination metadata
   
-  <Expandable title="Pagination Object">
-    <ResponseField name="page" type="number">
-      Current page number
-    </ResponseField>
-    
-    <ResponseField name="page_size" type="number">
-      Number of items per page
-    </ResponseField>
-    
+  <Expandable title="Meta Object">
     <ResponseField name="total_items" type="number">
       Total number of collections matching the query
     </ResponseField>
     
     <ResponseField name="total_pages" type="number">
       Total number of pages available
+    </ResponseField>
+    
+    <ResponseField name="current_page" type="number">
+      Current page number
+    </ResponseField>
+    
+    <ResponseField name="page_size" type="number">
+      Number of items per page
     </ResponseField>
     
     <ResponseField name="has_next" type="boolean">
@@ -82,18 +82,10 @@ Retrieve collections from a specific vendor with pagination. Collections are ord
   </Expandable>
 </ResponseField>
 
-<ResponseField name="meta" type="object">
-  Response metadata (currently empty for this endpoint)
-</ResponseField>
-
-<Note>
-The `request_id` is available in the `Request-ID` response header for all responses.
-</Note>
-
 <RequestExample>
 
 ```bash cURL
-curl -X POST https://api.getcatalog.ai/v2/collections \
+curl -X POST https://api.getcatalog.ai/v1/collections \
   -H "x-api-key: $CATALOG_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -104,7 +96,7 @@ curl -X POST https://api.getcatalog.ai/v2/collections \
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.getcatalog.ai/v2/collections', {
+const response = await fetch('https://api.getcatalog.ai/v1/collections', {
   method: 'POST',
   headers: {
     'x-api-key': 'YOUR_API_KEY',
@@ -118,15 +110,15 @@ const response = await fetch('https://api.getcatalog.ai/v2/collections', {
 });
 
 const data = await response.json();
-console.log(`Found ${data.data.length} collections`);
-console.log(`Page ${data.pagination.page} of ${data.pagination.total_pages}`);
+console.log(`Found ${data.collections.length} collections`);
+console.log(`Page ${data.meta.current_page} of ${data.meta.total_pages}`);
 ```
 
 ```python Python
 import requests
 
 response = requests.post(
-    'https://api.getcatalog.ai/v2/collections',
+    'https://api.getcatalog.ai/v1/collections',
     headers={'x-api-key': 'YOUR_API_KEY'},
     json={
         'vendor': 'skims.com',
@@ -136,8 +128,8 @@ response = requests.post(
 )
 
 data = response.json()
-print(f"Found {len(data['data'])} collections")
-print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}")
+print(f"Found {len(data['collections'])} collections")
+print(f"Page {data['meta']['current_page']} of {data['meta']['total_pages']}")
 ```
 
 </RequestExample>
@@ -146,7 +138,7 @@ print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}
 
 ```json Success Response
 {
-  "data": [
+  "collections": [
     {
       "id": "db1a9fa8-4849-4209-bf13-14e4c176a96e",
       "url": "https://www.skims.com/collections/skims-sale",
@@ -178,15 +170,14 @@ print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}
       "last_updated_by_catalog": "2025-11-24T05:39:37.42+00:00"
     }
   ],
-  "pagination": {
-    "page": 1,
-    "page_size": 5,
+  "meta": {
     "total_items": 274,
     "total_pages": 55,
+    "current_page": 1,
+    "page_size": 5,
     "has_next": true,
     "has_prev": false
-  },
-  "meta": {}
+  }
 }
 ```
 

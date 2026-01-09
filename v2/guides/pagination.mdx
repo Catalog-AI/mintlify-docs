@@ -3,64 +3,23 @@ title: "Pagination"
 description: "Navigate through large result sets efficiently with pagination"
 ---
 
-The Catalog API uses page-based pagination to efficiently handle large result sets.
+The Catalog API uses page-based pagination to efficiently handle large result sets. All endpoints provide consistent pagination metadata to help you navigate through results.
 
-## How Pagination Works
+## Pagination Response Structure
 
-The API returns a limited number of items per page (default varies by endpoint, max: 100) along with pagination metadata to help you navigate through the results.
-
-### Basic Pagination
-
-<CodeGroup>
-
-```javascript Page 1
-const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'YOUR_API_KEY'
-  },
-  body: JSON.stringify({
-    query: 'dresses',
-    page: 1,
-    page_size: 10
-  })
-});
-```
-
-```javascript Page 2
-const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'YOUR_API_KEY'
-  },
-  body: JSON.stringify({
-    query: 'dresses',
-    page: 2,
-    page_size: 10
-  })
-});
-```
-
-</CodeGroup>
-
-### Pagination Response
-
-Every paginated response includes a `pagination` object with pagination details:
+Paginated endpoints return a consistent structure:
 
 ```json
 {
   "data": [...],  // Array of results (products, listings, etc.)
   "pagination": {
     "page": 1,              // Current page number
-    "page_size": 10,         // Items per page
-    "total_items": 127,      // Total matching items
-    "total_pages": 13,       // Total pages available
+    "page_size": 20,         // Items per page
+    "total_items": 100,       // Total matching items
+    "total_pages": 5,        // Total pages available
     "has_next": true,        // Whether there is a next page
     "has_prev": false        // Whether there is a previous page
-  },
-  "meta": {}                 // Additional metadata
+  }
 }
 ```
 
@@ -68,540 +27,240 @@ Every paginated response includes a `pagination` object with pagination details:
   The `total_items` value may be capped for performance optimization, depending on the endpoint.
 </Warning>
 
-## Implementation Patterns
+<Note>
+  In v2, all endpoints consistently return data in a `data` array and use `page_size` for pagination parameters. The pagination object structure is consistent across all endpoints.
+</Note>
 
-### Basic Pagination Component
+## Pagination Patterns
 
-<CodeGroup>
+The Catalog API uses consistent pagination patterns. Examples for each pattern are shown below:
 
-```javascript React Pagination
-import { useState, useEffect } from 'react';
+<Tabs>
+  <Tab title="Python">
+    ### Pattern 1: GET Endpoints with Query Parameters
 
-const ProductSearch = () => {
-  const [products, setProducts] = useState([]);
-  const [pagination, setPagination] = useState({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-
-  const searchProducts = async (page = 1) => {
-    setLoading(true);
-    try {
-      const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.CATALOG_API_KEY
-        },
-        body: JSON.stringify({
-          query: 'summer dress',
-          page,
-          page_size: 12
-        })
-      });
-      
-      const data = await response.json();
-      setProducts(data.data);
-      setPagination(data.pagination);
-      setCurrentPage(page);
-    } catch (error) {
-      console.error('Search failed:', error);
-    }
-    setLoading(false);
-  };
-
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= pagination.total_pages) {
-      searchProducts(newPage);
-    }
-  };
-
-  return (
-    <div>
-      {/* Product Grid */}
-      <div className="grid grid-cols-3 gap-4">
-        {products.map(product => (
-          <div key={product.id}>
-            {/* Product Card */}
-          </div>
-        ))}
-      </div>
-
-      {/* Pagination Controls */}
-      <div className="flex justify-center mt-8">
-        <button 
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={!pagination.has_prev}
-        >
-          Previous
-        </button>
-        
-        <span className="mx-4">
-          Page {pagination.page} of {pagination.total_pages}
-        </span>
-        
-        <button 
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={!pagination.has_next}
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  );
-};
-```
-
-```python Python Pagination
-import requests
-
-class ProductSearchPaginator:
-    def __init__(self, api_key):
-        self.api_key = api_key
-        self.base_url = 'https://api.getcatalog.ai/v2/agentic-search'
-        
-    def search(self, query, page=1, page_size=10):
-        payload = {
-            'query': query,
-            'page': page,
-            'page_size': page_size
-        }
-            
-        response = requests.post(
-            self.base_url,
-            headers={
-                'Content-Type': 'application/json',
-                'x-api-key': self.api_key
-            },
-            json=payload
-        )
-        
-        return response.json()
+    **Endpoints:** `/v2/vendors`, `/v2/usage`
     
-    def get_all_pages(self, query, max_pages=5):
-        """Fetch all pages up to max_pages limit"""
-        all_products = []
-        page = 1
-        
-        while page <= max_pages:
-            result = self.search(query, page=page)
-            
-            if not result.get('data'):
-                break
-                
-            all_products.extend(result['data'])
-            
-            if not result['pagination']['has_next']:
-                break
-                
-            page += 1
-            
-        return all_products
+    Use `page` and `page_size` as query parameters. Response includes a `pagination` object.
 
-# Usage
-paginator = ProductSearchPaginator('YOUR_API_KEY')
-products = paginator.get_all_pages('summer dress', max_pages=3)
-```
+    ```python
+    import requests
 
-</CodeGroup>
+    response = requests.get(
+      'https://api.getcatalog.ai/v2/vendors',
+      headers={'x-api-key': 'YOUR_API_KEY'},
+      params={'page': 1, 'page_size': 20}
+    )
 
-### Infinite Scroll
+    data = response.json()
+    print(f"Found {data['pagination']['total_items']} vendors")
+    print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}")
+    ```
 
-<CodeGroup>
+    ### Pattern 2: POST Endpoints with Body Parameters
 
-```javascript Infinite Scroll
-import { useState, useEffect, useCallback } from 'react';
-
-const InfiniteProductList = () => {
-  const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(false);
-
-  const loadMore = useCallback(async () => {
-    if (loading || !hasMore) return;
+    **Endpoints:** `/v2/listings`, `/v2/collections`, `/v2/agentic-search`
     
-    setLoading(true);
-    try {
-      const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.CATALOG_API_KEY
-        },
-        body: JSON.stringify({
-          query: 'fashion',
-          page,
-          page_size: 12
-        })
-      });
-      
-      const data = await response.json();
-      
-      if (data.data.length === 0 || !data.pagination.has_next) {
-        setHasMore(false);
-      } else {
-        setProducts(prev => [...prev, ...data.data]);
-        setPage(prev => prev + 1);
+    Include `page` and `page_size` in the request body. Response includes a `pagination` object.
+
+    ```python
+    import requests
+
+    response = requests.post(
+      'https://api.getcatalog.ai/v2/listings',
+      headers={
+        'Content-Type': 'application/json',
+        'x-api-key': 'YOUR_API_KEY'
+      },
+      json={
+        'vendor': 'nike',
+        'page': 1,
+        'page_size': 20
       }
-    } catch (error) {
-      console.error('Failed to load more:', error);
-    }
-    setLoading(false);
-  }, [page, loading, hasMore]);
+    )
 
-  useEffect(() => {
-    loadMore();
-  }, []);
+    data = response.json()
+    print(f"Found {data['pagination']['total_items']} listings")
+    print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}")
+    ```
 
-  return (
-    <div>
-      <div className="grid grid-cols-3 gap-4">
-        {products.map(product => (
-          <div key={product.id}>
-            {/* Product Card */}
-          </div>
-        ))}
-      </div>
-      
-      {hasMore && (
-        <button 
-          onClick={loadMore} 
-          disabled={loading}
-          className="mt-4"
-        >
-          {loading ? 'Loading...' : 'Load More'}
-        </button>
-      )}
-    </div>
-  );
-};
-```
+    ### Pattern 3: Execution Status Endpoints
 
-</CodeGroup>
-
-## GET Endpoint Pagination
-
-For GET endpoints like `/v2/vendors`, use query parameters:
-
-<CodeGroup>
-
-```javascript Vendor Pagination
-const response = await fetch(
-  'https://api.getcatalog.ai/v2/vendors?page=1&page_size=20',
-  {
-    headers: {
-      'x-api-key': 'YOUR_API_KEY'
-    }
-  }
-);
-
-const data = await response.json();
-console.log(`Found ${data.pagination.total_items} vendors`);
-console.log(`Page ${data.pagination.page} of ${data.pagination.total_pages}`);
-```
-
-```python Vendor Pagination
-import requests
-
-response = requests.get(
-  'https://api.getcatalog.ai/v2/vendors',
-  headers={'x-api-key': 'YOUR_API_KEY'},
-  params={'page': 1, 'page_size': 20}
-)
-
-data = response.json()
-print(f"Found {data['pagination']['total_items']} vendors")
-print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}")
-```
-
-</CodeGroup>
-
-## POST Endpoint Pagination
-
-For POST endpoints like `/v2/listings`, include pagination in the request body:
-
-<CodeGroup>
-
-```javascript Listings Pagination
-const response = await fetch('https://api.getcatalog.ai/v2/listings', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'YOUR_API_KEY'
-  },
-  body: JSON.stringify({
-    vendor: 'nike',
-    page: 1,
-    page_size: 20
-  })
-});
-
-const data = await response.json();
-console.log(`Found ${data.pagination.total_items} listings`);
-```
-
-```python Listings Pagination
-import requests
-
-response = requests.post(
-  'https://api.getcatalog.ai/v2/listings',
-  headers={
-    'Content-Type': 'application/json',
-    'x-api-key': 'YOUR_API_KEY'
-  },
-  json={
-    'vendor': 'nike',
-    'page': 1,
-    'page_size': 20
-  }
-)
-
-data = response.json()
-print(f"Found {data['pagination']['total_items']} listings")
-```
-
-</CodeGroup>
-
-## Execution Status Pagination
-
-For the execution status endpoint (`/v2/products/{execution_id}`), use `page_size`:
-
-<CodeGroup>
-
-```javascript Execution Status
-const response = await fetch(
-  `https://api.getcatalog.ai/v2/products/${executionId}?page=1&page_size=50`,
-  {
-    headers: {
-      'x-api-key': 'YOUR_API_KEY'
-    }
-  }
-);
-
-const data = await response.json();
-if (data.status === 'completed') {
-  console.log(`Retrieved ${data.data.length} products`);
-  console.log(`Page ${data.pagination.page} of ${data.pagination.total_pages}`);
-}
-```
-
-```python Execution Status
-import requests
-
-response = requests.get(
-  f'https://api.getcatalog.ai/v2/products/{execution_id}',
-  headers={'x-api-key': 'YOUR_API_KEY'},
-  params={'page': 1, 'page_size': 50}
-)
-
-data = response.json()
-if data['status'] == 'completed':
-  print(f"Retrieved {len(data['data'])} products")
-  print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}")
-```
-
-</CodeGroup>
-
-## Performance Optimization
-
-### Preload Next Page
-
-<CodeGroup>
-
-```javascript Preload Strategy
-const useProductSearch = (query) => {
-  const [currentData, setCurrentData] = useState(null);
-  const [nextData, setNextData] = useState(null);
-  const [page, setPage] = useState(1);
-
-  const fetchPage = async (pageNum) => {
-    const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.CATALOG_API_KEY
-      },
-      body: JSON.stringify({
-        query,
-        page: pageNum,
-        page_size: 12
-      })
-    });
-    return response.json();
-  };
-
-  useEffect(() => {
-    const loadData = async () => {
-      const [current, next] = await Promise.all([
-        fetchPage(page),
-        page < 5 ? fetchPage(page + 1) : null  // Only preload if within bounds
-      ]);
-      
-      setCurrentData(current);
-      setNextData(next);
-    };
+    **Endpoints:** `/v2/products/{execution_id}`
     
-    loadData();
-  }, [page, query]);
+    Use `page` and `page_size` as query parameters (only when status is `"completed"`). Response includes a `pagination` object.
 
-  const goToNextPage = () => {
-    if (nextData) {
-      setCurrentData(nextData);
-      setPage(page + 1);
-      // Preload the next page
-    }
-  };
+    ```python
+    import requests
 
-  return { currentData, goToNextPage, page };
-};
-```
+    response = requests.get(
+      f'https://api.getcatalog.ai/v2/products/{execution_id}',
+      headers={'x-api-key': 'YOUR_API_KEY'},
+      params={'page': 1, 'page_size': 50}
+    )
 
-</CodeGroup>
+    data = response.json()
+    if data['status'] == 'completed':
+      print(f"Retrieved {len(data['data'])} products")
+      print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}")
+    ```
 
-### Cache Previous Pages
+    ### Basic Implementation Example
 
-<CodeGroup>
+    Here's a simple example of implementing pagination:
 
-```javascript Page Caching
-class PageCache {
-  constructor(maxSize = 10) {
-    this.cache = new Map();
-    this.maxSize = maxSize;
-  }
-  
-  set(key, data) {
-    if (this.cache.size >= this.maxSize) {
-      const firstKey = this.cache.keys().next().value;
-      this.cache.delete(firstKey);
-    }
-    this.cache.set(key, data);
-  }
-  
-  get(key) {
-    return this.cache.get(key);
-  }
-  
-  has(key) {
-    return this.cache.has(key);
-  }
-}
+    ```python
+    import requests
 
-const pageCache = new PageCache();
+    def fetch_vendors(page=1, page_size=20):
+        response = requests.get(
+            'https://api.getcatalog.ai/v2/vendors',
+            headers={'x-api-key': 'YOUR_API_KEY'},
+            params={'page': page, 'page_size': page_size}
+        )
+        return response.json()
 
-const searchWithCache = async (query, page, page_size) => {
-  const cacheKey = `${query}-${page}-${page_size}`;
-  
-  if (pageCache.has(cacheKey)) {
-    return pageCache.get(cacheKey);
-  }
-  
-  const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': process.env.CATALOG_API_KEY
-    },
-    body: JSON.stringify({
-      query,
-      page,
-      page_size
-    })
-  });
-  
-  const data = await response.json();
-  pageCache.set(cacheKey, data);
-  
-  return data;
-};
-```
+    # Navigate through pages
+    data = fetch_vendors(page=1)
+    pagination = data['pagination']
 
-</CodeGroup>
+    if pagination['has_next']:
+        next_page_data = fetch_vendors(page=pagination['page'] + 1)
+    ```
+  </Tab>
 
-## URL State Management
+  <Tab title="JavaScript">
+    ### Pattern 1: GET Endpoints with Query Parameters
 
-Sync pagination state with URL for better user experience:
-
-<CodeGroup>
-
-```javascript URL Pagination
-import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
-
-const ProductSearchPage = () => {
-  const router = useRouter();
-  const [products, setProducts] = useState([]);
-  const [pagination, setPagination] = useState({});
-  
-  const currentPage = parseInt(router.query.page) || 1;
-  const query = router.query.q || '';
-
-  const searchProducts = async (page) => {
-    const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.CATALOG_API_KEY
-      },
-      body: JSON.stringify({
-        query,
-        page,
-        page_size: 12
-      })
-    });
+    **Endpoints:** `/v2/vendors`, `/v2/usage`
     
+    Use `page` and `page_size` as query parameters. Response includes a `pagination` object.
+
+    ```javascript
+    const response = await fetch(
+      'https://api.getcatalog.ai/v2/vendors?page=1&page_size=20',
+      {
+        headers: {
+          'x-api-key': 'YOUR_API_KEY'
+        }
+      }
+    );
+
     const data = await response.json();
-    setProducts(data.data);
-    setPagination(data.pagination);
-  };
+    console.log(`Found ${data.pagination.total_items} vendors`);
+    console.log(`Page ${data.pagination.page} of ${data.pagination.total_pages}`);
+    ```
 
-  const handlePageChange = (newPage) => {
-    router.push({
-      pathname: router.pathname,
-      query: { ...router.query, page: newPage }
+    ### Pattern 2: POST Endpoints with Body Parameters
+
+    **Endpoints:** `/v2/listings`, `/v2/collections`, `/v2/agentic-search`
+    
+    Include `page` and `page_size` in the request body. Response includes a `pagination` object.
+
+    ```javascript
+    const response = await fetch('https://api.getcatalog.ai/v2/listings', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': 'YOUR_API_KEY'
+      },
+      body: JSON.stringify({
+        vendor: 'nike',
+        page: 1,
+        page_size: 20
+      })
     });
-  };
 
-  useEffect(() => {
-    if (query) {
-      searchProducts(currentPage);
+    const data = await response.json();
+    console.log(`Found ${data.pagination.total_items} listings`);
+    console.log(`Page ${data.pagination.page} of ${data.pagination.total_pages}`);
+    ```
+
+    ### Pattern 3: Execution Status Endpoints
+
+    **Endpoints:** `/v2/products/{execution_id}`
+    
+    Use `page` and `page_size` as query parameters (only when status is `"completed"`). Response includes a `pagination` object.
+
+    ```javascript
+    const response = await fetch(
+      `https://api.getcatalog.ai/v2/products/${executionId}?page=1&page_size=50`,
+      {
+        headers: {
+          'x-api-key': 'YOUR_API_KEY'
+        }
+      }
+    );
+
+    const data = await response.json();
+    if (data.status === 'completed') {
+      console.log(`Retrieved ${data.data.length} products`);
+      console.log(`Page ${data.pagination.page} of ${data.pagination.total_pages}`);
     }
-  }, [query, currentPage]);
+    ```
 
-  return (
-    <div>
-      {/* Product Grid */}
-      <div className="grid grid-cols-3 gap-4">
-        {products.map(product => (
-          <div key={product.id}>
-            {/* Product Card */}
-          </div>
-        ))}
-      </div>
+    ### Basic Implementation Example
 
-      {/* Pagination */}
-      <div className="flex justify-center mt-8">
-        {Array.from({ length: pagination.total_pages }, (_, i) => i + 1).map(pageNum => (
-          <button
-            key={pageNum}
-            onClick={() => handlePageChange(pageNum)}
-            className={`mx-1 px-3 py-1 ${
-              pageNum === pagination.page ? 'bg-blue-500 text-white' : 'bg-gray-200'
-            }`}
-          >
-            {pageNum}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-};
-```
+    Here's a simple example of implementing pagination:
 
-</CodeGroup>
+    ```javascript
+    const fetchVendors = async (page = 1) => {
+      const response = await fetch(
+        `https://api.getcatalog.ai/v2/vendors?page=${page}&page_size=20`,
+        {
+          headers: {
+            'x-api-key': 'YOUR_API_KEY'
+          }
+        }
+      );
+      
+      const data = await response.json();
+      return data;
+    };
+
+    // Navigate to next page
+    const handleNextPage = async (currentPage, pagination) => {
+      if (pagination.has_next) {
+        const data = await fetchVendors(currentPage + 1);
+        // Update your UI with data.data and data.pagination
+      }
+    };
+
+    // Navigate to previous page
+    const handlePrevPage = async (currentPage, pagination) => {
+      if (pagination.has_prev) {
+        const data = await fetchVendors(currentPage - 1);
+        // Update your UI with data.data and data.pagination
+      }
+    };
+    ```
+  </Tab>
+</Tabs>
 
 ## Best Practices
 
-### Limit Management
+### Using has_next and has_prev
+
+The `has_next` and `has_prev` boolean fields make it easy to implement navigation controls:
+
+```javascript
+// Enable/disable navigation buttons based on pagination state
+<button 
+  onClick={() => goToPage(pagination.page - 1)}
+  disabled={!pagination.has_prev}
+>
+  Previous
+</button>
+
+<button 
+  onClick={() => goToPage(pagination.page + 1)}
+  disabled={!pagination.has_next}
+>
+  Next
+</button>
+```
+
+### Page Size Recommendations
 
 <Tip>
   Choose page sizes that balance performance and user experience:
@@ -610,88 +269,12 @@ const ProductSearchPage = () => {
   - **Maximum**: 100 items per page (varies by endpoint)
 </Tip>
 
-### Loading States
-
-Always provide loading indicators during pagination:
-
-<CodeGroup>
-
-```javascript Loading States
-const [loading, setLoading] = useState(false);
-
-const handlePageChange = async (newPage) => {
-  setLoading(true);
-  try {
-    await searchProducts(newPage);
-  } finally {
-    setLoading(false);
-  }
-};
-
-return (
-  <div>
-    {loading && <div className="text-center py-4">Loading...</div>}
-    {/* Product Grid */}
-  </div>
-);
-```
-
-</CodeGroup>
-
-### Error Handling
-
-Handle pagination errors gracefully:
-
-<CodeGroup>
-
-```javascript Error Handling
-const handlePageChange = async (newPage) => {
-  try {
-    await searchProducts(newPage);
-  } catch (error) {
-    console.error('Pagination failed:', error);
-    // Show user-friendly error message
-    // Optionally retry or fallback to previous page
-  }
-};
-```
-
-</CodeGroup>
-
-### Using has_next and has_prev
-
-The `has_next` and `has_prev` boolean fields make it easy to implement navigation:
-
-<CodeGroup>
-
-```javascript Navigation with Booleans
-const PaginationControls = ({ pagination, onPageChange }) => {
-  return (
-    <div className="flex justify-center gap-2">
-      <button
-        onClick={() => onPageChange(pagination.page - 1)}
-        disabled={!pagination.has_prev}
-      >
-        Previous
-      </button>
-      
-      <span>
-        Page {pagination.page} of {pagination.total_pages}
-      </span>
-      
-      <button
-        onClick={() => onPageChange(pagination.page + 1)}
-        disabled={!pagination.has_next}
-      >
-        Next
-      </button>
-    </div>
-  );
-};
-```
-
-</CodeGroup>
+## Important Notes
 
 <Note>
-  In v2, all endpoints consistently return data in a `data` array and use `page_size` for pagination parameters. The pagination object structure is consistent across all endpoints with `page`, `page_size`, `total_items`, `total_pages`, `has_next`, and `has_prev` fields.
+  **Consistent Structure in v2:**
+  - All endpoints return data in a `data` array
+  - All endpoints use `pagination` object (not `meta`)
+  - All endpoints use `page` in response (not `current_page`)
+  - All endpoints use `page_size` consistently
 </Note>

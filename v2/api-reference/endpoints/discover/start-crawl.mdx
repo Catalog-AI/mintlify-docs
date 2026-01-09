@@ -1,0 +1,146 @@
+---
+title: "Start Crawl"
+api: "POST https://api.getcatalog.ai/v2/crawl"
+description: "Start asynchronous crawling of a vendor website to discover collections and products"
+---
+
+Start an asynchronous crawl of a vendor website. This endpoint discovers collections and products from the specified domain, then extracts product details. Returns immediately with an `execution_id` that you can use to check status.
+
+<Tip>
+**When to use:** Discover and index all products from a vendor website. The crawl process will:
+1. Discover collections from the vendor
+2. Extract product listings from each collection
+3. Process product details for all discovered products
+
+This is ideal for initial indexing of a new vendor or keeping your catalog up-to-date with a vendor's full inventory.
+</Tip>
+
+<Note>
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Crawl Execution Status](/v2/api-reference/endpoints/crawl/get-execution-status) endpoint to check progress and retrieve results when processing completes.
+
+**Billing Requirement:** Crawl requests require auto top-up to be enabled in your billing settings. This ensures you have sufficient credits to complete the crawl operation.
+
+
+**View All Executions:** You can view all your crawl executions using the [List Crawl Executions](/v2/api-reference/endpoints/crawl/list-executions) endpoint to see all crawl jobs, their statuses, and when they were created.
+
+**Cancel Execution:** You can cancel a running crawl execution using the [Cancel Crawl Execution](/v2/api-reference/endpoints/crawl/cancel-execution) endpoint if you need to stop a crawl that is currently processing.
+</Note>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+### Request Body
+
+<ParamField body="url" type="string" required>
+  The vendor website URL or domain to crawl
+
+  
+  **Note:** The URL will be normalized to a canonical form. If a crawl is already running for the same hostname, the existing execution ID will be returned.
+</ParamField>
+
+## Response
+
+<ResponseField name="execution_id" type="string">
+  Unique execution identifier for this crawl job. Use this ID with the [Get Crawl Execution Status](/v2/api-reference/endpoints/crawl/get-execution-status) endpoint to check progress.
+  
+  **Format:** `crawl-{hostname}-{uuid}`
+  
+  **Note:** If a crawl is already running for the same hostname, this will return the existing execution ID.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Initial execution status. Always `"pending"` when the crawl is first started.
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Metadata about the request
+  
+  <Expandable title="Meta Object">
+    <ResponseField name="credits_used" type="number">
+      Number of credits charged for starting this crawl operation
+    </ResponseField>
+    
+    <ResponseField name="request_id" type="string" optional>
+      Unique request identifier for support purposes (also available in the `Request-ID` response header)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<Note>
+**HTTP Status Code:** This endpoint returns `202 Accepted` to indicate the request has been accepted for processing. The response body contains the execution details you need to track the crawl progress.
+</Note>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.getcatalog.ai/v2/crawl \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $CATALOG_API_KEY" \
+  -d '{
+    "url": "https://www.example.com"
+  }'
+```
+
+```javascript JavaScript
+// Start crawl
+const response = await fetch('https://api.getcatalog.ai/v2/crawl', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_API_KEY'
+  },
+  body: JSON.stringify({
+    url: 'https://www.example.com'
+  })
+});
+
+const data = await response.json();
+console.log(`Crawl started with execution ID: ${data.execution_id}`);
+console.log(`Credits used: ${data.meta.credits_used}`);
+
+// Poll for results using the execution_id
+// See Get Execution Status endpoint documentation for details
+```
+
+```python Python
+import requests
+
+# Start crawl
+response = requests.post(
+    'https://api.getcatalog.ai/v2/crawl',
+    headers={
+        'Content-Type': 'application/json',
+        'x-api-key': 'YOUR_API_KEY'
+    },
+    json={
+        'url': 'https://www.example.com'
+    }
+)
+
+data = response.json()
+execution_id = data['execution_id']
+print(f"Crawl started with execution ID: {execution_id}")
+print(f"Credits used: {data['meta']['credits_used']}")
+
+# Poll for results using the execution_id
+# See Get Execution Status endpoint documentation for details
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json POST Response (202 Accepted)
+{
+  "execution_id": "crawl-example-com-a1b2c3d4",
+  "status": "pending",
+  "meta": {
+    "credits_used": 100
+  }
+}
+```
+
+</ResponseExample>

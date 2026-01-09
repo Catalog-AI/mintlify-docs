@@ -7,7 +7,7 @@ description: "Start asynchronous batch processing of product URLs to retrieve de
 Start asynchronous batch processing for multiple product URLs. This endpoint returns immediately with an `execution_id` that you can use to check status and retrieve results. Supports processing 1 to 1000 URLs per request.
 
 <Note>
-**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Execution Status](/v2/api-reference/endpoints/products/get-execution-status) endpoint to check progress and retrieve results when processing completes.
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Execution Status](/v2/api-reference/endpoints/extract/get-execution-status) endpoint to check progress and retrieve results when processing completes.
 </Note>
 
 ## Request
@@ -68,7 +68,7 @@ Start asynchronous batch processing for multiple product URLs. This endpoint ret
 ## Response
 
 <ResponseField name="execution_id" type="string">
-  Unique execution identifier for this batch processing job. Use this ID with the [Get Execution Status](/v2/api-reference/endpoints/products/get-execution-status) endpoint to check progress and retrieve results.
+  Unique execution identifier for this batch processing job. Use this ID with the [Get Execution Status](/v2/api-reference/endpoints/extract/get-execution-status) endpoint to check progress and retrieve results.
   
   **Format:** `products-batch-{uuid}`
 </ResponseField>
@@ -93,7 +93,7 @@ Start asynchronous batch processing for multiple product URLs. This endpoint ret
 
 <Note>
 **Getting Results:** The POST endpoint returns immediately with an `execution_id` and HTTP 202 status. Processing happens asynchronously. To get your results:
-1. Use the `execution_id` to poll the [Get Execution Status](/v2/api-reference/endpoints/products/get-execution-status) endpoint
+1. Use the `execution_id` to poll the [Get Execution Status](/v2/api-reference/endpoints/extract/get-execution-status) endpoint
 2. Check the `status` field - when it's `"completed"`, results are available
 3. Use pagination parameters (`page`, `page_size`) to retrieve results in chunks
 </Note>
@@ -290,7 +290,7 @@ You can retrieve a list of recent product processing executions using the GET en
 
 1. **Start Processing:** Send a POST request with your URLs to start async batch processing
 2. **Get Execution ID:** Receive an `execution_id` immediately in the response (HTTP 202)
-3. **Check Status:** Poll the [Get Execution Status](/v2/api-reference/endpoints/products/get-execution-status) endpoint using the `execution_id`
+3. **Check Status:** Poll the [Get Execution Status](/v2/api-reference/endpoints/extract/get-execution-status) endpoint using the `execution_id`
 4. **Retrieve Results:** When `status` is `"completed"`, results are available with pagination support
 
 ## Features

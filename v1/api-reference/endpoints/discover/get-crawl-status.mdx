@@ -1,0 +1,155 @@
+---
+title: "Get Crawl Execution Status"
+api: "GET https://api.getcatalog.ai/v1/crawl/{execution_id}"
+description: "Check the status of an asynchronous crawl job"
+---
+
+Retrieve the status and results for an asynchronous crawl job started via the [Start Crawl](/v1/api-reference/endpoints/crawl/start-crawl) endpoint.
+
+<Tip>
+**When to use:** After starting a crawl job with the POST endpoint, use this endpoint to:
+- Check if the crawl is complete
+- Monitor real-time progress
+- Get the total number of listings found when the crawl completes
+</Tip>
+
+<Note>
+**Authentication Required:** This endpoint requires a valid API key. The API key is verified, but execution IDs are not restricted to specific API keys. Keep your execution IDs secure.
+
+**Cancel Running Executions:** If you need to stop a crawl that is currently running, use the [Cancel Crawl Execution](/v1/api-reference/endpoints/crawl/cancel-execution) endpoint to stop the execution.
+</Note>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+<ParamField path="execution_id" type="string" required>
+  The execution ID returned from the [Start Crawl](/v1/api-reference/endpoints/crawl/start-crawl) POST endpoint
+  
+  **Format:** `crawl-{hostname}-{uuid}`
+  
+  **Note:** If the execution ID does not exist, the endpoint returns a 404 Not Found error.
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="arn" type="string" optional>
+  Full AWS Step Functions execution ARN (optional override, used for advanced scenarios)
+</ParamField>
+
+## Response
+
+<ResponseField name="status" type="string">
+  Current execution status
+  
+  **Possible values:**
+  - `"pending"` - Execution has been created but not yet started
+  - `"running"` - Execution is currently processing
+  - `"completed"` - Execution finished successfully
+  - `"failed"` - Execution failed or was aborted
+</ResponseField>
+
+<ResponseField name="total_listings_found" type="number | null">
+  Total number of product listings discovered during the crawl (only available when status is "completed")
+  
+  **Note:** This value is extracted from the execution output and may be `null` if the crawl is still running or if the count cannot be determined.
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+# Check execution status
+curl -X GET "https://api.getcatalog.ai/v1/crawl/crawl-example-com-a1b2c3d4" \
+  -H "x-api-key: $CATALOG_API_KEY"
+```
+
+```javascript JavaScript
+// Check execution status
+const executionId = 'crawl-example-com-a1b2c3d4';
+
+const response = await fetch(
+  `https://api.getcatalog.ai/v1/crawl/${executionId}`,
+  {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  }
+);
+
+const data = await response.json();
+
+if (data.status === 'completed') {
+  console.log(`Crawl completed! Found ${data.total_listings_found} listings`);
+} else if (data.status === 'running') {
+  console.log('Crawl is still running...');
+  // Optionally cancel if needed: DELETE /v1/crawl/{executionId}
+} else if (data.status === 'failed') {
+  console.error('Crawl failed');
+}
+```
+
+```python Python
+import requests
+import time
+
+execution_id = 'crawl-example-com-a1b2c3d4'
+
+# Poll for completion
+while True:
+    response = requests.get(
+        f'https://api.getcatalog.ai/v1/crawl/{execution_id}',
+        headers={'x-api-key': 'YOUR_API_KEY'}
+    )
+    
+    data = response.json()
+    
+    if data['status'] == 'completed':
+        print(f"Crawl completed! Found {data['total_listings_found']} listings")
+        break
+    elif data['status'] == 'running':
+        print('Crawl is still running...')
+        # Optionally cancel if needed: DELETE /v1/crawl/{execution_id}
+        time.sleep(10)  # Wait 10 seconds before next poll
+    elif data['status'] == 'failed':
+        print('Crawl failed')
+        break
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Status: Running
+{
+  "status": "running",
+  "total_listings_found": null
+}
+```
+
+```json Status: Completed
+{
+  "status": "completed",
+  "total_listings_found": 1234
+}
+```
+
+```json Status: Failed
+{
+  "status": "failed",
+  "total_listings_found": null
+}
+```
+
+</ResponseExample>
+
+## Polling Strategy
+
+For best results when waiting for completion:
+
+1. **Initial Poll:** Check status immediately after receiving `execution_id`
+2. **Polling Interval:** Wait 10-30 seconds between polls for running executions (crawls can take longer than product processing)
+3. **Exponential Backoff:** Consider increasing wait time for long-running crawls
+4. **Timeout:** Set a maximum wait time based on the size of the vendor website
+5. **Cancellation:** If a crawl is taking too long or you need to stop it, use the [Cancel Crawl Execution](/v1/api-reference/endpoints/crawl/cancel-execution) endpoint to stop running executions

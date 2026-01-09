@@ -17,20 +17,20 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 
 ## Endpoints
 
-### Listings
+### Discover
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| [`/v1/vendors`](/v1/api-reference/endpoints/listings/get-vendors) | GET | List all vendors with product counts |
-| [`/v1/collections`](/v1/api-reference/endpoints/listings/get-collections) | POST | List collections for a vendor |
-| [`/v1/listings`](/v1/api-reference/endpoints/listings/get-products) | POST | List products from a vendor or collection |
+| [`/v1/vendors`](/v1/api-reference/endpoints/discover/get-vendors) | GET | List all vendors with product counts |
+| [`/v1/collections`](/v1/api-reference/endpoints/discover/get-collections) | POST | List collections for a vendor |
+| [`/v1/listings`](/v1/api-reference/endpoints/discover/get-products) | POST | List products from a vendor or collection |
 
-### Products
+### Extract
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| [`/v1/products`](/v1/api-reference/endpoints/products/retrieve-products) | POST | Start async batch processing of product URLs (1-1000 URLs) |
-| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/products/get-execution-status) | GET | Check status and retrieve results for a batch processing job |
+| [`/v1/products`](/v1/api-reference/endpoints/extract/retrieve-products) | POST | Start async batch processing of product URLs (1-1000 URLs) |
+| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-execution-status) | GET | Check status and retrieve results for a batch processing job |
 
 ### Search
 
@@ -106,7 +106,7 @@ Response structures vary by endpoint:
 
 ## Error handling
 
-Errors return appropriate HTTP status codes with error details. The error format varies:
+Errors return appropriate HTTP status codes with structured error details:
 
 **Standard error responses** (400, 401, 402, 403, 404, 409, 429, 500):
 ```json
@@ -119,26 +119,9 @@ Errors return appropriate HTTP status codes with error details. The error format
 }
 ```
 
-**Execution status errors** return a simple string:
-```json
-{
-  "status": "failed",
-  "error": "The operation failed. Please retry or contact support with this execution ID."
-}
-```
+All error responses include a `Request-ID` header that matches the `request_id` in the response body.
 
-| HTTP Status | Meaning | Description |
-|-------------|---------|-------------|
-| `400` | Bad Request | Invalid request parameters or malformed JSON |
-| `401` | Unauthorized | Missing or invalid API key |
-| `402` | Payment Required | Insufficient credits to complete the request |
-| `403` | Forbidden | API key lacks required permissions |
-| `404` | Not Found | Requested resource does not exist |
-| `409` | Conflict | Resource state conflict |
-| `429` | Too Many Requests | Rate limit exceeded |
-| `500` | Internal Server Error | Server-side error occurred |
-
-All error responses include a `Request-ID` header that matches the `request_id` in the response body. See [Error Codes](/resources/error-codes) for the complete reference.
+See [Error Codes](/resources/error-codes) for the complete reference.
 
 ## Rate limits
 
@@ -147,20 +130,6 @@ Default policy: 50 requests per 4-second sliding window, counted per IP with a g
 See [Rate Limits](/resources/rate-limits) for headers, what `429` means, and pacing guidance.
 
 ## Pagination
-
-Most list endpoints support pagination using query parameters:
-
-**GET endpoints** (vendors, usage) use query string parameters:
-- `page`: Page number (1-indexed, default: 1)
-- `page_size`: Items per page (default varies, max: 100)
-
-**POST endpoints** (listings, collections, agentic-search) include pagination in the request body:
-- `page`: Page number (required for listings/collections)
-- `page_size`: Items per page (optional, default varies)
-
-**Execution status endpoint** (`/v1/products/{execution_id}`) uses different parameter names:
-- `page`: Page number (1-indexed, default: 1)
-- `limit`: Items per page (default: 50, max: 100)
 
 All paginated responses include a `pagination` object in the response with:
 - `page`: Current page number

@@ -1,0 +1,155 @@
+---
+title: "List Extract Executions"
+api: "GET https://api.getcatalog.ai/v1/extract"
+description: "Retrieve a list of recent extraction executions"
+---
+
+Retrieve a list of recent extraction executions for your organization. This endpoint allows you to see all extraction jobs you've started, their current status, and when they were created.
+
+<Tip>
+**When to use:** Monitor all your extraction operations in one place. Use this endpoint to:
+- See all extraction executions you've started
+- Filter by status (processing, completed, failed)
+- Track when extraction jobs were initiated
+- Find execution IDs for status checks
+</Tip>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="status" type="string" optional>
+  Filter executions by status. Possible values: `"processing"`, `"completed"`, `"failed"`
+  
+  **Note:** If not provided, all executions are returned regardless of status.
+</ParamField>
+
+<ParamField query="limit" type="number" optional>
+  Number of executions to return (default: 20)
+  
+  **Note:** Executions are returned in reverse chronological order (most recent first).
+</ParamField>
+
+## Response
+
+<ResponseField name="executions" type="array">
+  Array of execution summary objects
+  
+  <Expandable title="Execution Summary">
+    <ResponseField name="execution_id" type="string">
+      Unique execution identifier. Use this ID with the [Get Execution Status](/v1/api-reference/endpoints/extract/get-execution-status) endpoint to check detailed status and results.
+      
+      **Format:** `extract-{vendor}-{uuid}`
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Current execution status
+      
+      **Possible values:**
+      - `"pending"` - Execution is waiting to start (may be waiting for crawl)
+      - `"running"` - Execution is currently processing
+      - `"completed"` - Execution finished successfully
+      - `"failed"` - Execution failed or was aborted
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp when the execution was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+# Get all executions
+curl -X GET "https://api.getcatalog.ai/v1/extract" \
+  -H "x-api-key: $CATALOG_API_KEY"
+
+# Get only completed executions
+curl -X GET "https://api.getcatalog.ai/v1/extract?status=completed" \
+  -H "x-api-key: $CATALOG_API_KEY"
+
+# Get first 50 executions
+curl -X GET "https://api.getcatalog.ai/v1/extract?limit=50" \
+  -H "x-api-key: $CATALOG_API_KEY"
+```
+
+```javascript JavaScript
+// Get all executions
+const response = await fetch('https://api.getcatalog.ai/v1/extract', {
+  headers: {
+    'x-api-key': 'YOUR_API_KEY'
+  }
+});
+
+const data = await response.json();
+console.log(`Found ${data.executions.length} executions`);
+
+// Get only processing executions
+const processingResponse = await fetch(
+  'https://api.getcatalog.ai/v1/extract?status=processing',
+  {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  }
+);
+
+const processingData = await processingResponse.json();
+console.log(`Found ${processingData.executions.length} processing executions`);
+```
+
+```python Python
+import requests
+
+# Get all executions
+response = requests.get(
+    'https://api.getcatalog.ai/v1/extract',
+    headers={'x-api-key': 'YOUR_API_KEY'}
+)
+
+data = response.json()
+print(f"Found {len(data['executions'])} executions")
+
+# Get only failed executions
+failed_response = requests.get(
+    'https://api.getcatalog.ai/v1/extract',
+    headers={'x-api-key': 'YOUR_API_KEY'},
+    params={'status': 'failed'}
+)
+
+failed_data = failed_response.json()
+print(f"Found {len(failed_data['executions'])} failed executions")
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "executions": [
+    {
+      "execution_id": "extract-nike-com-550e8400",
+      "status": "completed",
+      "created_at": "2025-01-15T10:30:00.000Z"
+    },
+    {
+      "execution_id": "extract-adidas-com-660f9511",
+      "status": "running",
+      "created_at": "2025-01-15T11:00:00.000Z"
+    },
+    {
+      "execution_id": "extract-example-com-770g0622",
+      "status": "failed",
+      "created_at": "2025-01-15T09:15:00.000Z"
+    }
+  ]
+}
+```
+
+</ResponseExample>

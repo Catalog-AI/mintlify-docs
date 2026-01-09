@@ -1,0 +1,338 @@
+---
+title: "Get Crawl Execution Status"
+api: "GET https://api.getcatalog.ai/v2/crawl/{execution_id}"
+description: "Check the status of an asynchronous crawl job"
+---
+
+Retrieve the status and results for an asynchronous crawl job started via the [Start Crawl](/v2/api-reference/endpoints/crawl/start-crawl) endpoint.
+
+<Tip>
+**When to use:** After starting a crawl job with the POST endpoint, use this endpoint to:
+- Check if the crawl is complete
+- Monitor real-time progress with step-by-step status
+- Get detailed metrics including collections and listings found
+- Track execution timing and duration
+</Tip>
+
+<Note>
+**Cancel Running Executions:** If you need to stop a crawl that is currently running, use the [Cancel Crawl Execution](/v2/api-reference/endpoints/crawl/cancel-execution) endpoint to stop the execution.
+</Note>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+<ParamField path="execution_id" type="string" required>
+  The execution ID returned from the [Start Crawl](/v2/api-reference/endpoints/crawl/start-crawl) POST endpoint
+  
+  **Format:** `crawl-{hostname}-{uuid}`
+  
+  **Note:** If the execution ID does not exist or does not belong to your organization, the endpoint returns a 404 Not Found error.
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="arn" type="string" optional>
+  Full AWS Step Functions execution ARN (optional override, used for advanced scenarios)
+</ParamField>
+
+## Response
+
+<ResponseField name="execution_id" type="string">
+  The execution identifier
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Current execution status
+  
+  **Possible values:**
+  - `"pending"` - Execution has been created but not yet started
+  - `"running"` - Execution is currently processing
+  - `"completed"` - Execution finished successfully
+  - `"failed"` - Execution failed or was aborted
+</ResponseField>
+
+<ResponseField name="error" type="string | null">
+  Error message if the execution failed, otherwise `null`
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Detailed metadata about the execution
+  
+  <Expandable title="Meta Object">
+    <ResponseField name="vendor" type="string | null">
+      The vendor hostname being crawled
+    </ResponseField>
+    
+    <ResponseField name="start_date" type="string | null">
+      ISO 8601 timestamp when the execution started
+    </ResponseField>
+    
+    <ResponseField name="stop_date" type="string | null">
+      ISO 8601 timestamp when the execution stopped (only available when completed or failed)
+    </ResponseField>
+    
+    <ResponseField name="duration_ms" type="number | null">
+      Duration of the execution in milliseconds (only available when execution has started)
+    </ResponseField>
+    
+    <ResponseField name="progress" type="object | null">
+      Real-time progress information (only available when status is "running")
+      
+      <Expandable title="Progress Object">
+        <ResponseField name="collections_found" type="number">
+          Number of collections discovered so far
+        </ResponseField>
+        
+        <ResponseField name="listings_found" type="number">
+          Number of product listings discovered so far
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="steps" type="array">
+      Array of step status objects showing the progress of each crawl phase
+      
+      <Expandable title="Step Object">
+        <ResponseField name="name" type="string">
+          Name of the crawl step
+          
+          **Possible values:**
+          - `"Determining crawl method"`
+          - `"Discovering collections"`
+          - `"Analyzing collections"`
+          - `"Extracting listings"`
+        </ResponseField>
+        
+        <ResponseField name="status" type="string">
+          Status of this step
+          
+          **Possible values:**
+          - `"pending"` - Step has not started
+          - `"running"` - Step is currently executing
+          - `"completed"` - Step finished successfully
+          - `"failed"` - Step failed
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="result" type="object" optional>
+      Final result statistics (only available when status is "completed")
+      
+      <Expandable title="Result Object">
+        <ResponseField name="collections_total" type="number">
+          Total number of collections discovered
+        </ResponseField>
+        
+        <ResponseField name="listings_total" type="number">
+          Total number of product listings discovered
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+# Check execution status
+curl -X GET "https://api.getcatalog.ai/v2/crawl/crawl-example-com-a1b2c3d4" \
+  -H "x-api-key: $CATALOG_API_KEY"
+```
+
+```javascript JavaScript
+// Check execution status
+const executionId = 'crawl-example-com-a1b2c3d4';
+
+const response = await fetch(
+  `https://api.getcatalog.ai/v2/crawl/${executionId}`,
+  {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  }
+);
+
+const data = await response.json();
+
+if (data.status === 'completed') {
+  console.log(`Crawl completed!`);
+  console.log(`Collections: ${data.meta.result.collections_total}`);
+  console.log(`Listings: ${data.meta.result.listings_total}`);
+  console.log(`Duration: ${data.meta.duration_ms}ms`);
+} else if (data.status === 'running') {
+  console.log('Crawl is still running...');
+  if (data.meta.progress) {
+    console.log(`Progress: ${data.meta.progress.collections_found} collections, ${data.meta.progress.listings_found} listings`);
+  }
+  // Show step status
+  data.meta.steps.forEach(step => {
+    console.log(`${step.name}: ${step.status}`);
+  });
+  // Optionally cancel if needed: DELETE /v2/crawl/{executionId}
+} else if (data.status === 'failed') {
+  console.error(`Crawl failed: ${data.error}`);
+}
+```
+
+```python Python
+import requests
+import time
+
+execution_id = 'crawl-example-com-a1b2c3d4'
+
+# Poll for completion
+while True:
+    response = requests.get(
+        f'https://api.getcatalog.ai/v2/crawl/{execution_id}',
+        headers={'x-api-key': 'YOUR_API_KEY'}
+    )
+    
+    data = response.json()
+    
+    if data['status'] == 'completed':
+        print(f"Crawl completed!")
+        print(f"Collections: {data['meta']['result']['collections_total']}")
+        print(f"Listings: {data['meta']['result']['listings_total']}")
+        print(f"Duration: {data['meta']['duration_ms']}ms")
+        break
+    elif data['status'] == 'running':
+        print('Crawl is still running...')
+        if data['meta'].get('progress'):
+            progress = data['meta']['progress']
+            print(f"Progress: {progress['collections_found']} collections, {progress['listings_found']} listings")
+        # Show step status
+        for step in data['meta']['steps']:
+            print(f"{step['name']}: {step['status']}")
+        # Optionally cancel if needed: DELETE /v2/crawl/{execution_id}
+        time.sleep(10)  # Wait 10 seconds before next poll
+    elif data['status'] == 'failed':
+        print(f"Crawl failed: {data['error']}")
+        break
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Status: Running
+{
+  "execution_id": "crawl-example-com-a1b2c3d4",
+  "status": "running",
+  "error": null,
+  "meta": {
+    "vendor": "example.com",
+    "start_date": "2025-01-15T10:30:00.000Z",
+    "stop_date": null,
+    "duration_ms": 45000,
+    "progress": {
+      "collections_found": 12,
+      "listings_found": 456
+    },
+    "steps": [
+      {
+        "name": "Determining crawl method",
+        "status": "completed"
+      },
+      {
+        "name": "Discovering collections",
+        "status": "running"
+      },
+      {
+        "name": "Analyzing collections",
+        "status": "pending"
+      },
+      {
+        "name": "Extracting listings",
+        "status": "pending"
+      }
+    ]
+  }
+}
+```
+
+```json Status: Completed
+{
+  "execution_id": "crawl-example-com-a1b2c3d4",
+  "status": "completed",
+  "error": null,
+  "meta": {
+    "vendor": "example.com",
+    "start_date": "2025-01-15T10:30:00.000Z",
+    "stop_date": "2025-01-15T10:45:30.000Z",
+    "duration_ms": 930000,
+    "progress": null,
+    "steps": [
+      {
+        "name": "Determining crawl method",
+        "status": "completed"
+      },
+      {
+        "name": "Discovering collections",
+        "status": "completed"
+      },
+      {
+        "name": "Analyzing collections",
+        "status": "completed"
+      },
+      {
+        "name": "Extracting listings",
+        "status": "completed"
+      }
+    ],
+    "result": {
+      "collections_total": 25,
+      "listings_total": 1234
+    }
+  }
+}
+```
+
+```json Status: Failed
+{
+  "execution_id": "crawl-example-com-a1b2c3d4",
+  "status": "failed",
+  "error": "Execution failed. Please check the execution details or contact support.",
+  "meta": {
+    "vendor": "example.com",
+    "start_date": "2025-01-15T10:30:00.000Z",
+    "stop_date": "2025-01-15T10:32:15.000Z",
+    "duration_ms": 135000,
+    "progress": null,
+    "steps": [
+      {
+        "name": "Determining crawl method",
+        "status": "completed"
+      },
+      {
+        "name": "Discovering collections",
+        "status": "failed"
+      },
+      {
+        "name": "Analyzing collections",
+        "status": "pending"
+      },
+      {
+        "name": "Extracting listings",
+        "status": "pending"
+      }
+    ]
+  }
+}
+```
+
+</ResponseExample>
+
+## Polling Strategy
+
+For best results when waiting for completion:
+
+1. **Initial Poll:** Check status immediately after receiving `execution_id`
+2. **Polling Interval:** Wait 10-30 seconds between polls for running executions (crawls can take longer than product processing)
+3. **Exponential Backoff:** Consider increasing wait time for long-running crawls
+4. **Timeout:** Set a maximum wait time based on the size of the vendor website
+5. **Step Monitoring:** Use the `steps` array in the response to see which phase of the crawl is currently executing
+6. **Progress Tracking:** Monitor `meta.progress` to see real-time counts of collections and listings discovered
+7. **Cancellation:** If a crawl is taking too long or you need to stop it, use the [Cancel Crawl Execution](/v2/api-reference/endpoints/crawl/cancel-execution) endpoint to stop running executions

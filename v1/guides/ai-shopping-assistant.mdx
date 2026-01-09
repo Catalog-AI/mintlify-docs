@@ -3,7 +3,7 @@ title: "Building AI Shopping Assistants"
 description: "Learn how to build intelligent shopping assistants using Catalog's AI-powered search"
 ---
 
-Build AI-powered shopping assistants that understand natural language queries and personalize recommendations. Catalog's [Agentic Search](/v2/api-reference/endpoints/search/agentic-search) endpoint provides the intelligence you need to create conversational shopping experiences.
+Build AI-powered shopping assistants that understand natural language queries and personalize recommendations. Catalog's [Agentic Search](/v1/api-reference/endpoints/search/agentic-search) endpoint provides the intelligence you need to create conversational shopping experiences.
 
 ## Overview
 
@@ -56,7 +56,7 @@ Build customer profiles to improve personalization. Profiles can include:
             payload['customer_profile'] = customer_profile
         
         response = requests.post(
-            'https://api.getcatalog.ai/v2/agentic-search',
+            'https://api.getcatalog.ai/v1/agentic-search',
             headers={
                 'Content-Type': 'application/json',
                 'x-api-key': os.getenv('CATALOG_API_KEY')
@@ -65,7 +65,7 @@ Build customer profiles to improve personalization. Profiles can include:
         )
         
         data = response.json()
-        return data['data']  # Array of products
+        return data['products']  # Array of products
 
     # Example usage
     products = search_products(
@@ -142,7 +142,7 @@ Build customer profiles to improve personalization. Profiles can include:
             profile = self.get_profile(user_id)
             
             response = requests.post(
-                'https://api.getcatalog.ai/v2/agentic-search',
+                'https://api.getcatalog.ai/v1/agentic-search',
                 headers={
                     'Content-Type': 'application/json',
                     'x-api-key': self.api_key
@@ -154,7 +154,7 @@ Build customer profiles to improve personalization. Profiles can include:
             )
             
             data = response.json()
-            return data['data']
+            return data['products']
         
         def format_response(self, products, query):
             """Format search results for display"""
@@ -199,7 +199,7 @@ Build customer profiles to improve personalization. Profiles can include:
         """Search with comprehensive error handling"""
         try:
             response = requests.post(
-                'https://api.getcatalog.ai/v2/agentic-search',
+                'https://api.getcatalog.ai/v1/agentic-search',
                 headers={
                     'Content-Type': 'application/json',
                     'x-api-key': os.getenv('CATALOG_API_KEY')
@@ -219,7 +219,7 @@ Build customer profiles to improve personalization. Profiles can include:
             
             data = response.json()
             
-            if not data.get('data') or len(data['data']) == 0:
+            if not data.get('products') or len(data['products']) == 0:
                 return {
                     'success': False,
                     'message': "I couldn't find products matching your search.",
@@ -228,8 +228,8 @@ Build customer profiles to improve personalization. Profiles can include:
             
             return {
                 'success': True,
-                'products': data['data'],
-                'message': f"Found {len(data['data'])} products."
+                'products': data['products'],
+                'message': f"Found {len(data['products'])} products."
             }
         
         except Exception as error:
@@ -248,7 +248,7 @@ Build customer profiles to improve personalization. Profiles can include:
 
     ```javascript
     async function searchProducts(query, customerProfile = null) {
-      const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+      const response = await fetch('https://api.getcatalog.ai/v1/agentic-search', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -261,7 +261,7 @@ Build customer profiles to improve personalization. Profiles can include:
       });
       
       const data = await response.json();
-      return data.data; // Array of products
+      return data.products; // Array of products
     }
 
     // Example usage
@@ -339,7 +339,7 @@ Build customer profiles to improve personalization. Profiles can include:
       async search(userId, query) {
         const profile = this.getProfile(userId);
         
-        const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+        const response = await fetch('https://api.getcatalog.ai/v1/agentic-search', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -352,7 +352,7 @@ Build customer profiles to improve personalization. Profiles can include:
         });
         
         const data = await response.json();
-        return data.data;
+        return data.products;
       }
       
       formatResponse(products, query) {
@@ -397,7 +397,7 @@ Build customer profiles to improve personalization. Profiles can include:
     ```javascript
     async function searchWithErrorHandling(query, profile = null) {
       try {
-        const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+        const response = await fetch('https://api.getcatalog.ai/v1/agentic-search', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -421,7 +421,7 @@ Build customer profiles to improve personalization. Profiles can include:
         
         const data = await response.json();
         
-        if (!data.data || data.data.length === 0) {
+        if (!data.products || data.products.length === 0) {
           return {
             success: false,
             message: "I couldn't find products matching your search.",
@@ -431,8 +431,8 @@ Build customer profiles to improve personalization. Profiles can include:
         
         return {
           success: true,
-          products: data.data,
-          message: `Found ${data.data.length} products.`
+          products: data.products,
+          message: `Found ${data.products.length} products.`
         };
         
       } catch (error) {
@@ -471,17 +471,18 @@ Format product responses to be user-friendly:
 Respect API rate limits and implement appropriate retry logic:
 - Default: 50 requests per 4-second sliding window
 - Implement exponential backoff for retries
-- Use [Agentic Search Mini](/v2/api-reference/endpoints/search/agentic-search-mini) for high-frequency preview features
+- Use [Agentic Search Mini](/v1/api-reference/endpoints/search/agentic-search-mini) for high-frequency preview features
 
 See [Rate Limits](/resources/rate-limits) for detailed information.
 
 ## Related Endpoints
 
 <CardGroup cols={2}>
-  <Card title="Agentic Search" icon="search" href="/v2/api-reference/endpoints/search/agentic-search">
+  <Card title="Agentic Search" icon="search" href="/v1/api-reference/endpoints/search/agentic-search">
     AI-powered search with customer profile personalization
   </Card>
-  <Card title="Agentic Search Mini" icon="bolt" href="/v2/api-reference/endpoints/search/agentic-search-mini">
+  <Card title="Agentic Search Mini" icon="bolt" href="/v1/api-reference/endpoints/search/agentic-search-mini">
     Fast search for autocomplete and quick previews
   </Card>
 </CardGroup>
+

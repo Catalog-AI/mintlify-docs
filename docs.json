@@ -34,18 +34,28 @@
                 "pages": [
                   "v1/api-reference/overview",
                   {
-                    "group": "Listings",
+                    "group": "Discover",
                     "pages": [
-                      "v1/api-reference/endpoints/listings/get-vendors",
-                      "v1/api-reference/endpoints/listings/get-collections",
-                      "v1/api-reference/endpoints/listings/get-products"
+                      "v1/api-reference/endpoints/discover/start-crawl",
+                      "v1/api-reference/endpoints/discover/list-crawl-executions",
+                      "v1/api-reference/endpoints/discover/get-crawl-status",
+                      "v1/api-reference/endpoints/discover/cancel-crawl-execution",
+                      "v1/api-reference/endpoints/discover/get-vendors",
+                      "v1/api-reference/endpoints/discover/get-collections",
+                      "v1/api-reference/endpoints/discover/get-products"
                     ]
                   },
                   {
-                    "group": "Products",
+                    "group": "Extract",
                     "pages": [
-                      "v1/api-reference/endpoints/products/retrieve-products",
-                      "v1/api-reference/endpoints/products/get-execution-status"
+                      "v1/api-reference/endpoints/extract/retrieve-products",
+                      "v1/api-reference/endpoints/extract/list-products-executions",
+                      "v1/api-reference/endpoints/extract/get-products-execution-status",
+                      "v1/api-reference/endpoints/extract/cancel-products-execution",
+                      "v1/api-reference/endpoints/extract/start-extract",
+                      "v1/api-reference/endpoints/extract/list-extract-executions",
+                      "v1/api-reference/endpoints/extract/get-extract-status",
+                      "v1/api-reference/endpoints/extract/cancel-extract-execution"
                     ]
                   },
                   {
@@ -63,7 +73,9 @@
                 "group": "Guides",
                 "pages": [
                   "v1/guides/pagination",
-                  "v1/guides/product-index"
+                  "v1/guides/product-index",
+                  "v1/guides/product-comparison",
+                  "v1/guides/ai-shopping-assistant"
                 ]
               },
               {
@@ -107,18 +119,22 @@
                 "pages": [
                   "v2/api-reference/overview",
                   {
-                    "group": "Listings",
+                    "group": "Discover",
                     "pages": [
-                      "v2/api-reference/endpoints/listings/get-vendors",
-                      "v2/api-reference/endpoints/listings/get-collections",
-                      "v2/api-reference/endpoints/listings/get-products"
+                      "v2/api-reference/endpoints/discover/start-crawl",
+                      "v2/api-reference/endpoints/discover/list-crawl-executions",
+                      "v2/api-reference/endpoints/discover/get-crawl-status",
+                      "v2/api-reference/endpoints/discover/cancel-crawl-execution",
+                      "v2/api-reference/endpoints/discover/get-vendors",
+                      "v2/api-reference/endpoints/discover/get-collections",
+                      "v2/api-reference/endpoints/discover/get-products"
                     ]
                   },
                   {
-                    "group": "Products",
+                    "group": "Extract",
                     "pages": [
-                      "v2/api-reference/endpoints/products/retrieve-products",
-                      "v2/api-reference/endpoints/products/get-execution-status"
+                      "v2/api-reference/endpoints/extract/retrieve-products",
+                      "v2/api-reference/endpoints/extract/get-execution-status"
                     ]
                   },
                   {
@@ -137,8 +153,8 @@
                 "pages": [
                   "v2/guides/pagination",
                   "v2/guides/product-index",
-                  "v2/guides/ai-shopping-assistant",
-                  "v2/guides/product-comparison"
+                  "v2/guides/product-comparison",
+                  "v2/guides/ai-shopping-assistant"
                 ]
               },
               {

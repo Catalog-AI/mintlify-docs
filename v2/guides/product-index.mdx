@@ -6,7 +6,7 @@ description: "How to build and maintain your own product index using the Catalog
 Build and maintain your own product index using Catalog's browse and product endpoints. Choose between vendor discovery or curating your own URL list.
 
 <Note>
-This guide covers both approaches: discovering products via [Get Vendors](/v2/api-reference/endpoints/listings/get-vendors) and collections, or indexing a self-selected set of URLs via [Get Products](/v2/api-reference/endpoints/products/retrieve-products).
+This guide covers both approaches: discovering products via [Get Vendors](/v2/api-reference/endpoints/discover/get-vendors) and collections, or indexing a self-selected set of URLs via [Get Products](/v2/api-reference/endpoints/extract/retrieve-products).
 </Note>
 
 ## Option 1: Build an index from vendors and collections
@@ -44,7 +44,7 @@ Once you have a list of product URLs, use the **Get Products** endpoint (`POST /
 
 1. Pull a batch of URLs from your queue or database
 2. Call `POST /v2/products` with up to 1000 URLs per request
-3. Receive an `execution_id` and poll the [Get Execution Status](/v2/api-reference/endpoints/products/get-execution-status) endpoint
+3. Receive an `execution_id` and poll the [Get Execution Status](/v2/api-reference/endpoints/extract/get-execution-status) endpoint
 4. For each result in the completed execution:
    - If `success === true`: Upsert the product into your index (search engine, DB, vector store, etc.)
    - If `success === false`: Optionally log the `outcome`/reason and decide whether to retry later
@@ -113,16 +113,16 @@ In practice, many integrations combine both approaches:
 ## Related endpoints
 
 <CardGroup cols={2}>
-  <Card title="Get Vendors" icon="store" href="/v2/api-reference/endpoints/listings/get-vendors">
+  <Card title="Get Vendors" icon="store" href="/v2/api-reference/endpoints/discover/get-vendors">
     Discover available vendors
   </Card>
-  <Card title="Get Collections" icon="folder" href="/v2/api-reference/endpoints/listings/get-collections">
+  <Card title="Get Collections" icon="folder" href="/v2/api-reference/endpoints/discover/get-collections">
     Browse vendor collections
   </Card>
-  <Card title="Get All Products" icon="list" href="/v2/api-reference/endpoints/listings/get-products">
+  <Card title="Get All Products" icon="list" href="/v2/api-reference/endpoints/discover/get-products">
     Get products from a vendor
   </Card>
-  <Card title="Get Products" icon="box" href="/v2/api-reference/endpoints/products/retrieve-products">
+  <Card title="Get Products" icon="box" href="/v2/api-reference/endpoints/extract/retrieve-products">
     Bulk fetch product details
   </Card>
 </CardGroup>
