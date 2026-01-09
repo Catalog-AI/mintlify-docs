@@ -1,0 +1,171 @@
+---
+title: "Overview"
+description: "Complete reference for the Catalog API endpoints"
+---
+
+The Catalog API provides endpoints for product search, discovery, and commerce intelligence. All endpoints return JSON responses.
+
+## Base URL
+
+```
+https://api.getcatalog.ai
+```
+
+## Authentication
+
+All requests require an API key in the `x-api-key` header. See [Authentication](/v2/authentication) for details.
+
+## Endpoints
+
+### Listings
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v2/vendors`](/v2/api-reference/endpoints/listings/get-vendors) | GET | List all vendors with product counts |
+| [`/v2/collections`](/v2/api-reference/endpoints/listings/get-collections) | POST | List collections for a vendor |
+| [`/v2/listings`](/v2/api-reference/endpoints/listings/get-products) | POST | List products from a vendor or collection |
+
+### Products
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v2/products`](/v2/api-reference/endpoints/products/retrieve-products) | POST | Start async batch processing of product URLs (1-1000 URLs) |
+| [`/v2/products/{execution_id}`](/v2/api-reference/endpoints/products/get-execution-status) | GET | Check status and retrieve results for a batch processing job |
+
+### Search
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v2/agentic-search`](/v2/api-reference/endpoints/search/agentic-search) | POST | AI-powered search with customer profile personalization |
+| [`/v2/agentic-search-mini`](/v2/api-reference/endpoints/search/agentic-search-mini) | POST | Fast AI search returning up to 10 products |
+
+### Affiliate
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v2/affiliate`](/v2/api-reference/endpoints/affiliate/generate-links) | POST | Generate affiliate tracking links |
+
+### Usage
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| [`/v2/usage`](/v2/api-reference/endpoints/usage/get-usage) | GET | Get API usage statistics |
+
+## Response format
+
+All successful responses follow a consistent structure with a `data` array and `pagination` object:
+
+```json
+{
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "page_size": 10,
+    "total_items": 100,
+    "total_pages": 10,
+    "has_next": true,
+    "has_prev": false
+  },
+  "meta": {}
+}
+```
+
+**Product execution status** returns results in a similar structure:
+```json
+{
+  "execution_id": "...",
+  "status": "completed",
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "page_size": 50,
+    "total_items": 100,
+    "total_pages": 2,
+    "has_next": true,
+    "has_prev": false
+  },
+  "meta": {
+    "progress": {...},
+    "result": {
+      "products_requested": 100,
+      "products_successful": 98,
+      "products_failed": 2
+    }
+  }
+}
+```
+
+## Error handling
+
+Errors return appropriate HTTP status codes with structured error details:
+
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error description",
+    "request_id": "req_..."
+  }
+}
+```
+
+Additional fields may be included for specific error types. For example, validation errors may include:
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "One or more URLs have invalid format",
+    "request_id": "req_..."
+  },
+  "invalid_urls": [
+    "Index 0: https://invalid-url - invalid format"
+  ]
+}
+```
+
+| HTTP Status | Meaning | Description |
+|-------------|---------|-------------|
+| `400` | Bad Request | Invalid request parameters or malformed JSON |
+| `401` | Unauthorized | Missing or invalid API key |
+| `402` | Payment Required | Insufficient credits to complete the request |
+| `403` | Forbidden | API key lacks required permissions |
+| `404` | Not Found | Requested resource does not exist |
+| `409` | Conflict | Resource state conflict |
+| `429` | Too Many Requests | Rate limit exceeded |
+| `500` | Internal Server Error | Server-side error occurred |
+
+All error responses include a `Request-ID` header that matches the `request_id` in the response body. See [Error Codes](/resources/error-codes) for the complete reference.
+
+## Rate limits
+
+Default policy: 50 requests per 4-second sliding window, counted per IP with a global fallback.
+
+See [Rate Limits](/resources/rate-limits) for headers, what `429` means, and pacing guidance.
+
+## Pagination
+
+All endpoints consistently use `page` and `page_size` for pagination:
+
+**GET endpoints** (vendors, usage) use query string parameters:
+- `page`: Page number (1-indexed, default: 1)
+- `page_size`: Items per page (default varies, max: 100)
+
+**POST endpoints** (listings, collections, agentic-search) include pagination in the request body:
+- `page`: Page number (required for listings/collections, optional for search)
+- `page_size`: Items per page (optional, default varies)
+
+**Execution status endpoint** (`/v2/products/{execution_id}`) uses query parameters:
+- `page`: Page number (1-indexed, default: 1)
+- `page_size`: Items per page (default: 50, max: 100)
+
+All paginated responses include a `pagination` object in the response with:
+- `page`: Current page number
+- `page_size`: Items per page
+- `total_items`: Total number of items
+- `total_pages`: Total number of pages
+- `has_next`: Whether there is a next page
+- `has_prev`: Whether there is a previous page
+
+<Note>
+The `total_items` count may be capped for performance depending on the endpoint. See [Pagination Guide](/v2/guides/pagination) for implementation patterns.
+</Note>

@@ -1,0 +1,173 @@
+---
+title: "Get API Usage Statistics"
+api: "GET https://api.getcatalog.ai/v2/usage"
+description: "Retrieve API usage statistics for your account grouped by endpoint path"
+---
+
+Get usage analytics for your API key showing request counts by endpoint.
+
+<Tip>
+**When to use:** Monitor your API consumption and track usage patterns. See [Rate Limits](/resources/rate-limits) for quota information.
+</Tip>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="period" type="string" default="30d">
+  Time period for usage statistics
+  
+  **Valid Values:**
+  - `24h` - Last 24 hours
+  - `7d` - Last 7 days  
+  - `30d` - Last 30 days (default)
+  - `90d` - Last 90 days
+  - `all` - All time usage
+</ParamField>
+
+<ParamField query="page" type="number" default="1">
+  Page number for pagination (1-indexed)
+</ParamField>
+
+<ParamField query="page_size" type="number" default="20">
+  Number of items per page (maximum 100)
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="array">
+  Array of usage statistics by endpoint path
+  
+  <Expandable title="Usage Statistics">
+    <ResponseField name="path" type="string">
+      API endpoint path (e.g., "/v2/agentic-search", "/v1/products")
+    </ResponseField>
+    
+    <ResponseField name="total_calls" type="number">
+      Total number of API calls made to this endpoint
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Pagination metadata for the results
+  
+  <Expandable title="Pagination Object">
+    <ResponseField name="page" type="number">
+      Current page number
+    </ResponseField>
+    
+    <ResponseField name="page_size" type="number">
+      Number of items per page
+    </ResponseField>
+    
+    <ResponseField name="total_items" type="number">
+      Total number of items across all pages
+    </ResponseField>
+    
+    <ResponseField name="total_pages" type="number">
+      Total number of pages available
+    </ResponseField>
+    
+    <ResponseField name="has_next" type="boolean">
+      Whether there is a next page
+    </ResponseField>
+    
+    <ResponseField name="has_prev" type="boolean">
+      Whether there is a previous page
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Response metadata
+  
+  <Expandable title="Meta Properties">
+    <ResponseField name="period" type="string">
+      Echo back the requested time period
+    </ResponseField>
+    
+    <ResponseField name="request_id" type="string" optional>
+      Unique request identifier for support purposes
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X GET "https://api.getcatalog.ai/v2/usage?period=7d&page_size=5" \
+  -H "x-api-key: $CATALOG_API_KEY"
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.getcatalog.ai/v2/usage?period=7d&page_size=5', {
+  method: 'GET',
+  headers: {
+    'x-api-key': 'YOUR_API_KEY'
+  }
+});
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://api.getcatalog.ai/v2/usage?period=7d&page_size=5',
+    headers={
+        'x-api-key': 'YOUR_API_KEY'
+    }
+)
+
+data = response.json()
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "data": [
+    {
+      "path": "/v1/listings",
+      "total_calls": 9
+    },
+    {
+      "path": "/v1/affiliate",
+      "total_calls": 8
+    },
+    {
+      "path": "/v1/vendors",
+      "total_calls": 6
+    },
+    {
+      "path": "/v1/agentic-search",
+      "total_calls": 4
+    },
+    {
+      "path": "/v1/collections",
+      "total_calls": 4
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 5,
+    "total_items": 16,
+    "total_pages": 4,
+    "has_next": true,
+    "has_prev": false
+  },
+  "meta": {
+    "period": "7d"
+  }
+}
+```
+</ResponseExample>
+

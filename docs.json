@@ -24,46 +24,46 @@
               {
                 "group": "Get Started",
                 "pages": [
-                  "welcome",
-                  "quickstart",
-                  "authentication"
+                  "v1/welcome",
+                  "v1/quickstart",
+                  "v1/authentication"
                 ]
               },
               {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/overview",
+                  "v1/api-reference/overview",
                   {
                     "group": "Listings",
                     "pages": [
-                      "api-reference/v1/browse/list-vendors",
-                      "api-reference/v1/browse/list-collections",
-                      "api-reference/v1/browse/list-listings"
+                      "v1/api-reference/endpoints/listings/get-vendors",
+                      "v1/api-reference/endpoints/listings/get-collections",
+                      "v1/api-reference/endpoints/listings/get-products"
                     ]
                   },
                   {
                     "group": "Products",
                     "pages": [
-                      "api-reference/v1/products/get-products",
-                      "api-reference/v1/products/get-execution-status"
+                      "v1/api-reference/endpoints/products/retrieve-products",
+                      "v1/api-reference/endpoints/products/get-execution-status"
                     ]
                   },
                   {
                     "group": "Search",
                     "pages": [
-                      "api-reference/v1/search/agentic-search",
-                      "api-reference/v1/search/agentic-search-mini"
+                      "v1/api-reference/endpoints/search/agentic-search",
+                      "v1/api-reference/endpoints/search/agentic-search-mini"
                     ]
                   },
-                  "api-reference/v1/affiliate/generate-links",
-                  "api-reference/v1/usage/get-usage"
+                  "v1/api-reference/endpoints/affiliate/generate-links",
+                  "v1/api-reference/endpoints/usage/get-usage"
                 ]
               },
               {
                 "group": "Guides",
                 "pages": [
-                  "guides/pagination",
-                  "guides/product-index"
+                  "v1/guides/pagination",
+                  "v1/guides/product-index"
                 ]
               },
               {
@@ -97,46 +97,48 @@
               {
                 "group": "Get Started",
                 "pages": [
-                  "welcome",
-                  "quickstart",
-                  "authentication"
+                  "v2/welcome",
+                  "v2/quickstart",
+                  "v2/authentication"
                 ]
               },
               {
                 "group": "API Reference",
                 "pages": [
-                  "api-reference/overview",
+                  "v2/api-reference/overview",
                   {
                     "group": "Listings",
                     "pages": [
-                      "api-reference/v2/browse/list-vendors",
-                      "api-reference/v2/browse/list-collections",
-                      "api-reference/v2/browse/list-listings"
+                      "v2/api-reference/endpoints/listings/get-vendors",
+                      "v2/api-reference/endpoints/listings/get-collections",
+                      "v2/api-reference/endpoints/listings/get-products"
                     ]
                   },
                   {
                     "group": "Products",
                     "pages": [
-                      "api-reference/v2/products/get-products",
-                      "api-reference/v2/products/get-execution-status"
+                      "v2/api-reference/endpoints/products/retrieve-products",
+                      "v2/api-reference/endpoints/products/get-execution-status"
                     ]
                   },
                   {
                     "group": "Search",
                     "pages": [
-                      "api-reference/v2/search/agentic-search",
-                      "api-reference/v2/search/agentic-search-mini"
+                      "v2/api-reference/endpoints/search/agentic-search",
+                      "v2/api-reference/endpoints/search/agentic-search-mini"
                     ]
                   },
-                  "api-reference/v2/affiliate/generate-links",
-                  "api-reference/v2/usage/get-usage"
+                  "v2/api-reference/endpoints/affiliate/generate-links",
+                  "v2/api-reference/endpoints/usage/get-usage"
                 ]
               },
               {
                 "group": "Guides",
                 "pages": [
-                  "guides/pagination",
-                  "guides/product-index"
+                  "v2/guides/pagination",
+                  "v2/guides/product-index",
+                  "v2/guides/ai-shopping-assistant",
+                  "v2/guides/product-comparison"
                 ]
               },
               {

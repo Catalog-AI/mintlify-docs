@@ -1,0 +1,1368 @@
+---
+title: "Product Comparison"
+description: "Learn how to build product comparison features using Catalog's product retrieval and enrichment capabilities"
+---
+
+Build powerful product comparison tools that help users make informed purchasing decisions. Catalog's product endpoints provide detailed, normalized product data that makes comparing products across different vendors straightforward.
+
+<Note>
+This guide covers comparing products retrieved via the [Get Products](/v2/api-reference/endpoints/products/retrieve-products) endpoint. For comparing products from search results, you can also use the [Agentic Search](/v2/api-reference/endpoints/search/agentic-search) endpoint to find comparable products.
+</Note>
+
+## Overview
+
+Product comparison helps users:
+
+- **Evaluate alternatives** side-by-side
+- **Compare key attributes** like price, materials, features, and specifications
+- **Make informed decisions** based on normalized data
+- **Save time** by viewing all relevant information in one place
+
+## Core Concepts
+
+### 1. Retrieving Products for Comparison
+
+Use the **Get Products** endpoint to retrieve detailed information for multiple product URLs at once (supports 1-1000 URLs per batch).
+
+### 2. Normalized Product Data
+
+Catalog provides normalized product data with consistent structure across different vendors, making comparison straightforward:
+
+- **Pricing**: Normalized price amounts and currency
+- **Attributes**: Standardized attribute structure (color, material, style, etc.)
+- **Variants**: Consistent variant information
+- **Availability**: Standardized availability status
+
+### 3. Comparison Dimensions
+
+Compare products across multiple dimensions:
+
+- **Price**: Current price, price ranges, sale status
+- **Specifications**: Materials, dimensions, care instructions
+- **Attributes**: Style, color, aesthetic, features
+- **Availability**: Stock status, variant availability
+- **Media**: Image quality and quantity
+- **Vendor**: Brand, vendor reputation, shipping options
+
+## Basic Comparison
+
+### Step 1: Retrieve Products
+
+Start by retrieving products you want to compare using the Get Products endpoint.
+
+<CodeGroup>
+
+```javascript Basic Retrieval
+async function retrieveProductsForComparison(urls) {
+  // Start async batch processing
+  const response = await fetch('https://api.getcatalog.ai/v2/products', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.CATALOG_API_KEY
+    },
+    body: JSON.stringify({
+      urls: urls,
+      enable_enrichment: true, // Enable enrichment for better attributes
+      country_code: 'us'
+    })
+  });
+  
+  const { execution_id } = await response.json();
+  console.log(`Processing started: ${execution_id}`);
+  
+  // Poll for results
+  return await pollForResults(execution_id);
+}
+
+async function pollForResults(executionId) {
+  while (true) {
+    const response = await fetch(
+      `https://api.getcatalog.ai/v2/products/${executionId}`,
+      {
+        headers: {
+          'x-api-key': process.env.CATALOG_API_KEY
+        }
+      }
+    );
+    
+    const data = await response.json();
+    
+    if (data.status === 'completed') {
+      // Extract successful products
+      return data.data
+        .filter(item => item.success && item.product)
+        .map(item => item.product);
+    } else if (data.status === 'failed') {
+      throw new Error(`Processing failed: ${data.error}`);
+    }
+    
+    // Wait before next poll
+    await new Promise(resolve => setTimeout(resolve, 2000));
+  }
+}
+
+// Usage
+const productUrls = [
+  'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+  'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+];
+
+const products = await retrieveProductsForComparison(productUrls);
+console.log(`Retrieved ${products.length} products for comparison`);
+```
+
+```python Basic Retrieval
+import requests
+import time
+
+def retrieve_products_for_comparison(urls):
+    """Retrieve products for comparison"""
+    # Start async batch processing
+    response = requests.post(
+        'https://api.getcatalog.ai/v2/products',
+        headers={
+            'Content-Type': 'application/json',
+            'x-api-key': os.getenv('CATALOG_API_KEY')
+        },
+        json={
+            'urls': urls,
+            'enable_enrichment': True,  # Enable enrichment for better attributes
+            'country_code': 'us'
+        }
+    )
+    
+    data = response.json()
+    execution_id = data['execution_id']
+    print(f"Processing started: {execution_id}")
+    
+    # Poll for results
+    return poll_for_results(execution_id)
+
+def poll_for_results(execution_id):
+    """Poll for execution results"""
+    while True:
+        response = requests.get(
+            f'https://api.getcatalog.ai/v2/products/{execution_id}',
+            headers={'x-api-key': os.getenv('CATALOG_API_KEY')}
+        )
+        
+        data = response.json()
+        
+        if data['status'] == 'completed':
+            # Extract successful products
+            return [
+                item['product']
+                for item in data['data']
+                if item['success'] and item.get('product')
+            ]
+        elif data['status'] == 'failed':
+            raise Exception(f"Processing failed: {data.get('error', 'Unknown error')}")
+        
+        # Wait before next poll
+        time.sleep(2)
+
+# Usage
+product_urls = [
+    'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+    'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+]
+
+products = retrieve_products_for_comparison(product_urls)
+print(f"Retrieved {len(products)} products for comparison")
+```
+
+</CodeGroup>
+
+### Step 2: Extract Comparison Attributes
+
+Extract and normalize comparison attributes from product data.
+
+<CodeGroup>
+
+```javascript Extract Attributes
+function extractComparisonAttributes(product) {
+  const attrs = product.attributes || {};
+  
+  return {
+    // Basic info
+    title: product.title,
+    brand: product.brand,
+    vendor: product.vendor,
+    url: product.url,
+    
+    // Pricing
+    price: product.price_amount,
+    currency: product.price_currency,
+    minPrice: product.min_price,
+    maxPrice: product.max_price,
+    onSale: product.min_price < product.max_price,
+    
+    // Availability
+    available: product.is_available,
+    availableVariants: product.variants?.filter(v => v.isAvailable).length || 0,
+    totalVariants: product.variants?.length || 0,
+    
+    // Attributes
+    color: attrs.color?.merchant_label || attrs.color || 'N/A',
+    material: attrs.material?.primary || attrs.material || 'N/A',
+    style: attrs.style || [],
+    season: attrs.season || [],
+    occasion: attrs.occasion || [],
+    
+    // Specifications
+    features: attrs.features || '',
+    careInstructions: attrs.care_instructions || 'N/A',
+    
+    // Media
+    imageCount: product.images?.length || 0,
+    primaryImage: product.images?.[0]?.url || null,
+    
+    // Description
+    summary: attrs.summary || product.description?.substring(0, 200) || '',
+    description: product.description
+  };
+}
+
+// Extract attributes for all products
+const comparisonData = products.map(extractComparisonAttributes);
+console.log('Comparison attributes extracted:', comparisonData);
+```
+
+```python Extract Attributes
+def extract_comparison_attributes(product):
+    """Extract comparison attributes from product data"""
+    attrs = product.get('attributes', {})
+    
+    return {
+        # Basic info
+        'title': product.get('title'),
+        'brand': product.get('brand'),
+        'vendor': product.get('vendor'),
+        'url': product.get('url'),
+        
+        # Pricing
+        'price': product.get('price_amount'),
+        'currency': product.get('price_currency'),
+        'min_price': product.get('min_price'),
+        'max_price': product.get('max_price'),
+        'on_sale': product.get('min_price', 0) < product.get('max_price', 0),
+        
+        # Availability
+        'available': product.get('is_available', False),
+        'available_variants': len([v for v in product.get('variants', []) if v.get('isAvailable')]),
+        'total_variants': len(product.get('variants', [])),
+        
+        # Attributes
+        'color': attrs.get('color', {}).get('merchant_label') or attrs.get('color') or 'N/A',
+        'material': attrs.get('material', {}).get('primary') or attrs.get('material') or 'N/A',
+        'style': attrs.get('style', []),
+        'season': attrs.get('season', []),
+        'occasion': attrs.get('occasion', []),
+        
+        # Specifications
+        'features': attrs.get('features', ''),
+        'care_instructions': attrs.get('care_instructions', 'N/A'),
+        
+        # Media
+        'image_count': len(product.get('images', [])),
+        'primary_image': product.get('images', [{}])[0].get('url') if product.get('images') else None,
+        
+        # Description
+        'summary': attrs.get('summary') or product.get('description', '')[:200] or '',
+        'description': product.get('description')
+    }
+
+# Extract attributes for all products
+comparison_data = [extract_comparison_attributes(p) for p in products]
+print('Comparison attributes extracted')
+```
+
+</CodeGroup>
+
+### Step 3: Display Comparison
+
+Create a comparison view that displays products side-by-side.
+
+<CodeGroup>
+
+```javascript Comparison Component
+class ProductComparison {
+  constructor(products) {
+    this.products = products.map(extractComparisonAttributes);
+  }
+  
+  // Generate comparison table data
+  generateComparisonTable() {
+    const rows = [
+      {
+        label: 'Product',
+        values: this.products.map(p => ({
+          title: p.title,
+          brand: p.brand,
+          image: p.primaryImage
+        }))
+      },
+      {
+        label: 'Price',
+        values: this.products.map(p => 
+          `$${p.price} ${p.currency}`
+        )
+      },
+      {
+        label: 'Price Range',
+        values: this.products.map(p => {
+          if (p.minPrice === p.maxPrice) {
+            return `$${p.minPrice}`;
+          }
+          return `$${p.minPrice} - $${p.maxPrice}`;
+        })
+      },
+      {
+        label: 'Availability',
+        values: this.products.map(p => 
+          p.available ? 
+            `In Stock (${p.availableVariants}/${p.totalVariants} variants)` : 
+            'Out of Stock'
+        )
+      },
+      {
+        label: 'Color',
+        values: this.products.map(p => p.color)
+      },
+      {
+        label: 'Material',
+        values: this.products.map(p => p.material)
+      },
+      {
+        label: 'Style',
+        values: this.products.map(p => p.style.join(', ') || 'N/A')
+      },
+      {
+        label: 'Key Features',
+        values: this.products.map(p => p.features || 'N/A')
+      },
+      {
+        label: 'Care Instructions',
+        values: this.products.map(p => p.careInstructions)
+      }
+    ];
+    
+    return rows;
+  }
+  
+  // Find best value (lowest price among available products)
+  findBestValue() {
+    const available = this.products.filter(p => p.available);
+    if (available.length === 0) return null;
+    
+    return available.reduce((best, current) => 
+      current.price < best.price ? current : best
+    );
+  }
+  
+  // Get comparison summary
+  getSummary() {
+    const bestValue = this.findBestValue();
+    const allAvailable = this.products.every(p => p.available);
+    const priceRange = {
+      min: Math.min(...this.products.map(p => p.minPrice)),
+      max: Math.max(...this.products.map(p => p.maxPrice))
+    };
+    
+    return {
+      totalProducts: this.products.length,
+      allAvailable,
+      bestValue: bestValue ? {
+        title: bestValue.title,
+        price: bestValue.price,
+        currency: bestValue.currency
+      } : null,
+      priceRange
+    };
+  }
+}
+
+// Usage
+const comparison = new ProductComparison(products);
+const table = comparison.generateComparisonTable();
+const summary = comparison.getSummary();
+
+console.log('Comparison Summary:', summary);
+console.log('Comparison Table:', table);
+```
+
+```python Comparison Class
+class ProductComparison:
+    def __init__(self, products):
+        self.products = [extract_comparison_attributes(p) for p in products]
+    
+    def generate_comparison_table(self):
+        """Generate comparison table data"""
+        rows = [
+            {
+                'label': 'Product',
+                'values': [
+                    {
+                        'title': p['title'],
+                        'brand': p['brand'],
+                        'image': p['primary_image']
+                    }
+                    for p in self.products
+                ]
+            },
+            {
+                'label': 'Price',
+                'values': [f"${p['price']} {p['currency']}" for p in self.products]
+            },
+            {
+                'label': 'Price Range',
+                'values': [
+                    f"${p['min_price']}" if p['min_price'] == p['max_price']
+                    else f"${p['min_price']} - ${p['max_price']}"
+                    for p in self.products
+                ]
+            },
+            {
+                'label': 'Availability',
+                'values': [
+                    f"In Stock ({p['available_variants']}/{p['total_variants']} variants)"
+                    if p['available']
+                    else 'Out of Stock'
+                    for p in self.products
+                ]
+            },
+            {
+                'label': 'Color',
+                'values': [p['color'] for p in self.products]
+            },
+            {
+                'label': 'Material',
+                'values': [p['material'] for p in self.products]
+            },
+            {
+                'label': 'Style',
+                'values': [', '.join(p['style']) if p['style'] else 'N/A' for p in self.products]
+            },
+            {
+                'label': 'Key Features',
+                'values': [p['features'] or 'N/A' for p in self.products]
+            },
+            {
+                'label': 'Care Instructions',
+                'values': [p['care_instructions'] for p in self.products]
+            }
+        ]
+        return rows
+    
+    def find_best_value(self):
+        """Find best value (lowest price among available products)"""
+        available = [p for p in self.products if p['available']]
+        if not available:
+            return None
+        
+        return min(available, key=lambda p: p['price'])
+    
+    def get_summary(self):
+        """Get comparison summary"""
+        best_value = self.find_best_value()
+        all_available = all(p['available'] for p in self.products)
+        prices = [p['min_price'] for p in self.products]
+        
+        return {
+            'total_products': len(self.products),
+            'all_available': all_available,
+            'best_value': {
+                'title': best_value['title'],
+                'price': best_value['price'],
+                'currency': best_value['currency']
+            } if best_value else None,
+            'price_range': {
+                'min': min(prices),
+                'max': max(prices)
+            }
+        }
+
+# Usage
+comparison = ProductComparison(products)
+table = comparison.generate_comparison_table()
+summary = comparison.get_summary()
+
+print('Comparison Summary:', summary)
+print('Comparison Table:', table)
+```
+
+</CodeGroup>
+
+## Advanced Comparison Features
+
+### Highlighting Differences
+
+Automatically highlight key differences between products to help users make decisions faster.
+
+<CodeGroup>
+
+```javascript Highlight Differences
+class ComparisonHighlighter {
+  constructor(comparison) {
+    this.comparison = comparison;
+  }
+  
+  getDifferences() {
+    const differences = [];
+    const products = this.comparison.products;
+    
+    if (products.length < 2) return differences;
+    
+    // Compare prices
+    const prices = products.map(p => p.price);
+    const priceRange = Math.max(...prices) - Math.min(...prices);
+    if (priceRange > 0) {
+      differences.push({
+        type: 'price',
+        message: `Price difference: $${priceRange.toFixed(2)}`,
+        significance: priceRange > 50 ? 'high' : 'low'
+      });
+    }
+    
+    // Compare availability
+    const allAvailable = products.every(p => p.available);
+    if (!allAvailable) {
+      differences.push({
+        type: 'availability',
+        message: 'Some products are out of stock',
+        significance: 'high'
+      });
+    }
+    
+    // Compare materials
+    const materials = [...new Set(products.map(p => p.material))];
+    if (materials.length > 1) {
+      differences.push({
+        type: 'material',
+        message: `Different materials: ${materials.join(', ')}`,
+        significance: 'medium'
+      });
+    }
+    
+    // Compare styles
+    const allStyles = products.flatMap(p => p.style);
+    const uniqueStyles = [...new Set(allStyles)];
+    if (uniqueStyles.length > products.length) {
+      differences.push({
+        type: 'style',
+        message: 'Varied style profiles',
+        significance: 'low'
+      });
+    }
+    
+    return differences.sort((a, b) => {
+      const significanceOrder = { 'high': 0, 'medium': 1, 'low': 2 };
+      return significanceOrder[a.significance] - significanceOrder[b.significance];
+    });
+  }
+  
+  getRecommendation(criteria = {}) {
+    const { prioritizePrice = false, prioritizeAvailability = true } = criteria;
+    const products = this.comparison.products;
+    
+    let filtered = products;
+    
+    if (prioritizeAvailability) {
+      filtered = filtered.filter(p => p.available);
+    }
+    
+    if (filtered.length === 0) {
+      return {
+        recommendation: 'none',
+        reason: 'No products match your criteria'
+      };
+    }
+    
+    if (prioritizePrice) {
+      const best = filtered.reduce((best, current) => 
+        current.price < best.price ? current : best
+      );
+      return {
+        recommendation: 'best_value',
+        product: best,
+        reason: 'Lowest price among available products'
+      };
+    }
+    
+    // Default: return first available or first product
+    const recommended = filtered[0] || products[0];
+    return {
+      recommendation: 'default',
+      product: recommended,
+      reason: 'First available product'
+    };
+  }
+}
+
+// Usage
+const highlighter = new ComparisonHighlighter(comparison);
+const differences = highlighter.getDifferences();
+const recommendation = highlighter.getRecommendation({
+  prioritizePrice: true,
+  prioritizeAvailability: true
+});
+
+console.log('Key Differences:', differences);
+console.log('Recommendation:', recommendation);
+```
+
+```python Highlight Differences
+class ComparisonHighlighter:
+    def __init__(self, comparison):
+        self.comparison = comparison
+    
+    def get_differences(self):
+        """Identify key differences between products"""
+        differences = []
+        products = self.comparison.products
+        
+        if len(products) < 2:
+            return differences
+        
+        # Compare prices
+        prices = [p['price'] for p in products]
+        price_range = max(prices) - min(prices)
+        if price_range > 0:
+            differences.append({
+                'type': 'price',
+                'message': f'Price difference: ${price_range:.2f}',
+                'significance': 'high' if price_range > 50 else 'low'
+            })
+        
+        # Compare availability
+        all_available = all(p['available'] for p in products)
+        if not all_available:
+            differences.append({
+                'type': 'availability',
+                'message': 'Some products are out of stock',
+                'significance': 'high'
+            })
+        
+        # Compare materials
+        materials = list(set(p['material'] for p in products))
+        if len(materials) > 1:
+            differences.append({
+                'type': 'material',
+                'message': f"Different materials: {', '.join(materials)}",
+                'significance': 'medium'
+            })
+        
+        # Compare styles
+        all_styles = [style for p in products for style in p['style']]
+        unique_styles = list(set(all_styles))
+        if len(unique_styles) > len(products):
+            differences.append({
+                'type': 'style',
+                'message': 'Varied style profiles',
+                'significance': 'low'
+            })
+        
+        # Sort by significance
+        significance_order = {'high': 0, 'medium': 1, 'low': 2}
+        return sorted(differences, key=lambda x: significance_order[x['significance']])
+    
+    def get_recommendation(self, criteria=None):
+        """Get recommendation based on criteria"""
+        if criteria is None:
+            criteria = {}
+        
+        prioritize_price = criteria.get('prioritize_price', False)
+        prioritize_availability = criteria.get('prioritize_availability', True)
+        products = self.comparison.products
+        
+        filtered = products
+        
+        if prioritize_availability:
+            filtered = [p for p in filtered if p['available']]
+        
+        if not filtered:
+            return {
+                'recommendation': 'none',
+                'reason': 'No products match your criteria'
+            }
+        
+        if prioritize_price:
+            best = min(filtered, key=lambda p: p['price'])
+            return {
+                'recommendation': 'best_value',
+                'product': best,
+                'reason': 'Lowest price among available products'
+            }
+        
+        # Default: return first available or first product
+        recommended = filtered[0] if filtered else products[0]
+        return {
+            'recommendation': 'default',
+            'product': recommended,
+            'reason': 'First available product'
+        }
+
+# Usage
+highlighter = ComparisonHighlighter(comparison)
+differences = highlighter.get_differences()
+recommendation = highlighter.get_recommendation({
+    'prioritize_price': True,
+    'prioritize_availability': True
+})
+
+print('Key Differences:', differences)
+print('Recommendation:', recommendation)
+```
+
+</CodeGroup>
+
+### Variant Comparison
+
+Compare specific variants (e.g., different sizes or colors) across products.
+
+<CodeGroup>
+
+```javascript Variant Comparison
+function compareVariants(products) {
+  const variantComparisons = [];
+  
+  products.forEach(product => {
+    if (!product.variants || product.variants.length === 0) {
+      return;
+    }
+    
+    product.variants.forEach(variant => {
+      variantComparisons.push({
+        productTitle: product.title,
+        productUrl: product.url,
+        variantTitle: variant.title,
+        sku: variant.SKU,
+        price: parseFloat(variant.price),
+        available: variant.isAvailable,
+        options: {
+          option1: variant.option1,
+          option2: variant.option2,
+          option3: variant.option3
+        }
+      });
+    });
+  });
+  
+  // Group by similar options (e.g., same size)
+  const groupedBySize = {};
+  variantComparisons.forEach(variant => {
+    const size = variant.options.option1 || 'default';
+    if (!groupedBySize[size]) {
+      groupedBySize[size] = [];
+    }
+    groupedBySize[size].push(variant);
+  });
+  
+  return {
+    allVariants: variantComparisons,
+    groupedBySize,
+    priceRange: {
+      min: Math.min(...variantComparisons.map(v => v.price)),
+      max: Math.max(...variantComparisons.map(v => v.price))
+    }
+  };
+}
+
+// Usage
+const variantComparison = compareVariants(products);
+console.log('Variant comparison:', variantComparison);
+```
+
+```python Variant Comparison
+def compare_variants(products):
+    """Compare product variants"""
+    variant_comparisons = []
+    
+    for product in products:
+        variants = product.get('variants', [])
+        if not variants:
+            continue
+        
+        for variant in variants:
+            variant_comparisons.append({
+                'product_title': product.get('title'),
+                'product_url': product.get('url'),
+                'variant_title': variant.get('title'),
+                'sku': variant.get('SKU'),
+                'price': float(variant.get('price', 0)),
+                'available': variant.get('isAvailable', False),
+                'options': {
+                    'option1': variant.get('option1'),
+                    'option2': variant.get('option2'),
+                    'option3': variant.get('option3')
+                }
+            })
+    
+    # Group by similar options (e.g., same size)
+    grouped_by_size = {}
+    for variant in variant_comparisons:
+        size = variant['options'].get('option1') or 'default'
+        if size not in grouped_by_size:
+            grouped_by_size[size] = []
+        grouped_by_size[size].append(variant)
+    
+    prices = [v['price'] for v in variant_comparisons]
+    
+    return {
+        'all_variants': variant_comparisons,
+        'grouped_by_size': grouped_by_size,
+        'price_range': {
+            'min': min(prices) if prices else 0,
+            'max': max(prices) if prices else 0
+        }
+    }
+
+# Usage
+variant_comparison = compare_variants(products)
+print('Variant comparison:', variant_comparison)
+```
+
+</CodeGroup>
+
+### Visual Comparison Display
+
+Create a React component for displaying product comparisons.
+
+<CodeGroup>
+
+```javascript React Comparison Component
+import React from 'react';
+
+function ProductComparisonTable({ products }) {
+  const comparison = new ProductComparison(products);
+  const table = comparison.generateComparisonTable();
+  const summary = comparison.getSummary();
+  const highlighter = new ComparisonHighlighter(comparison);
+  const differences = highlighter.getDifferences();
+  
+  return (
+    <div className="product-comparison">
+      <h2>Product Comparison</h2>
+      
+      {/* Summary */}
+      <div className="comparison-summary">
+        <p>Comparing {summary.totalProducts} products</p>
+        {summary.bestValue && (
+          <p>
+            Best Value: <strong>{summary.bestValue.title}</strong> at 
+            ${summary.bestValue.price} {summary.bestValue.currency}
+          </p>
+        )}
+        <p>Price Range: ${summary.priceRange.min} - ${summary.priceRange.max}</p>
+      </div>
+      
+      {/* Key Differences */}
+      {differences.length > 0 && (
+        <div className="key-differences">
+          <h3>Key Differences</h3>
+          <ul>
+            {differences.map((diff, i) => (
+              <li key={i} className={`difference ${diff.significance}`}>
+                {diff.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      
+      {/* Comparison Table */}
+      <table className="comparison-table">
+        <thead>
+          <tr>
+            <th>Attribute</th>
+            {comparison.products.map((product, i) => (
+              <th key={i}>
+                <img src={product.primaryImage} alt={product.title} />
+                <div>
+                  <strong>{product.brand}</strong>
+                  <p>{product.title}</p>
+                </div>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.map((row, i) => (
+            <tr key={i}>
+              <td><strong>{row.label}</strong></td>
+              {row.values.map((value, j) => (
+                <td key={j}>
+                  {typeof value === 'object' ? (
+                    <div>
+                      {value.title && <div>{value.title}</div>}
+                      {value.brand && <div><small>{value.brand}</small></div>}
+                    </div>
+                  ) : (
+                    value
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      
+      {/* Product Links */}
+      <div className="product-actions">
+        {comparison.products.map((product, i) => (
+          <a
+            key={i}
+            href={product.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="product-link"
+          >
+            View {product.brand} Product
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default ProductComparisonTable;
+```
+
+</CodeGroup>
+
+## Best Practices
+
+### 1. Enable Enrichment
+
+<Tip>
+Always enable `enable_enrichment: true` when retrieving products for comparison. This provides richer, normalized attributes that make comparisons more meaningful.
+</Tip>
+
+Enrichment provides:
+- Better attribute extraction
+- Normalized color and material information
+- Enhanced style and feature descriptions
+- Consistent data structure across vendors
+
+### 2. Handle Missing Data
+
+Not all products will have all attributes. Handle missing data gracefully:
+
+<CodeGroup>
+
+```javascript Handle Missing Data
+function safeGetAttribute(product, path, defaultValue = 'N/A') {
+  const keys = path.split('.');
+  let value = product;
+  
+  for (const key of keys) {
+    if (value && typeof value === 'object' && key in value) {
+      value = value[key];
+    } else {
+      return defaultValue;
+    }
+  }
+  
+  return value || defaultValue;
+}
+
+// Usage
+const color = safeGetAttribute(product, 'attributes.color.merchant_label', 'Color not specified');
+const material = safeGetAttribute(product, 'attributes.material.primary', 'Material not specified');
+```
+
+```python Handle Missing Data
+def safe_get_attribute(product, path, default='N/A'):
+    """Safely get nested attribute with default value"""
+    keys = path.split('.')
+    value = product
+    
+    for key in keys:
+        if isinstance(value, dict) and key in value:
+            value = value[key]
+        else:
+            return default
+    
+    return value or default
+
+# Usage
+color = safe_get_attribute(product, 'attributes.color.merchant_label', 'Color not specified')
+material = safe_get_attribute(product, 'attributes.material.primary', 'Material not specified')
+```
+
+</CodeGroup>
+
+### 3. Normalize Currency
+
+When comparing products from different regions, normalize currency:
+
+<CodeGroup>
+
+```javascript Currency Normalization
+async function normalizeCurrency(products, targetCurrency = 'USD') {
+  // In production, use a currency conversion API
+  // For now, assume all products are in the same currency
+  
+  return products.map(product => ({
+    ...product,
+    originalCurrency: product.price_currency,
+    normalizedPrice: product.price_amount, // Would convert here
+    normalizedCurrency: targetCurrency
+  }));
+}
+```
+
+```python Currency Normalization
+def normalize_currency(products, target_currency='USD'):
+    """Normalize currency for comparison"""
+    # In production, use a currency conversion API
+    # For now, assume all products are in the same currency
+    
+    return [
+        {
+            **product,
+            'original_currency': product.get('price_currency'),
+            'normalized_price': product.get('price_amount'),  # Would convert here
+            'normalized_currency': target_currency
+        }
+        for product in products
+    ]
+```
+
+</CodeGroup>
+
+### 4. Error Handling
+
+Handle cases where some products fail to retrieve:
+
+<CodeGroup>
+
+```javascript Error Handling
+async function retrieveProductsWithErrors(urls) {
+  const executionId = await startProductRetrieval(urls);
+  const results = await pollForResults(executionId);
+  
+  const successful = [];
+  const failed = [];
+  
+  results.forEach(result => {
+    if (result.success && result.product) {
+      successful.push(result.product);
+    } else {
+      failed.push({
+        url: result.url,
+        reason: result.outcome || 'Unknown error'
+      });
+    }
+  });
+  
+  return {
+    products: successful,
+    errors: failed,
+    successRate: (successful.length / urls.length) * 100
+  };
+}
+```
+
+```python Error Handling
+def retrieve_products_with_errors(urls):
+    """Retrieve products with error handling"""
+    execution_id = start_product_retrieval(urls)
+    results = poll_for_results(execution_id)
+    
+    successful = []
+    failed = []
+    
+    for result in results:
+        if result.get('success') and result.get('product'):
+            successful.append(result['product'])
+        else:
+            failed.append({
+                'url': result.get('url'),
+                'reason': result.get('outcome', 'Unknown error')
+            })
+    
+    return {
+        'products': successful,
+        'errors': failed,
+        'success_rate': (len(successful) / len(urls)) * 100 if urls else 0
+    }
+```
+
+</CodeGroup>
+
+### 5. Performance Optimization
+
+- **Batch requests**: Retrieve all products in a single batch (up to 1000 URLs)
+- **Cache results**: Cache product data to avoid re-retrieving
+- **Lazy loading**: Load comparison details only when needed
+- **Pagination**: Handle large result sets with pagination
+
+## Example: Complete Comparison Tool
+
+Here's a complete example combining all concepts:
+
+<CodeGroup>
+
+```javascript Complete Example
+class ProductComparisonTool {
+  constructor(apiKey) {
+    this.apiKey = apiKey;
+  }
+  
+  async compareProductUrls(urls, options = {}) {
+    // 1. Retrieve products
+    const retrievalResult = await this.retrieveProducts(urls, options);
+    
+    if (retrievalResult.errors.length > 0) {
+      console.warn(`${retrievalResult.errors.length} products failed to retrieve`);
+    }
+    
+    if (retrievalResult.products.length < 2) {
+      throw new Error('Need at least 2 products to compare');
+    }
+    
+    // 2. Create comparison
+    const comparison = new ProductComparison(retrievalResult.products);
+    
+    // 3. Generate comparison data
+    const table = comparison.generateComparisonTable();
+    const summary = comparison.getSummary();
+    const highlighter = new ComparisonHighlighter(comparison);
+    const differences = highlighter.getDifferences();
+    const recommendation = highlighter.getRecommendation(options);
+    
+    // 4. Variant comparison
+    const variantComparison = compareVariants(retrievalResult.products);
+    
+    return {
+      products: retrievalResult.products,
+      comparison: {
+        table,
+        summary,
+        differences,
+        recommendation,
+        variants: variantComparison
+      },
+      errors: retrievalResult.errors,
+      metadata: {
+        totalRequested: urls.length,
+        totalRetrieved: retrievalResult.products.length,
+        successRate: retrievalResult.successRate
+      }
+    };
+  }
+  
+  async retrieveProducts(urls, options) {
+    const response = await fetch('https://api.getcatalog.ai/v2/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey
+      },
+      body: JSON.stringify({
+        urls,
+        enable_enrichment: options.enableEnrichment !== false,
+        country_code: options.countryCode || 'us'
+      })
+    });
+    
+    const { execution_id } = await response.json();
+    const results = await this.pollForResults(execution_id);
+    
+    const products = [];
+    const errors = [];
+    
+    results.forEach(result => {
+      if (result.success && result.product) {
+        products.push(result.product);
+      } else {
+        errors.push({
+          url: result.url,
+          reason: result.outcome || 'Unknown error'
+        });
+      }
+    });
+    
+    return {
+      products,
+      errors,
+      successRate: (products.length / urls.length) * 100
+    };
+  }
+  
+  async pollForResults(executionId) {
+    while (true) {
+      const response = await fetch(
+        `https://api.getcatalog.ai/v2/products/${executionId}`,
+        {
+          headers: { 'x-api-key': this.apiKey }
+        }
+      );
+      
+      const data = await response.json();
+      
+      if (data.status === 'completed') {
+        return data.data;
+      } else if (data.status === 'failed') {
+        throw new Error(`Processing failed: ${data.error}`);
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+}
+
+// Usage
+const tool = new ProductComparisonTool(process.env.CATALOG_API_KEY);
+
+const comparison = await tool.compareProductUrls([
+  'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+  'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+], {
+  enableEnrichment: true,
+  countryCode: 'us'
+});
+
+console.log('Comparison Summary:', comparison.comparison.summary);
+console.log('Recommendation:', comparison.comparison.recommendation);
+```
+
+```python Complete Example
+class ProductComparisonTool:
+    def __init__(self, api_key):
+        self.api_key = api_key
+    
+    def compare_product_urls(self, urls, options=None):
+        """Complete product comparison workflow"""
+        if options is None:
+            options = {}
+        
+        # 1. Retrieve products
+        retrieval_result = self.retrieve_products(urls, options)
+        
+        if retrieval_result['errors']:
+            print(f"Warning: {len(retrieval_result['errors'])} products failed to retrieve")
+        
+        if len(retrieval_result['products']) < 2:
+            raise Exception('Need at least 2 products to compare')
+        
+        # 2. Create comparison
+        comparison = ProductComparison(retrieval_result['products'])
+        
+        # 3. Generate comparison data
+        table = comparison.generate_comparison_table()
+        summary = comparison.get_summary()
+        highlighter = ComparisonHighlighter(comparison)
+        differences = highlighter.get_differences()
+        recommendation = highlighter.get_recommendation(options)
+        
+        # 4. Variant comparison
+        variant_comparison = compare_variants(retrieval_result['products'])
+        
+        return {
+            'products': retrieval_result['products'],
+            'comparison': {
+                'table': table,
+                'summary': summary,
+                'differences': differences,
+                'recommendation': recommendation,
+                'variants': variant_comparison
+            },
+            'errors': retrieval_result['errors'],
+            'metadata': {
+                'total_requested': len(urls),
+                'total_retrieved': len(retrieval_result['products']),
+                'success_rate': retrieval_result['success_rate']
+            }
+        }
+    
+    def retrieve_products(self, urls, options):
+        """Retrieve products from URLs"""
+        response = requests.post(
+            'https://api.getcatalog.ai/v2/products',
+            headers={
+                'Content-Type': 'application/json',
+                'x-api-key': self.api_key
+            },
+            json={
+                'urls': urls,
+                'enable_enrichment': options.get('enable_enrichment', True),
+                'country_code': options.get('country_code', 'us')
+            }
+        )
+        
+        data = response.json()
+        execution_id = data['execution_id']
+        results = self.poll_for_results(execution_id)
+        
+        products = []
+        errors = []
+        
+        for result in results:
+            if result.get('success') and result.get('product'):
+                products.append(result['product'])
+            else:
+                errors.append({
+                    'url': result.get('url'),
+                    'reason': result.get('outcome', 'Unknown error')
+                })
+        
+        return {
+            'products': products,
+            'errors': errors,
+            'success_rate': (len(products) / len(urls)) * 100 if urls else 0
+        }
+    
+    def poll_for_results(self, execution_id):
+        """Poll for execution results"""
+        while True:
+            response = requests.get(
+                f'https://api.getcatalog.ai/v2/products/{execution_id}',
+                headers={'x-api-key': self.api_key}
+            )
+            
+            data = response.json()
+            
+            if data['status'] == 'completed':
+                return data['data']
+            elif data['status'] == 'failed':
+                raise Exception(f"Processing failed: {data.get('error', 'Unknown error')}")
+            
+            time.sleep(2)
+
+# Usage
+tool = ProductComparisonTool(os.getenv('CATALOG_API_KEY'))
+
+comparison = tool.compare_product_urls([
+    'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+    'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+], {
+    'enable_enrichment': True,
+    'country_code': 'us'
+})
+
+print('Comparison Summary:', comparison['comparison']['summary'])
+print('Recommendation:', comparison['comparison']['recommendation'])
+```
+
+</CodeGroup>
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Get Products" icon="box" href="/v2/api-reference/endpoints/products/retrieve-products">
+    Retrieve detailed product information by URL
+  </Card>
+  <Card title="Get Execution Status" icon="clock" href="/v2/api-reference/endpoints/products/get-execution-status">
+    Check status and retrieve batch processing results
+  </Card>
+  <Card title="Agentic Search" icon="search" href="/v2/api-reference/endpoints/search/agentic-search">
+    Find comparable products using AI-powered search
+  </Card>
+  <Card title="Generate Affiliate Links" icon="link" href="/v2/api-reference/endpoints/affiliate/generate-links">
+    Convert product URLs to affiliate tracking links
+  </Card>
+</CardGroup>
+

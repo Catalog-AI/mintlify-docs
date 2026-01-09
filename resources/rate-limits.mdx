@@ -9,7 +9,7 @@ The Catalog platform uses a global, IP-scoped rate limit to keep traffic fair an
 
 - 50 requests per 4-second sliding window.
 - Counted per IP. If an IP cannot be determined, requests fall back to a shared global bucket.
-- Applies to all public routes, including `/api/*` and `/v1/*`. Admin pages stay protected separately.
+- Applies to all public API routes, including `/api/*`, `/v1/*`, `/v2/*`, and `/v3/*`. Admin pages stay protected separately.
 
 ## Identification and scope
 
@@ -17,5 +17,5 @@ The Catalog platform uses a global, IP-scoped rate limit to keep traffic fair an
 
 ## Headers and responses
 
-- Successful requests include: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, and `X-RateLimit-Reset` (ISO timestamp).
+- Successful requests include: `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` (ISO timestamp).
 - Exceeded requests return `429 Too Many Requests` with a brief JSON error, plus the headers above and `Retry-After` (seconds). Content-Type is `application/json`.

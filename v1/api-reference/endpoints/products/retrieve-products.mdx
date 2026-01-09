@@ -1,0 +1,184 @@
+---
+title: "Get Products by URLs"
+api: "POST https://api.getcatalog.ai/v1/products"
+description: "Start asynchronous batch processing of product URLs to retrieve detailed product information"
+---
+
+Start asynchronous batch processing for multiple product URLs. This endpoint returns immediately with an `execution_id` that you can use to check status and retrieve results. Supports processing 1 to 1000 URLs per request.
+
+<Note>
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Execution Status](/v1/api-reference/endpoints/products/get-execution-status) endpoint to check progress and retrieve results when processing completes.
+</Note>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+### Request Body
+
+<ParamField body="urls" type="string[]" required>
+  Array of product URLs to process (1 to 1000 URLs per request)
+  
+  **Requirements:**
+  - Must be a non-empty array
+  - Each entry must be a non-empty string
+  - Maximum 1000 URLs per request
+  
+  **Example:**
+  ```json
+  [
+    "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+    "https://www.adidas.com/us/gazelle-shoes/BB5476.html",
+    "https://www.example-store.com/product/123"
+  ]
+  ```
+  
+  **Note:** You can send a single URL in an array: `["https://example.com/product"]`
+</ParamField>
+
+<ParamField body="enable_enrichment" type="boolean" default="true">
+  Whether to enable AI enrichment for products. When enabled, products are enhanced with additional attributes and categorization.
+</ParamField>
+
+<ParamField body="country_code" type="string" default="us">
+  ISO 2-letter country code for localization (e.g., "us", "ca", "gb", "de")
+  
+  **Supported Country Codes:**
+  nl, ca, si, co, by, ee, no, br, us, de, es, vn, il, th, gb, ph, kg, in, ru, fr, hk, ua, jp, at, mm, my, pl, au, nz, ro, tw, mx, id, dk, ng, ch, hu, sg, sa, ae, cn, ar, cl, it, tr, lv, gh, sk, gr, eg, lu, bg, se, lt, lk, kz, hr, bd, kr, cz, fi, ie, be, pt, za
+</ParamField>
+
+<ParamField body="enable_reviews" type="boolean" default="false">
+  Whether to enable product reviews processing
+</ParamField>
+
+<ParamField body="enable_image_tags" type="boolean" default="false">
+  Whether to enable AI-generated image tags and descriptions
+</ParamField>
+
+<ParamField body="regenerate_description_html" type="boolean" default="true">
+  Whether to regenerate HTML-formatted product descriptions
+</ParamField>
+
+<ParamField body="populate_description_html_from_html" type="boolean" default="true">
+  Whether to populate description HTML from existing HTML content
+</ParamField>
+
+## Response
+
+<ResponseField name="success" type="boolean">
+  Whether the batch processing request was successfully started
+</ResponseField>
+
+<ResponseField name="execution_id" type="string">
+  Unique execution identifier for this batch processing job. Use this ID with the [Get Execution Status](/v1/api-reference/endpoints/products/get-execution-status) endpoint to check progress and retrieve results.
+  
+  **Format:** `products-batch-{uuid}`
+</ResponseField>
+
+<Note>
+**Getting Results:** The POST endpoint returns immediately with an `execution_id`. Processing happens asynchronously. To get your results:
+1. Use the `execution_id` to poll the [Get Execution Status](/v1/api-reference/endpoints/products/get-execution-status) endpoint
+2. Check the `status` field - when it's `"completed"`, results are available
+3. Use pagination parameters (`page`, `limit`) to retrieve results in chunks
+</Note>
+
+
+<RequestExample>
+
+```bash cURL
+curl -X POST https://api.getcatalog.ai/v1/products \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: $CATALOG_API_KEY" \
+  -d '{
+    "urls": [
+      "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+      "https://www.adidas.com/us/gazelle-shoes/BB5476.html"
+    ],
+    "enable_enrichment": true,
+    "country_code": "us"
+  }'
+```
+
+```javascript JavaScript
+// Start async batch processing
+const response = await fetch('https://api.getcatalog.ai/v1/products', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'x-api-key': 'YOUR_API_KEY'
+  },
+  body: JSON.stringify({
+    urls: [
+      'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+      'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+    ],
+    enable_enrichment: true,
+    country_code: 'us',
+    enable_reviews: false,
+    enable_image_tags: false
+  })
+});
+
+const { execution_id } = await response.json();
+
+// Poll for results using the execution_id
+// See Get Execution Status endpoint documentation for details
+```
+
+```python Python
+import requests
+
+# Start async batch processing
+response = requests.post(
+    'https://api.getcatalog.ai/v1/products',
+    headers={
+        'Content-Type': 'application/json',
+        'x-api-key': 'YOUR_API_KEY'
+    },
+    json={
+        'urls': [
+            'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+            'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+        ],
+        'enable_enrichment': True,
+        'country_code': 'us',
+        'enable_reviews': False,
+        'enable_image_tags': False
+    }
+)
+
+data = response.json()
+execution_id = data['execution_id']
+
+# Poll for results using the execution_id
+# See Get Execution Status endpoint documentation for details
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json POST Response 
+{
+  "success": true,
+  "execution_id": "products-batch-51d87084-7f42-402f-a5af-6ff512c82cd0"
+}
+```
+</ResponseExample>
+
+## Workflow
+
+1. **Start Processing:** Send a POST request with your URLs to start async batch processing
+2. **Get Execution ID:** Receive an `execution_id` immediately in the response
+3. **Check Status:** Poll the [Get Execution Status](/v1/api-reference/endpoints/products/get-execution-status) endpoint using the `execution_id`
+4. **Retrieve Results:** When `status` is `"completed"`, results are available with pagination support
+
+## Features
+- **Large-scale processing** - Handles 1 to 1000 URLs per batch
+- **Asynchronous execution** - Returns immediately, process runs in background
+- **Real-time progress tracking** - Monitor progress via execution status endpoint
+- **Paginated results** - Retrieve results in chunks for large batches
+- **Partial failures** - Individual URL failures don't affect other URLs in the batch
+

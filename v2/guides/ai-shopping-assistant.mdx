@@ -1,0 +1,1314 @@
+---
+title: "Building AI Shopping Assistants"
+description: "Learn how to build intelligent shopping assistants using Catalog's AI-powered search capabilities"
+---
+
+Build AI-powered shopping assistants that understand natural language queries, personalize recommendations, and guide users to the perfect products. Catalog's [Agentic Search](/v2/api-reference/endpoints/search/agentic-search) endpoint provides the intelligence you need to create conversational shopping experiences.
+
+<Note>
+This guide focuses on using Catalog's Agentic Search endpoints for building shopping assistants. For faster search experiences with smaller result sets, consider using [Agentic Search Mini](/v2/api-reference/endpoints/search/agentic-search-mini) for autocomplete or quick preview features.
+</Note>
+
+## Overview
+
+AI shopping assistants help users find products through natural conversation. They:
+
+- **Understand context** from natural language queries
+- **Learn preferences** from user interactions and profiles
+- **Provide personalized recommendations** based on style, occasion, and needs
+- **Guide discovery** by asking clarifying questions when needed
+
+## Core Concepts
+
+### 1. Natural Language Queries
+
+Catalog's Agentic Search understands complex, conversational queries without requiring structured filters:
+
+```javascript
+// Examples of natural language queries
+const queries = [
+  "I need a jacket for my office job that's not too formal",
+  "Show me sustainable dresses for a summer wedding",
+  "I want sneakers for daily walks that are comfortable and stylish",
+  "Looking for a gift for my mom who loves minimalist jewelry"
+];
+```
+
+### 2. Customer Profiles
+
+Build rich customer profiles that improve personalization over time. Profiles can include:
+
+- **Style preferences**: fit, color, aesthetic, silhouettes
+- **Usage context**: activities, environment, travel needs
+- **Purchase behavior**: value priorities, buying frequency
+- **Avoids**: things the customer doesn't like
+
+### 3. Conversation Flow
+
+Design your assistant to handle:
+
+- Initial queries and clarifications
+- Refinement based on results
+- Profile building through interaction
+- Context retention across the conversation
+
+## Building Your Assistant
+
+### Step 1: Handle Initial User Query
+
+Start with the user's natural language query. You can use Agentic Search Mini for quick previews or Agentic Search for comprehensive results.
+
+<CodeGroup>
+
+```javascript Basic Query Handler
+async function searchProducts(query, customerProfile = null) {
+  const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.CATALOG_API_KEY
+    },
+    body: JSON.stringify({
+      query,
+      ...(customerProfile && { customer_profile: customerProfile })
+    })
+  });
+  
+  const data = await response.json();
+  return data.data; // Array of products
+}
+
+// Example usage
+const products = await searchProducts(
+  "I need a versatile blazer for work and casual outings"
+);
+console.log(`Found ${products.length} products`);
+```
+
+```python Basic Query Handler
+import requests
+import os
+
+def search_products(query, customer_profile=None):
+    """Search for products using natural language query"""
+    payload = {
+        'query': query
+    }
+    
+    if customer_profile:
+        payload['customer_profile'] = customer_profile
+    
+    response = requests.post(
+        'https://api.getcatalog.ai/v2/agentic-search',
+        headers={
+            'Content-Type': 'application/json',
+            'x-api-key': os.getenv('CATALOG_API_KEY')
+        },
+        json=payload
+    )
+    
+    data = response.json()
+    return data['data']  # Array of products
+
+# Example usage
+products = search_products(
+    "I need a versatile blazer for work and casual outings"
+)
+print(f"Found {len(products)} products")
+```
+
+</CodeGroup>
+
+### Step 2: Build and Manage Customer Profiles
+
+Create customer profiles that evolve based on user interactions. Store preferences and use them to enhance future searches.
+
+<CodeGroup>
+
+```javascript Profile Manager
+class CustomerProfileManager {
+  constructor() {
+    // In production, this would be stored in a database
+    this.profiles = new Map();
+  }
+  
+  getProfile(userId) {
+    return this.profiles.get(userId) || {
+      style: {},
+      preferences: {},
+      usage_context: {},
+      purchase_behavior: {}
+    };
+  }
+  
+  updateProfile(userId, updates) {
+    const profile = this.getProfile(userId);
+    
+    // Merge updates into existing profile
+    Object.keys(updates).forEach(key => {
+      if (typeof updates[key] === 'object' && !Array.isArray(updates[key])) {
+        profile[key] = { ...profile[key], ...updates[key] };
+      } else {
+        profile[key] = updates[key];
+      }
+    });
+    
+    this.profiles.set(userId, profile);
+    return profile;
+  }
+  
+  extractFromQuery(query, userId) {
+    // Simple extraction logic - in production, use NLP to extract preferences
+    const profile = this.getProfile(userId);
+    
+    // Extract style preferences
+    if (query.includes('minimalist') || query.includes('minimal')) {
+      profile.style.aesthetic = [...(profile.style.aesthetic || []), 'minimal'];
+    }
+    if (query.includes('comfortable') || query.includes('comfort')) {
+      profile.preferences.comfort_priority = true;
+    }
+    if (query.includes('work') || query.includes('office')) {
+      profile.usage_context.activities = [
+        ...(profile.usage_context.activities || []),
+        'office'
+      ];
+    }
+    
+    return this.updateProfile(userId, profile);
+  }
+}
+
+// Usage
+const profileManager = new CustomerProfileManager();
+const userId = 'user123';
+
+// Extract preferences from user query
+const query = "I need comfortable minimalist sneakers for work";
+profileManager.extractFromQuery(query, userId);
+
+// Get profile for search
+const profile = profileManager.getProfile(userId);
+const products = await searchProducts(query, profile);
+```
+
+```python Profile Manager
+class CustomerProfileManager:
+    def __init__(self):
+        # In production, this would be stored in a database
+        self.profiles = {}
+    
+    def get_profile(self, user_id):
+        """Get customer profile, creating default if not exists"""
+        if user_id not in self.profiles:
+            self.profiles[user_id] = {
+                'style': {},
+                'preferences': {},
+                'usage_context': {},
+                'purchase_behavior': {}
+            }
+        return self.profiles[user_id]
+    
+    def update_profile(self, user_id, updates):
+        """Update customer profile with new information"""
+        profile = self.get_profile(user_id)
+        
+        # Merge updates into existing profile
+        for key, value in updates.items():
+            if isinstance(value, dict) and key in profile:
+                profile[key].update(value)
+            else:
+                profile[key] = value
+        
+        self.profiles[user_id] = profile
+        return profile
+    
+    def extract_from_query(self, query, user_id):
+        """Extract preferences from user query"""
+        profile = self.get_profile(user_id)
+        query_lower = query.lower()
+        
+        # Extract style preferences
+        if 'minimalist' in query_lower or 'minimal' in query_lower:
+            if 'aesthetic' not in profile['style']:
+                profile['style']['aesthetic'] = []
+            if 'minimal' not in profile['style']['aesthetic']:
+                profile['style']['aesthetic'].append('minimal')
+        
+        if 'comfortable' in query_lower or 'comfort' in query_lower:
+            profile['preferences']['comfort_priority'] = True
+        
+        if 'work' in query_lower or 'office' in query_lower:
+            if 'activities' not in profile['usage_context']:
+                profile['usage_context']['activities'] = []
+            if 'office' not in profile['usage_context']['activities']:
+                profile['usage_context']['activities'].append('office')
+        
+        return self.update_profile(user_id, profile)
+
+# Usage
+profile_manager = CustomerProfileManager()
+user_id = 'user123'
+
+# Extract preferences from user query
+query = "I need comfortable minimalist sneakers for work"
+profile_manager.extract_from_query(query, user_id)
+
+# Get profile for search
+profile = profile_manager.get_profile(user_id)
+products = search_products(query, profile)
+```
+
+</CodeGroup>
+
+### Step 3: Create Conversation Flow
+
+Build a conversation handler that manages the interaction flow, asks clarifying questions, and refines searches based on feedback.
+
+<CodeGroup>
+
+```javascript Conversation Handler
+class ShoppingAssistant {
+  constructor(apiKey) {
+    this.apiKey = apiKey;
+    this.profileManager = new CustomerProfileManager();
+  }
+  
+  async handleMessage(userId, message, conversationHistory = []) {
+    // Extract profile from conversation history
+    const profile = this.profileManager.getProfile(userId);
+    
+    // Update profile based on current message
+    this.profileManager.extractFromQuery(message, userId);
+    
+    // Search for products
+    const products = await this.searchProducts(message, profile);
+    
+    // Generate response based on results
+    return this.generateResponse(products, message, conversationHistory);
+  }
+  
+  async searchProducts(query, profile) {
+    const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': this.apiKey
+      },
+      body: JSON.stringify({
+        query,
+        customer_profile: profile
+      })
+    });
+    
+    const data = await response.json();
+    return data.data;
+  }
+  
+  generateResponse(products, query, history) {
+    if (products.length === 0) {
+      return {
+        message: "I couldn't find products matching your search. Could you try rephrasing or being more specific?",
+        products: [],
+        suggestions: [
+          "Try different keywords",
+          "Be more specific about style or use case",
+          "Check your filters"
+        ]
+      };
+    }
+    
+    // Format product summary
+    const productSummary = products.map((p, i) => ({
+      index: i + 1,
+      title: p.title,
+      brand: p.brand,
+      price: `$${p.price_amount}`,
+      url: p.url,
+      image: p.images?.[0]?.url,
+      description: p.attributes?.summary || p.description?.substring(0, 100)
+    }));
+    
+    return {
+      message: `I found ${products.length} products that match your search: "${query}". Here are my top recommendations:`,
+      products: productSummary,
+      canRefine: true
+    };
+  }
+  
+  async refineSearch(userId, originalQuery, refinement) {
+    const profile = this.profileManager.getProfile(userId);
+    const refinedQuery = `${originalQuery}, ${refinement}`;
+    
+    return await this.handleMessage(userId, refinedQuery);
+  }
+}
+
+// Usage
+const assistant = new ShoppingAssistant(process.env.CATALOG_API_KEY);
+const userId = 'user123';
+
+// Initial query
+let response = await assistant.handleMessage(
+  userId,
+  "I need a jacket for work"
+);
+
+console.log(response.message);
+response.products.forEach(p => {
+  console.log(`${p.index}. ${p.title} - ${p.price}`);
+});
+
+// Refinement
+if (response.canRefine) {
+  response = await assistant.refineSearch(
+    userId,
+    "I need a jacket for work",
+    "but not too formal, something I can wear on casual Fridays"
+  );
+}
+```
+
+```python Conversation Handler
+import requests
+import os
+
+class ShoppingAssistant:
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.profile_manager = CustomerProfileManager()
+    
+    async def handle_message(self, user_id, message, conversation_history=None):
+        """Handle a user message and return assistant response"""
+        if conversation_history is None:
+            conversation_history = []
+        
+        # Get and update profile
+        profile = self.profile_manager.get_profile(user_id)
+        self.profile_manager.extract_from_query(message, user_id)
+        
+        # Search for products
+        products = self.search_products(message, profile)
+        
+        # Generate response
+        return self.generate_response(products, message, conversation_history)
+    
+    def search_products(self, query, profile):
+        """Search for products using Catalog API"""
+        payload = {
+            'query': query,
+            'customer_profile': profile
+        }
+        
+        response = requests.post(
+            'https://api.getcatalog.ai/v2/agentic-search',
+            headers={
+                'Content-Type': 'application/json',
+                'x-api-key': self.api_key
+            },
+            json=payload
+        )
+        
+        data = response.json()
+        return data['data']
+    
+    def generate_response(self, products, query, history):
+        """Generate assistant response based on search results"""
+        if len(products) == 0:
+            return {
+                'message': "I couldn't find products matching your search. Could you try rephrasing or being more specific?",
+                'products': [],
+                'suggestions': [
+                    "Try different keywords",
+                    "Be more specific about style or use case",
+                    "Check your filters"
+                ]
+            }
+        
+        # Format product summary
+        product_summary = []
+        for i, product in enumerate(products, 1):
+            product_summary.append({
+                'index': i,
+                'title': product.get('title', 'Unknown'),
+                'brand': product.get('brand', 'Unknown'),
+                'price': f"${product.get('price_amount', 0)}",
+                'url': product.get('url', ''),
+                'image': product.get('images', [{}])[0].get('url', '') if product.get('images') else '',
+                'description': product.get('attributes', {}).get('summary', product.get('description', ''))[:100]
+            })
+        
+        return {
+            'message': f'I found {len(products)} products that match your search: "{query}". Here are my top recommendations:',
+            'products': product_summary,
+            'can_refine': True
+        }
+    
+    def refine_search(self, user_id, original_query, refinement):
+        """Refine an existing search with additional criteria"""
+        profile = self.profile_manager.get_profile(user_id)
+        refined_query = f"{original_query}, {refinement}"
+        return self.handle_message(user_id, refined_query)
+
+# Usage
+assistant = ShoppingAssistant(os.getenv('CATALOG_API_KEY'))
+user_id = 'user123'
+
+# Initial query
+response = assistant.handle_message(
+    user_id,
+    "I need a jacket for work"
+)
+
+print(response['message'])
+for product in response['products']:
+    print(f"{product['index']}. {product['title']} - {product['price']}")
+
+# Refinement
+if response['can_refine']:
+    response = assistant.refine_search(
+        user_id,
+        "I need a jacket for work",
+        "but not too formal, something I can wear on casual Fridays"
+    )
+```
+
+</CodeGroup>
+
+### Step 4: Add Rich Customer Profiles
+
+Build comprehensive customer profiles by collecting preferences through conversation or user input forms.
+
+<CodeGroup>
+
+```javascript Rich Profile Builder
+function buildRichProfile(formData) {
+  return {
+    style: {
+      fit: formData.fit || undefined,
+      color: formData.colorPreference || undefined,
+      aesthetic: formData.aesthetics || [],
+      silhouette: formData.silhouettes || [],
+      avoid: formData.avoidItems || []
+    },
+    preferences: {
+      in_stock_only: formData.inStockOnly || true,
+      comfort_priority: formData.comfortPriority || false,
+      sustainability_priority: formData.sustainabilityPriority || false
+    },
+    usage_context: {
+      activities: formData.activities || [],
+      environment: formData.environment || undefined,
+      travel_friendly: formData.travelFriendly || undefined,
+      durability_priority: formData.durabilityPriority || undefined
+    },
+    purchase_behavior: {
+      value: formData.valueProposition || undefined,
+      buying_frequency: formData.buyingFrequency || undefined,
+      price_range: formData.priceRange || undefined
+    }
+  };
+}
+
+// Example: Building profile from onboarding form
+const profile = buildRichProfile({
+  fit: "relaxed with a refined edge",
+  colorPreference: "prefers earth tones, neutrals, black",
+  aesthetics: ["minimal and cool", "understated"],
+  silhouettes: ["relaxed", "cropped", "unstructured"],
+  avoidItems: ["large logos", "loud streetwear"],
+  activities: ["office", "coffee runs", "after-work events"],
+  environment: "urban, mild climate",
+  travelFriendly: true,
+  durabilityPriority: true,
+  comfortPriority: true,
+  inStockOnly: true,
+  valueProposition: "distinctive, expressive pieces",
+  buyingFrequency: "occasional, style-driven"
+});
+
+// Use profile in search
+const products = await searchProducts(
+  "A Barbour jacket suitable for the office",
+  profile
+);
+```
+
+```python Rich Profile Builder
+def build_rich_profile(form_data):
+    """Build a rich customer profile from form data"""
+    return {
+        'style': {
+            'fit': form_data.get('fit'),
+            'color': form_data.get('color_preference'),
+            'aesthetic': form_data.get('aesthetics', []),
+            'silhouette': form_data.get('silhouettes', []),
+            'avoid': form_data.get('avoid_items', [])
+        },
+        'preferences': {
+            'in_stock_only': form_data.get('in_stock_only', True),
+            'comfort_priority': form_data.get('comfort_priority', False),
+            'sustainability_priority': form_data.get('sustainability_priority', False)
+        },
+        'usage_context': {
+            'activities': form_data.get('activities', []),
+            'environment': form_data.get('environment'),
+            'travel_friendly': form_data.get('travel_friendly'),
+            'durability_priority': form_data.get('durability_priority')
+        },
+        'purchase_behavior': {
+            'value': form_data.get('value_proposition'),
+            'buying_frequency': form_data.get('buying_frequency'),
+            'price_range': form_data.get('price_range')
+        }
+    }
+
+# Example: Building profile from onboarding form
+form_data = {
+    'fit': 'relaxed with a refined edge',
+    'color_preference': 'prefers earth tones, neutrals, black',
+    'aesthetics': ['minimal and cool', 'understated'],
+    'silhouettes': ['relaxed', 'cropped', 'unstructured'],
+    'avoid_items': ['large logos', 'loud streetwear'],
+    'activities': ['office', 'coffee runs', 'after-work events'],
+    'environment': 'urban, mild climate',
+    'travel_friendly': True,
+    'durability_priority': True,
+    'comfort_priority': True,
+    'in_stock_only': True,
+    'value_proposition': 'distinctive, expressive pieces',
+    'buying_frequency': 'occasional, style-driven'
+}
+
+profile = build_rich_profile(form_data)
+
+# Use profile in search
+products = search_products(
+    "A Barbour jacket suitable for the office",
+    profile
+)
+```
+
+</CodeGroup>
+
+### Step 5: Integrate with Chat Interfaces
+
+Connect your assistant to popular chat frameworks like OpenAI's GPT, Anthropic's Claude, or your own chat interface.
+
+<CodeGroup>
+
+```javascript OpenAI Integration
+import OpenAI from 'openai';
+
+class ChatShoppingAssistant extends ShoppingAssistant {
+  constructor(apiKey, openaiKey) {
+    super(apiKey);
+    this.openai = new OpenAI({ apiKey: openaiKey });
+  }
+  
+  async handleChatMessage(userId, message, conversationHistory = []) {
+    // Get customer profile
+    const profile = this.profileManager.getProfile(userId);
+    
+    // Search for products
+    const products = await this.searchProducts(message, profile);
+    
+    // Use OpenAI to generate natural language response
+    const systemPrompt = `You are a helpful shopping assistant. You help users find products 
+by understanding their needs and preferences. When presenting products, be conversational 
+and helpful. Format product information clearly.`;
+    
+    const userPrompt = `User asked: "${message}"
+    
+    I found ${products.length} products:
+    ${products.map((p, i) => 
+      `${i + 1}. ${p.title} by ${p.brand} - $${p.price_amount}
+       ${p.attributes?.summary || p.description?.substring(0, 150)}...`
+    ).join('\n\n')}
+    
+    Generate a helpful, conversational response presenting these products.`;
+    
+    const completion = await this.openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        { role: "system", content: systemPrompt },
+        ...conversationHistory,
+        { role: "user", content: userPrompt }
+      ]
+    });
+    
+    return {
+      message: completion.choices[0].message.content,
+      products: products.map(p => ({
+        title: p.title,
+        brand: p.brand,
+        price: p.price_amount,
+        url: p.url,
+        image: p.images?.[0]?.url
+      })),
+      profile: profile
+    };
+  }
+}
+
+// Usage
+const assistant = new ChatShoppingAssistant(
+  process.env.CATALOG_API_KEY,
+  process.env.OPENAI_API_KEY
+);
+
+const response = await assistant.handleChatMessage(
+  'user123',
+  "I need a sustainable dress for a summer wedding"
+);
+console.log(response.message);
+```
+
+```python OpenAI Integration
+from openai import OpenAI
+
+class ChatShoppingAssistant(ShoppingAssistant):
+    def __init__(self, api_key, openai_key):
+        super().__init__(api_key)
+        self.openai = OpenAI(api_key=openai_key)
+    
+    async def handle_chat_message(self, user_id, message, conversation_history=None):
+        """Handle chat message with OpenAI integration"""
+        if conversation_history is None:
+            conversation_history = []
+        
+        # Get customer profile
+        profile = self.profile_manager.get_profile(user_id)
+        
+        # Search for products
+        products = self.search_products(message, profile)
+        
+        # Generate natural language response with OpenAI
+        system_prompt = """You are a helpful shopping assistant. You help users find products 
+by understanding their needs and preferences. When presenting products, be conversational 
+and helpful. Format product information clearly."""
+        
+        products_text = "\n\n".join([
+            f"{i+1}. {p.get('title', 'Unknown')} by {p.get('brand', 'Unknown')} - ${p.get('price_amount', 0)}\n"
+            f"   {p.get('attributes', {}).get('summary', p.get('description', '')[:150])}..."
+            for i, p in enumerate(products)
+        ])
+        
+        user_prompt = f"""User asked: "{message}"
+
+I found {len(products)} products:
+{products_text}
+
+Generate a helpful, conversational response presenting these products."""
+        
+        completion = self.openai.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                *conversation_history,
+                {"role": "user", "content": user_prompt}
+            ]
+        )
+        
+        return {
+            'message': completion.choices[0].message.content,
+            'products': [
+                {
+                    'title': p.get('title'),
+                    'brand': p.get('brand'),
+                    'price': p.get('price_amount'),
+                    'url': p.get('url'),
+                    'image': p.get('images', [{}])[0].get('url') if p.get('images') else ''
+                }
+                for p in products
+            ],
+            'profile': profile
+        }
+
+# Usage
+assistant = ChatShoppingAssistant(
+    os.getenv('CATALOG_API_KEY'),
+    os.getenv('OPENAI_API_KEY')
+)
+
+response = assistant.handle_chat_message(
+    'user123',
+    "I need a sustainable dress for a summer wedding"
+)
+print(response['message'])
+```
+
+</CodeGroup>
+
+## Advanced Patterns
+
+### Quick Preview with Agentic Search Mini
+
+Use Agentic Search Mini for fast autocomplete or quick preview features before committing to a full search.
+
+<CodeGroup>
+
+```javascript Quick Preview
+async function quickPreview(query) {
+  const response = await fetch('https://api.getcatalog.ai/v2/agentic-search-mini', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.CATALOG_API_KEY
+    },
+    body: JSON.stringify({
+      query,
+      enable_enrichment: true
+    })
+  });
+  
+  const data = await response.json();
+  return data.data; // Up to 10 products
+}
+
+// Use in autocomplete
+const previewResults = await quickPreview("sustainable");
+console.log(`Quick preview: ${previewResults.length} products found`);
+```
+
+```python Quick Preview
+def quick_preview(query):
+    """Get quick preview of products (up to 10 results)"""
+    response = requests.post(
+        'https://api.getcatalog.ai/v2/agentic-search-mini',
+        headers={
+            'Content-Type': 'application/json',
+            'x-api-key': os.getenv('CATALOG_API_KEY')
+        },
+        json={
+            'query': query,
+            'enable_enrichment': True
+        }
+    )
+    
+    data = response.json()
+    return data['data']  # Up to 10 products
+
+# Use in autocomplete
+preview_results = quick_preview("sustainable")
+print(f"Quick preview: {len(preview_results)} products found")
+```
+
+</CodeGroup>
+
+### Contextual Refinement
+
+Allow users to refine searches based on initial results, building on previous context.
+
+<CodeGroup>
+
+```javascript Contextual Refinement
+async function refineWithContext(originalQuery, refinement, previousResults) {
+  // Combine original query with refinement
+  const refinedQuery = `${originalQuery}. ${refinement}`;
+  
+  // Optionally, you can add constraints based on previous results
+  // For example, if user wants "something similar but cheaper":
+  if (refinement.includes('cheaper') || refinement.includes('less expensive')) {
+    const avgPrice = previousResults.reduce((sum, p) => sum + p.price_amount, 0) / previousResults.length;
+    refinedQuery += ` under $${Math.floor(avgPrice * 0.8)}`;
+  }
+  
+  const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': process.env.CATALOG_API_KEY
+    },
+    body: JSON.stringify({
+      query: refinedQuery
+    })
+  });
+  
+  return response.json();
+}
+```
+
+```python Contextual Refinement
+def refine_with_context(original_query, refinement, previous_results):
+    """Refine search with context from previous results"""
+    # Combine original query with refinement
+    refined_query = f"{original_query}. {refinement}"
+    
+    # Optionally add constraints based on previous results
+    if 'cheaper' in refinement.lower() or 'less expensive' in refinement.lower():
+        avg_price = sum(p.get('price_amount', 0) for p in previous_results) / len(previous_results)
+        refined_query += f" under ${int(avg_price * 0.8)}"
+    
+    response = requests.post(
+        'https://api.getcatalog.ai/v2/agentic-search',
+        headers={
+            'Content-Type': 'application/json',
+            'x-api-key': os.getenv('CATALOG_API_KEY')
+        },
+        json={
+            'query': refined_query
+        }
+    )
+    
+    return response.json()
+```
+
+</CodeGroup>
+
+## Best Practices
+
+### 1. Profile Building
+
+<Tip>
+Build customer profiles incrementally through conversation rather than requiring lengthy onboarding forms. Extract preferences naturally from user queries and interactions.
+</Tip>
+
+- Start with minimal profiles and enrich over time
+- Extract preferences from natural language queries
+- Ask clarifying questions only when necessary
+- Store profiles securely and update them with each interaction
+
+### 2. Error Handling
+
+Always handle cases where no products are found or the API returns errors:
+
+<CodeGroup>
+
+```javascript Error Handling
+async function searchWithErrorHandling(query, profile) {
+  try {
+    const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.CATALOG_API_KEY
+      },
+      body: JSON.stringify({
+        query,
+        customer_profile: profile
+      })
+    });
+    
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error('Rate limit exceeded. Please try again in a moment.');
+      } else if (response.status === 401) {
+        throw new Error('Authentication failed. Please check your API key.');
+      } else {
+        throw new Error(`API error: ${response.status}`);
+      }
+    }
+    
+    const data = await response.json();
+    
+    if (!data.data || data.data.length === 0) {
+      return {
+        success: false,
+        message: "I couldn't find products matching your search. Try rephrasing or being more specific.",
+        products: []
+      };
+    }
+    
+    return {
+      success: true,
+      products: data.data,
+      message: `Found ${data.data.length} products matching your search.`
+    };
+    
+  } catch (error) {
+    return {
+      success: false,
+      message: `An error occurred: ${error.message}`,
+      products: []
+    };
+  }
+}
+```
+
+```python Error Handling
+def search_with_error_handling(query, profile):
+    """Search with comprehensive error handling"""
+    try:
+        response = requests.post(
+            'https://api.getcatalog.ai/v2/agentic-search',
+            headers={
+                'Content-Type': 'application/json',
+                'x-api-key': os.getenv('CATALOG_API_KEY')
+            },
+            json={
+                'query': query,
+                'customer_profile': profile
+            }
+        )
+        
+        if response.status_code == 429:
+            raise Exception('Rate limit exceeded. Please try again in a moment.')
+        elif response.status_code == 401:
+            raise Exception('Authentication failed. Please check your API key.')
+        elif not response.ok:
+            raise Exception(f'API error: {response.status_code}')
+        
+        data = response.json()
+        
+        if not data.get('data') or len(data['data']) == 0:
+            return {
+                'success': False,
+                'message': "I couldn't find products matching your search. Try rephrasing or being more specific.",
+                'products': []
+            }
+        
+        return {
+            'success': True,
+            'products': data['data'],
+            'message': f"Found {len(data['data'])} products matching your search."
+        }
+    
+    except Exception as error:
+        return {
+            'success': False,
+            'message': f'An error occurred: {str(error)}',
+            'products': []
+        }
+```
+
+</CodeGroup>
+
+### 3. Response Formatting
+
+Format product responses to be user-friendly and actionable:
+
+- Include key product details: title, brand, price, image
+- Highlight why each product matches the query
+- Provide direct links to purchase
+- Show relevant attributes (color, material, style)
+
+### 4. Rate Limiting
+
+Respect API rate limits and implement appropriate retry logic:
+
+- Default: 50 requests per 4-second sliding window
+- Implement exponential backoff for retries
+- Cache results when appropriate
+- Use Agentic Search Mini for high-frequency preview features
+
+See [Rate Limits](/resources/rate-limits) for detailed information.
+
+### 5. Conversation Context
+
+Maintain conversation context across multiple turns:
+
+- Remember previous queries in the session
+- Build on refinements naturally
+- Update profiles based on feedback
+- Track which products users show interest in
+
+## Example: Complete Shopping Assistant
+
+Here's a complete example combining all concepts:
+
+<CodeGroup>
+
+```javascript Complete Example
+class CompleteShoppingAssistant {
+  constructor(apiKey) {
+    this.apiKey = apiKey;
+    this.profileManager = new CustomerProfileManager();
+    this.conversations = new Map(); // Track conversation history
+  }
+  
+  async processMessage(userId, message) {
+    // Get or create conversation history
+    if (!this.conversations.has(userId)) {
+      this.conversations.set(userId, []);
+    }
+    const history = this.conversations.get(userId);
+    
+    // Get customer profile
+    const profile = this.profileManager.getProfile(userId);
+    
+    // Update profile from message
+    this.profileManager.extractFromQuery(message, userId);
+    
+    // Search for products
+    const searchResult = await this.searchWithErrorHandling(message, profile);
+    
+    if (!searchResult.success) {
+      return {
+        type: 'error',
+        message: searchResult.message,
+        suggestions: this.generateSuggestions(history)
+      };
+    }
+    
+    // Format response
+    const response = {
+      type: 'success',
+      message: this.formatProductResponse(searchResult.products, message),
+      products: this.formatProducts(searchResult.products),
+      canRefine: true
+    };
+    
+    // Update conversation history
+    history.push({
+      role: 'user',
+      content: message
+    });
+    history.push({
+      role: 'assistant',
+      content: response.message
+    });
+    
+    return response;
+  }
+  
+  async searchWithErrorHandling(query, profile) {
+    try {
+      const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': this.apiKey
+        },
+        body: JSON.stringify({
+          query,
+          customer_profile: profile
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.data || data.data.length === 0) {
+        return {
+          success: false,
+          message: "I couldn't find products matching your search."
+        };
+      }
+      
+      return {
+        success: true,
+        products: data.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message
+      };
+    }
+  }
+  
+  formatProductResponse(products, query) {
+    const count = products.length;
+    return `I found ${count} ${count === 1 ? 'product' : 'products'} that match "${query}". Here are my top recommendations:`;
+  }
+  
+  formatProducts(products) {
+    return products.map((p, i) => ({
+      id: p.id,
+      title: p.title,
+      brand: p.brand,
+      price: `$${p.price_amount}`,
+      currency: p.price_currency,
+      url: p.url,
+      image: p.images?.[0]?.url,
+      available: p.is_available,
+      summary: p.attributes?.summary || p.description?.substring(0, 150),
+      keyFeatures: [
+        p.attributes?.color?.merchant_label,
+        p.attributes?.material?.primary,
+        ...(p.attributes?.style || []).slice(0, 2)
+      ].filter(Boolean)
+    }));
+  }
+  
+  generateSuggestions(history) {
+    return [
+      "Try rephrasing your query",
+      "Be more specific about style or occasion",
+      "Ask about a different category"
+    ];
+  }
+  
+  async refine(userId, refinement) {
+    const history = this.conversations.get(userId) || [];
+    const lastUserMessage = history
+      .filter(m => m.role === 'user')
+      .pop()?.content || "";
+    
+    const refinedQuery = `${lastUserMessage}. ${refinement}`;
+    return await this.processMessage(userId, refinedQuery);
+  }
+}
+
+// Usage
+const assistant = new CompleteShoppingAssistant(process.env.CATALOG_API_KEY);
+
+// Conversation flow
+let response = await assistant.processMessage('user123', 'I need a jacket');
+console.log(response.message);
+
+response = await assistant.refine('user123', 'but something casual for weekends');
+console.log(response.message);
+```
+
+```python Complete Example
+class CompleteShoppingAssistant:
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.profile_manager = CustomerProfileManager()
+        self.conversations = {}  # Track conversation history
+    
+    def process_message(self, user_id, message):
+        """Process a user message and return formatted response"""
+        # Get or create conversation history
+        if user_id not in self.conversations:
+            self.conversations[user_id] = []
+        history = self.conversations[user_id]
+        
+        # Get customer profile
+        profile = self.profile_manager.get_profile(user_id)
+        
+        # Update profile from message
+        self.profile_manager.extract_from_query(message, user_id)
+        
+        # Search for products
+        search_result = self.search_with_error_handling(message, profile)
+        
+        if not search_result['success']:
+            return {
+                'type': 'error',
+                'message': search_result['message'],
+                'suggestions': self.generate_suggestions(history)
+            }
+        
+        # Format response
+        response = {
+            'type': 'success',
+            'message': self.format_product_response(search_result['products'], message),
+            'products': self.format_products(search_result['products']),
+            'can_refine': True
+        }
+        
+        # Update conversation history
+        history.append({'role': 'user', 'content': message})
+        history.append({'role': 'assistant', 'content': response['message']})
+        
+        return response
+    
+    def search_with_error_handling(self, query, profile):
+        """Search with error handling"""
+        try:
+            response = requests.post(
+                'https://api.getcatalog.ai/v2/agentic-search',
+                headers={
+                    'Content-Type': 'application/json',
+                    'x-api-key': self.api_key
+                },
+                json={
+                    'query': query,
+                    'customer_profile': profile
+                }
+            )
+            
+            if not response.ok:
+                raise Exception(f'API error: {response.status_code}')
+            
+            data = response.json()
+            
+            if not data.get('data') or len(data['data']) == 0:
+                return {
+                    'success': False,
+                    'message': "I couldn't find products matching your search."
+                }
+            
+            return {
+                'success': True,
+                'products': data['data']
+            }
+        except Exception as error:
+            return {
+                'success': False,
+                'message': str(error)
+            }
+    
+    def format_product_response(self, products, query):
+        """Format response message"""
+        count = len(products)
+        return f"I found {count} {'product' if count == 1 else 'products'} that match \"{query}\". Here are my top recommendations:"
+    
+    def format_products(self, products):
+        """Format products for display"""
+        formatted = []
+        for p in products:
+            attrs = p.get('attributes', {})
+            formatted.append({
+                'id': p.get('id'),
+                'title': p.get('title'),
+                'brand': p.get('brand'),
+                'price': f"${p.get('price_amount', 0)}",
+                'currency': p.get('price_currency'),
+                'url': p.get('url'),
+                'image': p.get('images', [{}])[0].get('url') if p.get('images') else '',
+                'available': p.get('is_available', False),
+                'summary': attrs.get('summary', p.get('description', '')[:150]),
+                'key_features': [
+                    attrs.get('color', {}).get('merchant_label'),
+                    attrs.get('material', {}).get('primary'),
+                    *attrs.get('style', [])[:2]
+                ]
+            })
+        return formatted
+    
+    def generate_suggestions(self, history):
+        """Generate helpful suggestions"""
+        return [
+            "Try rephrasing your query",
+            "Be more specific about style or occasion",
+            "Ask about a different category"
+        ]
+    
+    def refine(self, user_id, refinement):
+        """Refine previous search"""
+        history = self.conversations.get(user_id, [])
+        last_user_message = next(
+            (m['content'] for m in reversed(history) if m['role'] == 'user'),
+            ""
+        )
+        
+        refined_query = f"{last_user_message}. {refinement}"
+        return self.process_message(user_id, refined_query)
+
+# Usage
+assistant = CompleteShoppingAssistant(os.getenv('CATALOG_API_KEY'))
+
+# Conversation flow
+response = assistant.process_message('user123', 'I need a jacket')
+print(response['message'])
+
+response = assistant.refine('user123', 'but something casual for weekends')
+print(response['message'])
+```
+
+</CodeGroup>
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="Agentic Search" icon="search" href="/v2/api-reference/endpoints/search/agentic-search">
+    AI-powered search with customer profile personalization
+  </Card>
+  <Card title="Agentic Search Mini" icon="bolt" href="/v2/api-reference/endpoints/search/agentic-search-mini">
+    Fast search for autocomplete and quick previews
+  </Card>
+  <Card title="Get Products" icon="box" href="/v2/api-reference/endpoints/products/retrieve-products">
+    Retrieve detailed product information by URL
+  </Card>
+  <Card title="Generate Affiliate Links" icon="link" href="/v2/api-reference/endpoints/affiliate/generate-links">
+    Convert product URLs to affiliate tracking links
+  </Card>
+</CardGroup>
+

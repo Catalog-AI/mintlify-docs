@@ -14,14 +14,27 @@ All error responses follow a consistent structure:
   "error": {
     "code": "ERROR_CODE",
     "message": "Human-readable error description",
-    "details": {
-      "parameter": "field_name",
-      "expected": "expected_type",
-      "received": "actual_type"
-    }
+    "request_id": "req_..."
   }
 }
 ```
+
+Additional fields may be included at the root level for specific error types. For example, validation errors may include additional context:
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "One or more URLs have invalid format",
+    "request_id": "req_abc123"
+  },
+  "invalid_urls": [
+    "Index 0: https://invalid-url - invalid format"
+  ]
+}
+```
+
+All error responses include a `Request-ID` header that matches the `request_id` in the response body. Use this ID when contacting support.
 
 ## HTTP status codes
 
@@ -30,8 +43,10 @@ All error responses follow a consistent structure:
 | `200` | Success | Request completed successfully |
 | `400` | Bad Request | Invalid request parameters or malformed JSON |
 | `401` | Unauthorized | Missing or invalid API key |
+| `402` | Payment Required | Insufficient credits to complete the request |
 | `403` | Forbidden | API key lacks required permissions |
 | `404` | Not Found | Requested resource does not exist |
+| `409` | Conflict | Resource state conflict (e.g., operation already in progress) |
 | `429` | Too Many Requests | Rate limit exceeded |
 | `500` | Internal Server Error | Server-side error occurred |
 
@@ -48,33 +63,33 @@ All error responses follow a consistent structure:
 
 | Code | HTTP Status | Description | Resolution |
 |------|-------------|-------------|------------|
-| `INVALID_PARAMETER` | 400 | Invalid request parameter | Check the parameter requirements in the endpoint documentation |
-| `MISSING_PARAMETER` | 400 | Required parameter missing | Include all required parameters in your request |
-| `INVALID_JSON` | 400 | Malformed JSON body | Validate your JSON syntax before sending |
-| `INVALID_URL` | 400 | Invalid URL format | Ensure URLs are properly formatted and encoded |
+| `INVALID_REQUEST` | 400 | Invalid request format or missing required fields | Check the request format and ensure all required parameters are included |
+| `VALIDATION_ERROR` | 400 | Request format is valid but values are invalid | Check parameter values against endpoint requirements (e.g., URL format, array length limits) |
 
 ### Resource errors
 
 | Code | HTTP Status | Description | Resolution |
 |------|-------------|-------------|------------|
-| `NOT_FOUND` | 404 | Resource not found | Verify the endpoint URL and any resource IDs |
-| `PRODUCT_NOT_FOUND` | 200 | Product could not be retrieved | The product URL may be invalid, unavailable, or from an unsupported vendor |
-| `VENDOR_NOT_SUPPORTED` | 200 | Vendor is not supported | Check the list of supported vendors or contact support |
+| `NOT_FOUND` | 404 | Resource not found | Verify the endpoint URL and any resource IDs (e.g., execution IDs) |
+| `CONFLICT` | 409 | Resource state conflict | The requested operation conflicts with the current state (e.g., trying to cancel an execution that's already stopped) |
+
+### Billing errors
+
+| Code | HTTP Status | Description | Resolution |
+|------|-------------|-------------|------------|
+| `INSUFFICIENT_CREDITS` | 402 | Not enough credits to complete the request | Add credits to your account or enable auto top-up. The response includes `credits_needed` and `credits_remaining` fields. |
 
 ### Rate limiting errors
 
 | Code | HTTP Status | Description | Resolution |
 |------|-------------|-------------|------------|
-| `RATE_LIMITED` | 429 | Too many requests in a short window | Respect `Retry-After`, pace requests using `X-RateLimit-Remaining`, and back off (exponential recommended). Contact support if you need higher limits. |
+| `RATE_LIMITED` | 429 | Too many requests in a short window | Respect `Retry-After` header, pace requests using `RateLimit-Remaining`, and back off (exponential recommended). Contact support if you need higher limits. |
 
 ### Server errors
 
 | Code | HTTP Status | Description | Resolution |
 |------|-------------|-------------|------------|
-| `INTERNAL_ERROR` | 500 | Unexpected server error | Retry the request; if persistent, contact support |
-| `TIMEOUT` | 500 | Request timeout | Retry with a smaller batch size or simpler query |
-| `DB_TIMEOUT` | 500 | Database query timeout | Simplify your query or retry later |
-| `DB_ERROR` | 500 | Database error | Retry the request; if persistent, contact support |
+| `INTERNAL_ERROR` | 500 | Unexpected server error | Retry the request; if persistent, contact support with the `request_id` |
 
 ## Handling errors
 
@@ -94,16 +109,34 @@ const response = await fetch('https://api.getcatalog.ai/v1/search', {
 
 if (!response.ok) {
   const error = await response.json();
+  const requestId = response.headers.get('Request-ID') || error.error?.request_id;
   
   switch (response.status) {
     case 401:
-      console.error('Authentication failed:', error.message);
+      console.error('Authentication failed:', error.error.message);
+      break;
+    case 402:
+      console.error('Insufficient credits:', error.error.message);
+      if (error.credits_needed && error.credits_remaining) {
+        console.error(`Need ${error.credits_needed}, have ${error.credits_remaining}`);
+      }
+      break;
+    case 403:
+      console.error('Access forbidden:', error.error.message);
+      break;
+    case 404:
+      console.error('Resource not found:', error.error.message);
+      break;
+    case 409:
+      console.error('Conflict:', error.error.message);
       break;
     case 429:
-      console.error('Rate limited. Retry after:', response.headers.get('Retry-After'));
+      const retryAfter = response.headers.get('Retry-After');
+      console.error('Rate limited. Retry after:', retryAfter);
       break;
     case 500:
-      console.error('Server error:', error.message);
+      console.error('Server error:', error.error.message);
+      console.error('Request ID:', requestId);
       break;
     default:
       console.error('Request failed:', error);
@@ -131,21 +164,36 @@ try:
     data = response.json()
     
 except HTTPError as e:
+    error = e.response.json()
+    request_id = e.response.headers.get('Request-ID') or error.get('error', {}).get('request_id')
+    
     if e.response.status_code == 401:
         print('Authentication failed')
+    elif e.response.status_code == 402:
+        print('Insufficient credits')
+        if 'credits_needed' in error and 'credits_remaining' in error:
+            print(f"Need {error['credits_needed']}, have {error['credits_remaining']}")
+    elif e.response.status_code == 403:
+        print('Access forbidden')
+    elif e.response.status_code == 404:
+        print('Resource not found')
+    elif e.response.status_code == 409:
+        print('Conflict:', error.get('error', {}).get('message'))
     elif e.response.status_code == 429:
-        print('Rate limited. Please wait before retrying.')
+        retry_after = e.response.headers.get('Retry-After')
+        print(f'Rate limited. Please wait {retry_after} seconds before retrying.')
     elif e.response.status_code >= 500:
         print('Server error. Please retry.')
+        print(f'Request ID: {request_id}')
     else:
-        print(f'Request failed: {e.response.json()}')
+        print(f'Request failed: {error}')
 ```
 
 </CodeGroup>
 
 ### Retry with exponential backoff
 
-For transient errors (429, 500), implement exponential backoff:
+For transient errors (402, 429, 500), implement exponential backoff:
 
 <CodeGroup>
 
@@ -158,15 +206,27 @@ async function requestWithRetry(url, options, maxRetries = 3) {
       return response.json();
     }
     
+    const error = await response.json();
+    
+    // Don't retry client errors (except 402 for credits)
+    if (response.status === 402) {
+      // Insufficient credits - don't retry, user needs to add credits
+      throw new Error(`Insufficient credits: ${error.error.message}`);
+    }
+    
     if (response.status === 429 || response.status >= 500) {
-      const delay = Math.pow(2, attempt) * 1000; // 1s, 2s, 4s
+      const retryAfter = response.headers.get('Retry-After');
+      const delay = retryAfter 
+        ? parseInt(retryAfter) * 1000 
+        : Math.pow(2, attempt) * 1000; // 1s, 2s, 4s
+      
       console.log(`Retrying in ${delay}ms...`);
       await new Promise(resolve => setTimeout(resolve, delay));
       continue;
     }
     
     // Non-retryable error
-    throw new Error(`Request failed: ${response.status}`);
+    throw new Error(`Request failed: ${response.status} - ${error.error.message}`);
   }
   
   throw new Error('Max retries exceeded');
@@ -184,8 +244,16 @@ def request_with_retry(url, headers, json_data, max_retries=3):
         if response.ok:
             return response.json()
         
+        error = response.json()
+        
+        # Don't retry client errors (except 402 for credits)
+        if response.status_code == 402:
+            # Insufficient credits - don't retry, user needs to add credits
+            raise Exception(f"Insufficient credits: {error['error']['message']}")
+        
         if response.status_code in [429, 500, 502, 503, 504]:
-            delay = (2 ** attempt)  # 1s, 2s, 4s
+            retry_after = response.headers.get('Retry-After')
+            delay = int(retry_after) if retry_after else (2 ** attempt)  # 1s, 2s, 4s
             print(f'Retrying in {delay}s...')
             time.sleep(delay)
             continue
@@ -197,6 +265,62 @@ def request_with_retry(url, headers, json_data, max_retries=3):
 ```
 
 </CodeGroup>
+
+## Error response examples
+
+### Insufficient Credits (402)
+
+```json
+{
+  "error": {
+    "code": "INSUFFICIENT_CREDITS",
+    "message": "Insufficient credits",
+    "request_id": "req_01HZ..."
+  },
+  "credits_needed": 100,
+  "credits_remaining": 50
+}
+```
+
+### Validation Error with Additional Context (400)
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "One or more URLs have invalid format",
+    "request_id": "req_01HZ..."
+  },
+  "invalid_urls": [
+    "Index 0: https://invalid-url - invalid format",
+    "Index 2: not-a-url - invalid format"
+  ]
+}
+```
+
+### Not Found (404)
+
+```json
+{
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "Execution not found",
+    "request_id": "req_01HZ..."
+  }
+}
+```
+
+### Conflict (409)
+
+```json
+{
+  "error": {
+    "code": "CONFLICT",
+    "message": "Crawl is currently stopping for example.com. Please wait.",
+    "request_id": "req_01HZ..."
+  }
+}
+```
 
 ## Logical errors (200 OK responses)
 
@@ -248,7 +372,8 @@ Always check `meta.found` or `success` fields in responses, even when the HTTP s
 
 If you encounter persistent errors or need assistance, [contact our support team](mailto:founders@getcatalog.ai) with:
 
-- The full error response
+- The full error response (including the `error` object)
+- The `request_id` from the response (found in both the response body and `Request-ID` header)
 - Your request payload (with sensitive data redacted)
 - Timestamp of when the error occurred
 
