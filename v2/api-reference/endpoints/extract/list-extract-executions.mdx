@@ -1,0 +1,249 @@
+---
+title: "List Extract Executions"
+api: "GET https://api.getcatalog.ai/v2/extract"
+description: "Retrieve a list of recent extraction executions"
+---
+
+Retrieve a list of recent extraction executions for your organization. This endpoint allows you to see all extraction jobs you've started (both direct URLs and vendor-based), their current status, and when they were created.
+
+<Tip>
+**When to use:** Monitor all your extraction operations in one place. Use this endpoint to:
+- See all extraction executions you've started (both direct URLs and vendor-based modes)
+- Filter by status (processing, completed, failed)
+- Track when extraction jobs were initiated
+- Find execution IDs for status checks
+</Tip>
+
+<Note>
+**Unified Listing:** This endpoint returns executions from both extraction modes:
+- **Direct URLs mode:** Execution IDs formatted as `extract-urls-{uuid}`
+- **Vendor-based mode:** Execution IDs formatted as `extract-{vendor}-{uuid}`
+
+Both types of executions appear in the same list and can be filtered and managed together.
+</Note>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="status" type="string" optional>
+  Filter executions by status. Possible values: `"processing"`, `"completed"`, `"failed"`
+  
+  **Note:** If not provided, all executions are returned regardless of status.
+  
+  **Status Values:**
+  - `"processing"` - Executions that are currently running or waiting to start (includes `pending` and `running` states)
+  - `"completed"` - Executions that finished successfully
+  - `"failed"` - Executions that failed or were aborted
+</ParamField>
+
+<ParamField query="page_size" type="number" optional>
+  Number of executions to return (minimum: 1, maximum: 100, default: 20)
+  
+  **Note:** Executions are returned in reverse chronological order (most recent first).
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="array">
+  Array of execution summary objects
+  
+  <Expandable title="Execution Summary">
+    <ResponseField name="execution_id" type="string">
+      Unique execution identifier. Use this ID with the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-execution-status) endpoint to check detailed status and results.
+      
+      **Formats:**
+      - `extract-urls-{uuid}` - Direct URLs mode
+      - `extract-{vendor}-{uuid}` - Vendor-based mode (e.g., `extract-nike-com-51d87084`)
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Current execution status
+      
+      **Possible values:**
+      - `"pending"` - Execution is waiting to start (may be waiting for crawl)
+      - `"running"` - Execution is currently processing
+      - `"completed"` - Execution finished successfully
+      - `"failed"` - Execution failed or was aborted
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp when the execution was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Pagination metadata
+  
+  <Expandable title="Pagination Properties">
+    <ResponseField name="page" type="number">
+      Current page number (always 1 for this endpoint as it returns a single page)
+    </ResponseField>
+    
+    <ResponseField name="page_size" type="number">
+      Number of items per page (matches the requested `page_size` parameter)
+    </ResponseField>
+    
+    <ResponseField name="total_items" type="number">
+      Total number of items in this response (may be less than total available if filtered by status)
+    </ResponseField>
+    
+    <ResponseField name="total_pages" type="number">
+      Total number of pages (calculated from total_items and page_size)
+    </ResponseField>
+    
+    <ResponseField name="has_next" type="boolean">
+      Whether there is a next page (always false for this endpoint)
+    </ResponseField>
+    
+    <ResponseField name="has_prev" type="boolean">
+      Whether there is a previous page (always false for this endpoint)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Response metadata (currently empty for this endpoint)
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+# Get all executions
+curl -X GET "https://api.getcatalog.ai/v2/extract" \
+  -H "x-api-key: $CATALOG_API_KEY"
+
+# Get only completed executions
+curl -X GET "https://api.getcatalog.ai/v2/extract?status=completed" \
+  -H "x-api-key: $CATALOG_API_KEY"
+
+# Get first 50 executions
+curl -X GET "https://api.getcatalog.ai/v2/extract?page_size=50" \
+  -H "x-api-key: $CATALOG_API_KEY"
+
+# Get only processing executions with custom page size
+curl -X GET "https://api.getcatalog.ai/v2/extract?status=processing&page_size=100" \
+  -H "x-api-key: $CATALOG_API_KEY"
+```
+
+```javascript JavaScript
+// Get all executions
+const response = await fetch('https://api.getcatalog.ai/v2/extract', {
+  headers: {
+    'x-api-key': 'YOUR_API_KEY'
+  }
+});
+
+const data = await response.json();
+console.log(`Found ${data.data.length} executions`);
+data.data.forEach(exec => {
+  console.log(`${exec.execution_id}: ${exec.status} (created: ${exec.created_at})`);
+});
+
+// Get only processing executions
+const processingResponse = await fetch(
+  'https://api.getcatalog.ai/v2/extract?status=processing',
+  {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  }
+);
+
+const processingData = await processingResponse.json();
+console.log(`Found ${processingData.data.length} processing executions`);
+
+// Filter by execution ID format to separate direct URLs vs vendor-based
+const directUrlExecutions = processingData.data.filter(
+  exec => exec.execution_id.startsWith('extract-urls-')
+);
+const vendorExecutions = processingData.data.filter(
+  exec => exec.execution_id.startsWith('extract-') && !exec.execution_id.startsWith('extract-urls-')
+);
+console.log(`${directUrlExecutions.length} direct URL executions`);
+console.log(`${vendorExecutions.length} vendor-based executions`);
+```
+
+```python Python
+import requests
+
+# Get all executions
+response = requests.get(
+    'https://api.getcatalog.ai/v2/extract',
+    headers={'x-api-key': 'YOUR_API_KEY'}
+)
+
+data = response.json()
+print(f"Found {len(data['data'])} executions")
+for exec in data['data']:
+    print(f"{exec['execution_id']}: {exec['status']} (created: {exec['created_at']})")
+
+# Get only failed executions
+failed_response = requests.get(
+    'https://api.getcatalog.ai/v2/extract',
+    headers={'x-api-key': 'YOUR_API_KEY'},
+    params={'status': 'failed', 'page_size': 50}
+)
+
+failed_data = failed_response.json()
+print(f"Found {len(failed_data['data'])} failed executions")
+
+# Filter by execution ID format
+direct_url_executions = [
+    exec for exec in failed_data['data']
+    if exec['execution_id'].startswith('extract-urls-')
+]
+vendor_executions = [
+    exec for exec in failed_data['data']
+    if exec['execution_id'].startswith('extract-') and not exec['execution_id'].startswith('extract-urls-')
+]
+print(f"{len(direct_url_executions)} direct URL executions")
+print(f"{len(vendor_executions)} vendor-based executions")
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "data": [
+    {
+      "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
+      "status": "completed",
+      "created_at": "2025-01-15T10:30:00.000Z"
+    },
+    {
+      "execution_id": "extract-nike-com-51d87084",
+      "status": "running",
+      "created_at": "2025-01-15T11:00:00.000Z"
+    },
+    {
+      "execution_id": "extract-adidas-com-660f9511",
+      "status": "pending",
+      "created_at": "2025-01-15T11:15:00.000Z"
+    },
+    {
+      "execution_id": "extract-example-com-770g0622",
+      "status": "failed",
+      "created_at": "2025-01-15T09:15:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 20,
+    "total_items": 4,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  },
+  "meta": {}
+}
+```
+
+</ResponseExample>

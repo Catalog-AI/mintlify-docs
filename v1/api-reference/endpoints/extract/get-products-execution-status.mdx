@@ -361,48 +361,29 @@ while True:
 ```json Status: Completed
 {
   "status": "completed",
-  "progress": {
-    "products_processed": 98,
-    "urls_completed": 100,
-    "total_urls": 100,
-    "percent_complete": 100
-  },
+  "progress": null,
   "error": null,
   "results": {
     "products": [
       {
-        "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
-        "success": true,
-        "product": {
-          "id": "fec26b49-66f8-480e-8cbb-cfc823af1d33",
-          "title": "Air Force 1 '07 Men's Shoes",
-          "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
-          "brand": "Nike",
-          "vendor": "nike",
-          "price_amount": 90,
-          "price_currency": "USD",
-          "is_available": true
-        }
+        ...
       },
       {
-        "url": "https://www.example-store.com/invalid-product",
-        "success": false,
-        "product": null,
-        "outcome": "unsupported_vendor"
+        ...
       }
     ],
     "meta": {
-      "total_requested": 100,
-      "total_successful": 98,
-      "total_failed": 2
+      "total_successful": 2,
+      "total_requested": 2,
+      "total_failed": 0
     }
   },
   "pagination": {
     "page": 1,
     "limit": 50,
-    "total_items": 100,
-    "total_pages": 2,
-    "has_next": true
+    "total_items": 2,
+    "total_pages": 1,
+    "has_next": false
   }
 }
 ```

@@ -21,6 +21,10 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
+| [`/v1/crawl`](/v1/api-reference/endpoints/discover/start-crawl) | POST | Start asynchronous crawling of a vendor website |
+| [`/v1/crawl`](/v1/api-reference/endpoints/discover/list-crawl-executions) | GET | List recent crawl executions |
+| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/get-crawl-status) | GET | Check the status of a crawl execution |
+| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/cancel-crawl-execution) | DELETE | Cancel a running crawl execution |
 | [`/v1/vendors`](/v1/api-reference/endpoints/discover/get-vendors) | GET | List all vendors with product counts |
 | [`/v1/collections`](/v1/api-reference/endpoints/discover/get-collections) | POST | List collections for a vendor |
 | [`/v1/listings`](/v1/api-reference/endpoints/discover/get-products) | POST | List products from a vendor or collection |
@@ -30,7 +34,9 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | [`/v1/products`](/v1/api-reference/endpoints/extract/retrieve-products) | POST | Start async batch processing of product URLs (1-1000 URLs) |
-| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-execution-status) | GET | Check status and retrieve results for a batch processing job |
+| [`/v1/products`](/v1/api-reference/endpoints/extract/list-products-executions) | GET | List recent product processing executions |
+| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status) | GET | Check status and retrieve results for a batch processing job |
+| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/cancel-products-execution) | DELETE | Cancel a running product processing execution |
 
 ### Search
 
@@ -122,23 +128,3 @@ Errors return appropriate HTTP status codes with structured error details:
 All error responses include a `Request-ID` header that matches the `request_id` in the response body.
 
 See [Error Codes](/resources/error-codes) for the complete reference.
-
-## Rate limits
-
-Default policy: 50 requests per 4-second sliding window, counted per IP with a global fallback.
-
-See [Rate Limits](/resources/rate-limits) for headers, what `429` means, and pacing guidance.
-
-## Pagination
-
-All paginated responses include a `pagination` object in the response with:
-- `page`: Current page number
-- `page_size` or `limit`: Items per page (depends on endpoint)
-- `total_items`: Total number of items
-- `total_pages`: Total number of pages
-- `has_next`: Whether there is a next page
-- `has_prev`: Whether there is a previous page
-
-<Note>
-The `total_items` count may be capped for performance depending on the endpoint. See [Pagination Guide](/v1/guides/pagination) for implementation patterns.
-</Note>

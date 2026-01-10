@@ -20,7 +20,7 @@ Retrieve product listings from a specific vendor with pagination. Optionally fil
   The vendor/brand name to filter by
 </ParamField>
 
-<ParamField body="page" type="number" required>
+<ParamField body="page" type="number" optional>
   Page number for pagination (minimum: 1)
 </ParamField>
 
@@ -118,7 +118,7 @@ curl -X POST https://api.getcatalog.ai/v2/listings \
     "page": 1,
     "page_size": 2,
     "collection_urls": [
-      "https://skims.com/collections/skims-sale"
+      "https://www.skims.com/collections/skims-sale"
     ]
   }'
 ```
@@ -135,7 +135,7 @@ const response = await fetch('https://api.getcatalog.ai/v2/listings', {
     page: 1,
     page_size: 2,
     collection_urls: [
-      'https://skims.com/collections/skims-sale'
+      'https://www.skims.com/collections/skims-sale'
     ]
   })
 });
@@ -156,7 +156,7 @@ response = requests.post(
         'page': 1,
         'page_size': 2,
         'collection_urls': [
-            'https://skims.com/collections/skims-sale'
+            'https://www.skims.com/collections/skims-sale'
         ]
     }
 )
@@ -174,37 +174,125 @@ print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}
 {
   "data": [
     {
-      "id": "lst_abc123",
-      "url": "https://skims.com/products/basic-tee",
-      "name": "Basic Tee",
-      "images": ["https://skims.com/images/tee-1.jpg"],
+      "id": "b3fd62fe-56b3-4d24-8bb5-49485d04b4f7",
+      "url": "https://www.skims.com/products/cotton-fleece-short-ruby",
+      "name": "COTTON FLEECE SHORT | RUBY",
+      "images": [
+        {
+          "id": "f464d0fb-7b79-4f46-8c4a-d9f52e741787",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-SH-SHO-8419W-RBY-FLT.jpg?v=1746030214",
+          "width": 2000,
+          "height": 2000,
+          "position": 1
+        },
+        {
+          "id": "ae41651e-d41a-4f37-bc1b-99ae1546540f",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SH-SHO-8419W-RBY-JE-SKIMS-LOUNGEWEAR_0001-FR.jpg?v=1746030214",
+          "width": 2000,
+          "height": 2000,
+          "position": 2
+        },
+        {
+          "id": "e19d3350-f474-4105-8ff5-da66503ef707",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SH-SHO-8419W-RBY-JE-SKIMS-LOUNGEWEAR_0029-SD.jpg?v=1746030214",
+          "width": 1730,
+          "height": 1730,
+          "position": 3
+        },
+        {
+          "id": "b03ee465-81fa-46ed-bb8b-54783dfe04a1",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SH-SHO-8419W-RBY-JE-SKIMS-LOUNGEWEAR_0042-SD.jpg?v=1746030214",
+          "width": 1794,
+          "height": 1795,
+          "position": 4
+        },
+        {
+          "id": "bb2a32ff-1f77-4481-9dcd-4b9d87ff6ab4",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SH-SHO-8419W-RBY-JE-SKIMS-LOUNGEWEAR_0015-FR.jpg?v=1746030214",
+          "width": 2000,
+          "height": 2000,
+          "position": 5
+        },
+        {
+          "id": "97496d20-8041-4f60-9c55-b17e6e216cc0",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-COTTONFLEECE-RUBY-SW-ALT1.jpg?v=1746049310",
+          "width": 2000,
+          "height": 2000,
+          "position": 6
+        }
+      ],
       "price": {
-        "current_value": 29.99,
-        "currency": "USD"
+        "currency": "USD",
+        "current_value": 38,
+        "compare_at_value": 54
       },
       "vendor": "skims.com",
-      "first_seen_by_catalog": "2024-01-15T10:30:00Z",
-      "last_updated_by_catalog": "2024-01-20T18:45:00Z"
+      "first_seen_by_catalog": "2026-01-09T23:10:52.178561+00:00",
+      "last_updated_by_catalog": "2026-01-09T23:51:28.134254+00:00"
     },
     {
-      "id": "lst_def456",
-      "url": "https://skims.com/products/lounge-pants",
-      "name": "Lounge Pants",
-      "images": ["https://skims.com/images/pants-1.jpg"],
+      "id": "d481e8f3-8810-498d-856a-3c67f3b72a1e",
+      "url": "https://www.skims.com/products/cotton-fleece-short-onyx",
+      "name": "COTTON FLEECE SHORT | ONYX",
+      "images": [
+        {
+          "id": "c3284e88-4c53-43fb-869d-711f356102d5",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-LOUNGEWEAR-BO-SHO-4498-ONX-2.jpg?v=1735590602",
+          "width": 2000,
+          "height": 2000,
+          "position": 1
+        },
+        {
+          "id": "737c9e6e-afcb-4a64-accc-beba6ca64271",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/BO-SHO-4498-ONX-MC-SKIMS-LOUNGEWEAR_0010-FR_1acc4cee-2077-4508-b140-60fe1ff2de14.jpg?v=1735590602",
+          "width": 2000,
+          "height": 1997,
+          "position": 2
+        },
+        {
+          "id": "ee45e3aa-9a7c-452b-ba5c-897b88eaeb40",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/BO-SHO-4498-ONX-MC-SKIMS-LOUNGEWEAR_0030-FR-2_912bee2a-78e7-45be-ac7d-e80db61b3401.jpg?v=1735590602",
+          "width": 2000,
+          "height": 2000,
+          "position": 3
+        },
+        {
+          "id": "508d9b8e-0247-47b7-9000-1e341adcc864",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/BO-SHO-4498-ONX-MC-SKIMS-LOUNGEWEAR_0036-SD_11550aee-e4cd-4187-a44c-376b4149d9ef.jpg?v=1735590602",
+          "width": 1750,
+          "height": 1750,
+          "position": 4
+        },
+        {
+          "id": "4300e65c-8a6b-4240-97fc-e60414efb212",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/BO-SHO-4498-ONX-MC-SKIMS-LOUNGEWEAR_0021-BK_ed37d0b1-d6f6-4387-9eeb-f65b45c5d078.jpg?v=1735590602",
+          "width": 1997,
+          "height": 2000,
+          "position": 5
+        },
+        {
+          "id": "efa053af-979e-4c93-91d2-72c0d31cf831",
+          "url": "https://cdn.shopify.com/s/files/1/0259/5448/4284/files/SKIMS-COTTON_FLEECE-ONX-DET-2.jpg?v=1760122731",
+          "width": 2000,
+          "height": 2000,
+          "position": 6
+        }
+      ],
       "price": {
-        "current_value": 49.99,
-        "currency": "USD"
+        "currency": "USD",
+        "current_value": 27,
+        "compare_at_value": 54
       },
       "vendor": "skims.com",
-      "first_seen_by_catalog": "2024-01-16T14:20:00Z",
-      "last_updated_by_catalog": "2024-01-19T12:30:00Z"
+      "first_seen_by_catalog": "2026-01-09T23:10:49.895871+00:00",
+      "last_updated_by_catalog": "2026-01-09T23:51:28.134254+00:00"
     }
   ],
   "pagination": {
     "page": 1,
-    "page_size": 20,
-    "total_items": 234,
-    "total_pages": 12,
+    "page_size": 2,
+    "total_items": 1616,
+    "total_pages": 808,
     "has_next": true,
     "has_prev": false
   },

@@ -62,7 +62,7 @@ curl -X POST https://api.getcatalog.ai/v1/crawl \
   -H "Content-Type: application/json" \
   -H "x-api-key: $CATALOG_API_KEY" \
   -d '{
-    "url": "https://www.example.com"
+    "url": "skims.com"
   }'
 ```
 
@@ -75,7 +75,7 @@ const response = await fetch('https://api.getcatalog.ai/v1/crawl', {
     'x-api-key': 'YOUR_API_KEY'
   },
   body: JSON.stringify({
-    url: 'https://www.example.com'
+    url: 'skims.com'
   })
 });
 
@@ -97,7 +97,7 @@ response = requests.post(
         'x-api-key': 'YOUR_API_KEY'
     },
     json={
-        'url': 'https://www.example.com'
+        'url': 'skims.com'
     }
 )
 
@@ -116,7 +116,7 @@ print(f"Crawl started with execution ID: {execution_id}")
 ```json POST Response
 {
   "success": true,
-  "execution_id": "crawl-example-com-a1b2c3d4"
+  "execution_id": "crawl-skims-com-9b68e2c1"
 }
 ```
 

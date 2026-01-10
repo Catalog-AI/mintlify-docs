@@ -21,6 +21,10 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
+| [`/v2/crawl`](/v2/api-reference/endpoints/discover/start-crawl) | POST | Start asynchronous crawling of a vendor website |
+| [`/v2/crawl`](/v2/api-reference/endpoints/discover/list-crawl-executions) | GET | List recent crawl executions |
+| [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/get-crawl-status) | GET | Check the status of a crawl execution |
+| [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/cancel-crawl-execution) | DELETE | Cancel a running crawl execution |
 | [`/v2/vendors`](/v2/api-reference/endpoints/discover/get-vendors) | GET | List all vendors with product counts |
 | [`/v2/collections`](/v2/api-reference/endpoints/discover/get-collections) | POST | List collections for a vendor |
 | [`/v2/listings`](/v2/api-reference/endpoints/discover/get-products) | POST | List products from a vendor or collection |
@@ -29,8 +33,11 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| [`/v2/products`](/v2/api-reference/endpoints/extract/retrieve-products) | POST | Start async batch processing of product URLs (1-1000 URLs) |
-| [`/v2/products/{execution_id}`](/v2/api-reference/endpoints/extract/get-execution-status) | GET | Check status and retrieve results for a batch processing job |
+| [`/v2/extract`](/v2/api-reference/endpoints/extract/extract-direct-urls) | POST | Extract products from direct URLs (1-1000 URLs) - Direct URLs mode |
+| [`/v2/extract`](/v2/api-reference/endpoints/extract/extract-vendor-based) | POST | Extract products from a vendor domain - Vendor-based mode |
+| [`/v2/extract`](/v2/api-reference/endpoints/extract/list-extract-executions) | GET | List recent extraction executions |
+| [`/v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status) | GET | Check status and retrieve results for an extraction job |
+| [`/v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/cancel-extract-execution) | DELETE | Cancel a running extraction execution |
 
 ### Search
 
@@ -126,23 +133,3 @@ Additional fields may be included for specific error types. For example, validat
 All error responses include a `Request-ID` header that matches the `request_id` in the response body.
 
 See [Error Codes](/resources/error-codes) for the complete reference.
-
-## Rate limits
-
-Default policy: 50 requests per 4-second sliding window, counted per IP with a global fallback.
-
-See [Rate Limits](/resources/rate-limits) for headers, what `429` means, and pacing guidance.
-
-## Pagination
-
-All paginated responses include a `pagination` object in the response with:
-- `page`: Current page number
-- `page_size`: Items per page
-- `total_items`: Total number of items
-- `total_pages`: Total number of pages
-- `has_next`: Whether there is a next page
-- `has_prev`: Whether there is a previous page
-
-<Note>
-The `total_items` count may be capped for performance depending on the endpoint. See [Pagination Guide](/v2/guides/pagination) for implementation patterns.
-</Note>

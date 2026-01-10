@@ -20,7 +20,7 @@ Retrieve product listings from a specific vendor with pagination. Optionally fil
   The vendor/brand name to filter by
 </ParamField>
 
-<ParamField body="page" type="number" required>
+<ParamField body="page" type="number" optional>
   Page number for pagination (minimum: 1)
 </ParamField>
 
@@ -113,7 +113,7 @@ curl -X POST https://api.getcatalog.ai/v1/listings \
     "page": 1,
     "page_size": 2,
     "collection_urls": [
-      "https://skims.com/collections/skims-sale",
+      "https://www.skims.com/collections/skims-sale",
     ]
   }'
 ```
@@ -130,7 +130,7 @@ const response = await fetch('https://api.getcatalog.ai/v1/listings', {
     page: 1,
     page_size: 2,
     collection_urls: [
-      'https://skims.com/collections/skims-sale'
+      'https://www.skims.com/collections/skims-sale'
     ]
   })
 });
@@ -151,7 +151,7 @@ response = requests.post(
         'page': 1,
         'page_size': 2,
         'collection_urls': [
-            'https://skims.com/collections/skims-sale'
+            'https://www.skims.com/collections/skims-sale'
         ]
     }
 )

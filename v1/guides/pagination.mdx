@@ -87,7 +87,7 @@ The Catalog API uses three main pagination patterns depending on the endpoint ty
 
     ### Pattern 3: Execution Status Endpoints
 
-    **Endpoints:** `/v1/extract/{execution_id}`, `/v1/products/{execution_id}`
+    **Endpoints:** `/v1/products/{execution_id}`
     
     Use `page` and `limit` as query parameters (only when status is `"completed"`). Response includes a `pagination` object.
 
@@ -95,7 +95,7 @@ The Catalog API uses three main pagination patterns depending on the endpoint ty
     import requests
 
     response = requests.get(
-      f'https://api.getcatalog.ai/v1/extract/{execution_id}',
+      f'https://api.getcatalog.ai/v1/products/{execution_id}',
       headers={'x-api-key': 'YOUR_API_KEY'},
       params={'page': 1, 'limit': 50}
     )
@@ -107,7 +107,7 @@ The Catalog API uses three main pagination patterns depending on the endpoint ty
     ```
 
     <Note>
-      For `/v1/products/{execution_id}`, the pagination response uses `limit` instead of `page_size`. For `/v1/extract/{execution_id}`, it uses `page_size` in the response even though the query parameter is `limit`.
+      For `/v1/products/{execution_id}`, the pagination response uses `limit` instead of `page_size`.
     </Note>
 
     ### Basic Implementation Example
@@ -184,13 +184,13 @@ The Catalog API uses three main pagination patterns depending on the endpoint ty
 
     ### Pattern 3: Execution Status Endpoints
 
-    **Endpoints:** `/v1/extract/{execution_id}`, `/v1/products/{execution_id}`
+    **Endpoints:** `/v1/products/{execution_id}`
     
     Use `page` and `limit` as query parameters (only when status is `"completed"`). Response includes a `pagination` object.
 
     ```javascript
     const response = await fetch(
-      `https://api.getcatalog.ai/v1/extract/${executionId}?page=1&limit=50`,
+      `https://api.getcatalog.ai/v1/products/${executionId}?page=1&limit=50`,
       {
         headers: {
           'x-api-key': 'YOUR_API_KEY'
@@ -206,7 +206,7 @@ The Catalog API uses three main pagination patterns depending on the endpoint ty
     ```
 
     <Note>
-      For `/v1/products/{execution_id}`, the pagination response uses `limit` instead of `page_size`. For `/v1/extract/{execution_id}`, it uses `page_size` in the response even though the query parameter is `limit`.
+      For `/v1/products/{execution_id}`, the pagination response uses `limit` instead of `page_size`.
     </Note>
 
     ### Basic Implementation Example
@@ -293,5 +293,5 @@ The `has_next` and `has_prev` boolean fields make it easy to implement navigatio
   **Endpoints Without Pagination:**
   - `/v1/agentic-search` - Returns up to 8 products, no pagination
   - `/v1/agentic-search-mini` - Returns up to 10 products, no pagination
-  - List executions endpoints (`/v1/extract`, `/v1/crawl`) - Use `limit` parameter but don't return pagination metadata
+  - List executions endpoints (`/v1/crawl`) - Use `limit` parameter but don't return pagination metadata
 </Note>

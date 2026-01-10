@@ -86,7 +86,7 @@ The Catalog API uses consistent pagination patterns. Examples for each pattern a
 
     ### Pattern 3: Execution Status Endpoints
 
-    **Endpoints:** `/v2/products/{execution_id}`
+    **Endpoints:** `/v2/extract/{execution_id}`
     
     Use `page` and `page_size` as query parameters (only when status is `"completed"`). Response includes a `pagination` object.
 
@@ -94,7 +94,7 @@ The Catalog API uses consistent pagination patterns. Examples for each pattern a
     import requests
 
     response = requests.get(
-      f'https://api.getcatalog.ai/v2/products/{execution_id}',
+      f'https://api.getcatalog.ai/v2/extract/{execution_id}',
       headers={'x-api-key': 'YOUR_API_KEY'},
       params={'page': 1, 'page_size': 50}
     )
@@ -178,13 +178,13 @@ The Catalog API uses consistent pagination patterns. Examples for each pattern a
 
     ### Pattern 3: Execution Status Endpoints
 
-    **Endpoints:** `/v2/products/{execution_id}`
+    **Endpoints:** `/v2/extract/{execution_id}`
     
     Use `page` and `page_size` as query parameters (only when status is `"completed"`). Response includes a `pagination` object.
 
     ```javascript
     const response = await fetch(
-      `https://api.getcatalog.ai/v2/products/${executionId}?page=1&page_size=50`,
+      `https://api.getcatalog.ai/v2/extract/${executionId}?page=1&page_size=50`,
       {
         headers: {
           'x-api-key': 'YOUR_API_KEY'

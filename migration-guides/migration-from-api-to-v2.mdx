@@ -1,0 +1,782 @@
+---
+title: "Migrating from /api to v2"
+description: "Complete guide to migrating from Catalog API /api endpoints to v2 endpoints"
+---
+
+This guide covers all changes between Catalog API `/api` endpoints and v2 endpoints to help you successfully migrate your integration. The `/api` endpoints use synchronous processing with legacy response formats, while v2 endpoints use standardized response envelopes and asynchronous processing where applicable.
+
+## Overview of Changes
+
+The main improvements in v2 include:
+
+- **Asynchronous Product Extraction:** `/api/products` and `/api/product` are replaced with async `/v2/extract` endpoint requiring polling
+- **Standardized Response Format:** All endpoints now follow a unified response structure with `data`, `pagination`, and `meta` fields
+- **New Price Format:** Products now use a JSON `price` object instead of separate `price_amount`/`price_currency` fields
+- **Enhanced Pagination:** Vendors and Usage endpoints now support pagination
+- **Better Error Handling:** Enhanced error responses with additional context fields
+- **HTTP Status Codes:** Better adherence to REST standards (e.g., 202 Accepted for async operations)
+
+---
+
+## Product Extraction Endpoints
+
+The product extraction endpoints have undergone the most significant changes, moving from synchronous to asynchronous processing.
+
+### Major Changes
+
+#### 1. **Single Product Endpoint**
+
+**API:**
+```
+POST /api/product
+```
+
+**v2:**
+```
+POST /v2/extract
+```
+
+**Key Difference:**
+- `/api/product` returns the product immediately (synchronous)
+- `/v2/extract` returns an execution ID and requires polling for results (asynchronous)
+
+**API Request:**
+```json
+{
+  "url": "https://example.com/product",
+  "enable_enrichment": true,
+  "enable_reviews": false,
+  "enable_image_tags": false,
+  "regenerate_description_html": false,
+  "country_code": "us",
+  "force_extraction": false,
+  "populate_description_html_from_html": false
+}
+```
+
+**API Response:**
+```json
+{
+  "product": {
+    "id": "prod_123",
+    "title": "Product Title",
+    "price_amount": 29.99,
+    "price_currency": "USD",
+    "vendor": "example.com",
+    ...
+  },
+  "meta": {
+    "found": true,
+    "url": "https://example.com/product"
+  }
+}
+```
+
+**v2 Request (Direct URLs Mode):**
+```json
+{
+  "urls": ["https://example.com/product"],
+  "enable_enrichment": false,
+  "enable_reviews": false,
+  "enable_image_tags": false,
+  "regenerate_description_html": false,
+  "country_code": "us",
+  "populate_description_html_from_html": false
+}
+```
+
+**v2 POST Response:**
+```json
+{
+  "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
+  "status": "pending",
+  "meta": {
+    "credits_used": 1,
+    "url_count": 1
+  }
+}
+```
+
+**v2 Status Response (GET /v2/extract/{execution_id}):**
+```json
+{
+  "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
+  "status": "completed",
+  "error": null,
+  "data": [
+    {
+      "id": "prod_123",
+      "title": "Product Title",
+      "price": {
+        "current_value": 29.99,
+        "compare_at_value": null,
+        "currency": "USD"
+      },
+      "vendor": "example.com",
+      ...
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 50,
+    "total_items": 1,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  },
+  "meta": {
+    "progress": {
+      "products_processed": 1,
+      "products_total": 1,
+      "percent_complete": 100
+    },
+    "result": {
+      "products_requested": 1,
+      "products_successful": 1,
+      "products_failed": 0
+    },
+    "start_date": "2025-01-15T10:30:00.000Z",
+    "stop_date": "2025-01-15T10:30:15.000Z",
+    "duration_ms": 15000
+  }
+}
+```
+
+**Key Changes:**
+- `/api/product` accepts a single `url` string; `/v2/extract` requires an array `urls` (even for a single URL)
+- `/api/product` returns product immediately; `/v2/extract` requires polling `GET /v2/extract/{execution_id}`
+- Response field changed from `product` to `data` (array)
+- Price format changed from `price_amount`/`price_currency` to `price` JSON object
+- `enable_enrichment` default changed from `true` to `false` in v2
+- Removed `force_extraction` parameter in v2 (always extracts)
+- HTTP status code changed to `202 Accepted` for POST (was `200 OK`)
+
+#### 2. **Batch Products Endpoint**
+
+**API:**
+```
+POST /api/products
+```
+
+**v2:**
+```
+POST /v2/extract
+```
+
+**Key Difference:**
+- `/api/products` returns all products immediately (synchronous, blocking)
+- `/v2/extract` returns an execution ID and requires polling for results (asynchronous, non-blocking)
+
+**API Request:**
+```json
+{
+  "urls": [
+    "https://example.com/product1",
+    "https://example.com/product2"
+  ],
+  "enable_enrichment": true,
+  "enable_reviews": false,
+  "enable_image_tags": false,
+  "regenerate_description_html": false,
+  "country_code": "us",
+  "populate_description_html_from_html": false
+}
+```
+
+**API Response:**
+```json
+{
+  "products": [
+    {
+      "url": "https://example.com/product1",
+      "product": {
+        "id": "prod_123",
+        "title": "Product 1",
+        "price_amount": 29.99,
+        "price_currency": "USD",
+        ...
+      },
+      "success": true
+    },
+    {
+      "url": "https://example.com/product2",
+      "product": {
+        "id": "prod_456",
+        "title": "Product 2",
+        "price_amount": 49.99,
+        "price_currency": "USD",
+        ...
+      },
+      "success": true
+    }
+  ],
+  "meta": {
+    "total_requested": 2,
+    "total_successful": 2,
+    "total_failed": 0,
+    "urls_processed": [
+      "https://example.com/product1",
+      "https://example.com/product2"
+    ]
+  }
+}
+```
+
+**v2 Request:**
+```json
+{
+  "urls": [
+    "https://example.com/product1",
+    "https://example.com/product2"
+  ],
+  "enable_enrichment": false,
+  "enable_reviews": false,
+  "enable_image_tags": false,
+  "regenerate_description_html": false,
+  "country_code": "us",
+  "populate_description_html_from_html": false
+}
+```
+
+**v2 POST Response:**
+```json
+{
+  "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
+  "status": "pending",
+  "meta": {
+    "credits_used": 2,
+    "url_count": 2
+  }
+}
+```
+
+**v2 Status Response (when completed):**
+```json
+{
+  "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
+  "status": "completed",
+  "error": null,
+  "data": [
+    {
+      "id": "prod_123",
+      "title": "Product 1",
+      "price": {
+        "current_value": 29.99,
+        "compare_at_value": null,
+        "currency": "USD"
+      },
+      "url": "https://example.com/product1",
+      ...
+    },
+    {
+      "id": "prod_456",
+      "title": "Product 2",
+      "price": {
+        "current_value": 49.99,
+        "compare_at_value": null,
+        "currency": "USD"
+      },
+      "url": "https://example.com/product2",
+      ...
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 50,
+    "total_items": 2,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  },
+  "meta": {
+    "progress": {
+      "products_processed": 2,
+      "products_total": 2,
+      "percent_complete": 100
+    },
+    "result": {
+      "products_requested": 2,
+      "products_successful": 2,
+      "products_failed": 0
+    }
+  }
+}
+```
+
+**Key Changes:**
+- Response structure changed from array of `{url, product, success}` objects to flat `data` array of products
+- Failed products are excluded from `data` array (check `meta.result.products_failed` for failures)
+- Price format changed from `price_amount`/`price_currency` to `price` JSON object
+- `enable_enrichment` default changed from `true` to `false` in v2
+- HTTP status code changed to `202 Accepted` for POST (was `200 OK`)
+- Requires polling `GET /v2/extract/{execution_id}` to retrieve results
+- Support for pagination when retrieving results (use `page` and `page_size` query parameters)
+
+#### 3. **Polling for Results**
+
+Since `/v2/extract` is asynchronous, you must poll for results:
+
+**API Pattern (synchronous):**
+```javascript
+// API: Get results immediately
+const response = await fetch('/api/products', {
+  method: 'POST',
+  headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ urls: [...] })
+});
+const { products, meta } = await response.json();
+// Products are immediately available
+```
+
+**v2 Pattern (asynchronous):**
+```javascript
+// v2: Start extraction and poll for results
+const postResponse = await fetch('/v2/extract', {
+  method: 'POST',
+  headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+  body: JSON.stringify({ urls: [...] })
+});
+const { execution_id, status } = await postResponse.json();
+
+// Poll for completion
+let statusResponse;
+do {
+  await sleep(5000); // Wait 5 seconds between polls
+  statusResponse = await fetch(`/v2/extract/${execution_id}`, {
+    headers: { 'x-api-key': apiKey }
+  });
+  const statusData = await statusResponse.json();
+  
+  if (statusData.status === 'completed') {
+    // Products available in statusData.data
+    break;
+  } else if (statusData.status === 'failed') {
+    throw new Error(statusData.error);
+  }
+} while (statusData.status === 'pending' || statusData.status === 'running');
+```
+
+**Key Changes:**
+- Must implement polling logic instead of waiting for synchronous response
+- Check `status` field: `"pending"`, `"running"`, `"completed"`, or `"failed"`
+- Access products via `data` field when `status === "completed"`
+- Check `meta.progress` for real-time progress during `"running"` status
+
+### Migration Steps for Product Extraction Endpoints
+
+1. **Update endpoint paths:** Change `/api/product` or `/api/products` to `/v2/extract`
+2. **Convert to async pattern:** Implement polling logic instead of waiting for immediate response
+3. **Update request format:** For single product, wrap URL in array: `{urls: [url]}`
+4. **Update response parsing:** Change `product` or `products` to `data` array
+5. **Update price field access:** Change `price_amount`/`price_currency` to `price.current_value`/`price.currency`
+6. **Handle pagination:** Results are paginated; use `page` and `page_size` query parameters when fetching status
+7. **Update default values:** Set `enable_enrichment` explicitly if you were relying on API's default of `true`
+8. **Handle errors:** Check `status === "failed"` and read `error` field instead of checking individual product `success` flags
+
+---
+
+## Search Endpoint
+
+The Search endpoint has undergone moderate changes, primarily in response format standardization and price format updates.
+
+### Major Changes
+
+**API:**
+```
+POST /api/search
+```
+
+**v2:**
+```
+POST /v2/search
+```
+
+**Request Format:**
+- Request body structure remains largely the same
+- `limit` parameter renamed to `page_size` in v2
+- Default `page_size` changed from 10 to 20 in v2
+
+**Response Format:**
+
+**API Response:**
+```json
+{
+  "products": [
+    {
+      "id": "prod_123",
+      "title": "Product Title",
+      "price_amount": 29.99,
+      "price_currency": "USD",
+      "vendor": "example.com",
+      ...
+    }
+  ],
+  "meta": {
+    "totalItems": 100,
+    "totalPages": 10,
+    "currentPage": 1,
+    "pageSize": 10
+  }
+}
+```
+
+**v2 Response:**
+```json
+{
+  "data": [
+    {
+      "id": "prod_123",
+      "title": "Product Title",
+      "price": {
+        "current_value": 29.99,
+        "compare_at_value": null,
+        "currency": "USD"
+      },
+      "vendor": "example.com",
+      ...
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 20,
+    "total_items": 100,
+    "total_pages": 5,
+    "has_next": true,
+    "has_prev": false
+  },
+  "meta": {}
+}
+```
+
+**Key Changes:**
+- Response field changed from `products` to `data`
+- Price format changed from `price_amount`/`price_currency` to `price` JSON object
+- Pagination fields moved from `meta` to dedicated `pagination` object
+- `currentPage` renamed to `page` in pagination
+- `pageSize` renamed to `page_size` in pagination
+- Added `has_next` and `has_prev` boolean fields
+- `totalItems` moved to `pagination.total_items`
+- `totalPages` moved to `pagination.total_pages`
+- Default `page_size` changed from 10 to 20
+- Request parameter `limit` renamed to `page_size`
+
+### Migration Steps for Search Endpoint
+
+1. **Update response parsing:** Change `products` to `data`
+2. **Update pagination access:** Access pagination fields from `pagination` object instead of `meta`
+3. **Update price field access:** Change `price_amount`/`price_currency` to `price.current_value`/`price.currency`
+4. **Update query parameters:** Change `limit` to `page_size` in request body
+5. **Handle default change:** Adjust for default `page_size` change from 10 to 20, or set explicitly
+6. **Update pagination field names:** Change `currentPage` to `page`, `pageSize` to `page_size`
+
+---
+
+## Vendors Endpoint
+
+The Vendors endpoint has added pagination support and standardized response format.
+
+### Major Changes
+
+**API:**
+```
+GET /api/vendors
+```
+
+**v2:**
+```
+GET /v2/vendors?page=1&page_size=20
+```
+
+**Response Format:**
+
+**API Response:**
+```json
+{
+  "vendors": [
+    {
+      "vendor": "example.com",
+      "latest_product_update_by_catalog": "2025-01-15T10:30:00.000Z",
+      "product_count": 1234,
+      "in_affiliate_network": true
+    }
+  ]
+}
+```
+
+**v2 Response:**
+```json
+{
+  "data": [
+    {
+      "vendor": "example.com",
+      "latest_product_update_by_catalog": "2025-01-15T10:30:00.000Z",
+      "product_count": 1234,
+      "in_affiliate_network": true
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 20,
+    "total_items": 50,
+    "total_pages": 3,
+    "has_next": true,
+    "has_prev": false
+  },
+  "meta": {}
+}
+```
+
+**Key Changes:**
+- Response field changed from `vendors` to `data`
+- Added pagination support via `page` and `page_size` query parameters
+- Added `pagination` object to response
+- Default `page_size` is 20 (API returns all vendors)
+- Added `meta` object (empty for this endpoint)
+
+**Query Parameters:**
+- `page`: Page number (1-indexed, default: 1)
+- `page_size`: Items per page (default: 20, max: 100)
+
+### Migration Steps for Vendors Endpoint
+
+1. **Update response parsing:** Change `vendors` to `data`
+2. **Add pagination handling:** Implement pagination if you need to handle large vendor lists
+3. **Handle response structure:** Access vendors from `data` array instead of `vendors` array
+
+---
+
+## Usage Endpoint
+
+The Usage endpoint has added pagination support and standardized response format.
+
+### Major Changes
+
+**API:**
+```
+GET /api/usage?period=30d
+```
+
+**v2:**
+```
+GET /v2/usage?period=30d&page=1&page_size=20
+```
+
+**Response Format:**
+
+**API Response:**
+```json
+{
+  "usage": [
+    {
+      "path": "/api/products",
+      "total_calls": 1250
+    }
+  ],
+  "period": "30d"
+}
+```
+
+**v2 Response:**
+```json
+{
+  "data": [
+    {
+      "path": "/api/products",
+      "total_calls": 1250
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 20,
+    "total_items": 15,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  },
+  "meta": {
+    "period": "30d"
+  }
+}
+```
+
+**Key Changes:**
+- Response field changed from `usage` to `data`
+- `period` moved from top-level to `meta.period`
+- Added pagination support via `page` and `page_size` query parameters
+- Added `pagination` object to response
+- Default `page_size` is 20 (API returns all usage statistics)
+- Default `period` is `"30d" (same as API)
+
+**Query Parameters:**
+- `period`: Time period (24h, 7d, 30d, 90d, all) - default: 30d
+- `page`: Page number (1-indexed, default: 1)
+- `page_size`: Items per page (default: 20, max: 100)
+
+### Migration Steps for Usage Endpoint
+
+1. **Update response parsing:** Change `usage` to `data`
+2. **Update period access:** Access `period` from `meta.period` instead of top-level
+3. **Add pagination handling:** Implement pagination if you need to handle large usage lists
+4. **Handle response structure:** Access usage statistics from `data` array instead of `usage` array
+
+---
+
+## General Changes
+
+### Response Format Standardization
+
+All v2 endpoints follow a consistent response structure:
+
+```json
+{
+  "data": [...],           // Main response data (array or object)
+  "pagination": {          // Pagination metadata (when applicable)
+    "page": 1,
+    "page_size": 10,
+    "total_items": 100,
+    "total_pages": 10,
+    "has_next": true,
+    "has_prev": false
+  },
+  "meta": {               // Additional metadata
+    // Endpoint-specific metadata
+  }
+}
+```
+
+**Key Changes:**
+- API endpoints used various response formats (e.g., `products`, `vendors`, `usage`)
+- v2 uses consistent `data` field for all responses
+- Pagination moved to dedicated `pagination` object
+- Metadata moved to `meta` object
+
+### Price Format Changes
+
+**API Price Format:**
+```json
+{
+  "price_amount": 29.99,
+  "price_currency": "USD"
+}
+```
+
+**v2 Price Format:**
+```json
+{
+  "price": {
+    "current_value": 29.99,
+    "compare_at_value": null,
+    "currency": "USD"
+  }
+}
+```
+
+**Key Changes:**
+- Separate `price_amount` and `price_currency` fields consolidated into `price` object
+- Added `compare_at_value` field (may be null)
+- `price_amount` → `price.current_value`
+- `price_currency` → `price.currency`
+
+**Variants Price Format:**
+
+**API:**
+```json
+{
+  "variants": [
+    {
+      "price": "29.99",
+      "compareAtPrice": "39.99",
+      "currency": "USD"
+    }
+  ]
+}
+```
+
+**v2:**
+```json
+{
+  "variants": [
+    {
+      "price": {
+        "current_value": 29.99,
+        "compare_at_value": 39.99,
+        "currency": "USD"
+      }
+    }
+  ]
+}
+```
+
+### HTTP Status Codes
+
+**API:**
+- `200 OK` for all successful requests (synchronous)
+
+**v2:**
+- `202 Accepted` for async operations (POST requests that start async processing)
+- `200 OK` for sync operations (GET requests, completed status responses)
+
+### Error Handling
+
+**API Error Response:**
+```json
+{
+  "error": "Error message"
+}
+```
+
+**v2 Error Response:**
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error description",
+    "request_id": "req_..."
+  },
+  "invalid_urls": [  // Additional context for validation errors
+    "Index 0: https://invalid-url - invalid format"
+  ]
+}
+```
+
+**Key Changes:**
+- Error responses now use structured `error` object instead of string
+- Added `code` and `request_id` fields for better error tracking
+- Additional context fields may be included for specific error types (e.g., `invalid_urls` for validation errors)
+- All error responses include `Request-ID` header matching the `request_id` in the response body
+
+### Pagination Consistency
+
+**API:**
+- Mixed pagination structures across endpoints
+- Some endpoints had no pagination (e.g., vendors, usage)
+- Inconsistent field names (`currentPage` vs `page`, `limit` vs `page_size`)
+
+**v2:**
+- Consistent pagination structure across all endpoints:
+  - `page`: Current page number (1-indexed)
+  - `page_size`: Number of items per page
+  - `total_items`: Total number of items
+  - `total_pages`: Total number of pages
+  - `has_next`: Boolean indicating if next page exists
+  - `has_prev`: Boolean indicating if previous page exists
+
+### Query Parameter Naming
+
+- `limit` → `page_size` (in all endpoints)
+- All pagination-related parameters now consistently use `page` and `page_size`
+
+### Default Values
+
+- `enable_enrichment`: Changed from `true` (API) to `false` (v2) - **Important:** Set explicitly if you need enrichment
+- `page_size` (search): Changed from 10 (API) to 20 (v2)
+- `page_size` (vendors): No pagination in API, default 20 in v2
+- `page_size` (usage): No pagination in API, default 20 in v2
+
+---
+
+
+## Support
+
+If you encounter issues during migration or have questions about specific changes, please contact support at founders@getcatalog.ai or refer to the detailed endpoint documentation for v2.
+

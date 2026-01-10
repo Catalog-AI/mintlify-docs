@@ -1,0 +1,167 @@
+---
+title: "Cancel Extract Execution"
+api: "DELETE https://api.getcatalog.ai/v2/extract/{execution_id}"
+description: "Cancel a running extraction execution"
+---
+
+Cancel a running extraction execution. This endpoint stops an active extraction job that is currently processing.
+
+<Tip>
+**When to use:** Use this endpoint when you need to stop an extraction job that is currently running. This is useful if:
+- You started an extraction job by mistake
+- The extraction is taking longer than expected and you want to stop it
+- You need to free up resources for other operations
+</Tip>
+
+<Note>
+**Cancellation Requirements:** You can only cancel executions that are currently running (status `"running"`). 
+- If an execution has already completed or failed, it cannot be canceled
+- Executions that are waiting for a crawl to complete (status `"pending"` with `waiting_for` in meta) cannot be canceled until they start running
+- The endpoint will return an error if you attempt to cancel a non-running execution
+
+**Supported Execution Types:** This endpoint works for both extraction modes:
+- **Direct URLs mode:** Execution IDs formatted as `extract-urls-{uuid}`
+- **Vendor-based mode:** Execution IDs formatted as `extract-{vendor}-{uuid}` (e.g., `extract-nike-com-51d87084`)
+</Note>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+<ParamField path="execution_id" type="string" required>
+  The execution ID of the extraction job to cancel
+  
+  **Formats:**
+  - `extract-urls-{uuid}` - Direct URLs mode (e.g., `extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7`)
+  - `extract-{vendor}-{uuid}` - Vendor-based mode (e.g., `extract-nike-com-51d87084`)
+  
+  **Note:** If the execution ID does not exist or doesn't belong to your organization, the endpoint returns a 404 Not Found error.
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="arn" type="string" optional>
+  Full AWS Step Functions execution ARN (optional override, used for advanced scenarios)
+</ParamField>
+
+## Response
+
+<ResponseField name="status" type="string">
+  Status after cancellation. Always `"canceled"` on success.
+</ResponseField>
+
+<ResponseField name="execution_id" type="string">
+  The execution identifier that was canceled
+</ResponseField>
+
+<ResponseField name="stop_date" type="string | null">
+  ISO 8601 timestamp when the execution was stopped (null if not available)
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+# Cancel a running execution (direct URLs mode)
+curl -X DELETE "https://api.getcatalog.ai/v2/extract/extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7" \
+  -H "x-api-key: $CATALOG_API_KEY"
+
+# Cancel a running execution (vendor-based mode)
+curl -X DELETE "https://api.getcatalog.ai/v2/extract/extract-nike-com-51d87084" \
+  -H "x-api-key: $CATALOG_API_KEY"
+```
+
+```javascript JavaScript
+// Cancel execution (direct URLs mode)
+const executionId = 'extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7';
+
+const response = await fetch(
+  `https://api.getcatalog.ai/v2/extract/${executionId}`,
+  {
+    method: 'DELETE',
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  }
+);
+
+if (!response.ok) {
+  const error = await response.json();
+  console.error('Failed to cancel:', error.error.message);
+  if (error.error.code === 'INVALID_REQUEST') {
+    console.log('Execution may not be running or is waiting for a crawl');
+  }
+} else {
+  const data = await response.json();
+  console.log(`Execution ${data.execution_id} canceled at ${data.stop_date}`);
+}
+```
+
+```python Python
+import requests
+
+execution_id = 'extract-nike-com-51d87084'
+
+# Cancel execution
+response = requests.delete(
+    f'https://api.getcatalog.ai/v2/extract/{execution_id}',
+    headers={'x-api-key': 'YOUR_API_KEY'}
+)
+
+if response.status_code == 200:
+    data = response.json()
+    print(f"Execution {data['execution_id']} canceled at {data['stop_date']}")
+elif response.status_code == 400:
+    error = response.json()
+    print(f"Cannot cancel: {error['error']['message']}")
+    print("Execution may not be running or is waiting for a crawl")
+elif response.status_code == 404:
+    print('Execution not found or does not belong to your organization')
+else:
+    print(f'Error: {response.status_code}')
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json DELETE Response (Success)
+{
+  "status": "canceled",
+  "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
+  "stop_date": "2025-01-15T10:35:22.000Z"
+}
+```
+
+```json Error Response (Execution Not Running)
+{
+  "error": {
+    "message": "Execution is not running and cannot be canceled",
+    "code": "INVALID_REQUEST",
+    "request_id": "req-12345678-1234-1234-1234-123456789abc"
+  }
+}
+```
+
+```json Error Response (Waiting for Crawl)
+{
+  "error": {
+    "message": "Execution is waiting for crawl to complete and cannot be canceled yet",
+    "code": "INVALID_REQUEST",
+    "request_id": "req-12345678-1234-1234-1234-123456789abc"
+  }
+}
+```
+
+```json Error Response (Execution Not Found)
+{
+  "error": {
+    "message": "Execution not found",
+    "code": "NOT_FOUND",
+    "request_id": "req-12345678-1234-1234-1234-123456789abc"
+  }
+}
+```
+
+</ResponseExample>

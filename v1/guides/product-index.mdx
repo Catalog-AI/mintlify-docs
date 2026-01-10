@@ -3,10 +3,10 @@ title: "Building a Product Index"
 description: "How to build and maintain your own product index using the Catalog API"
 ---
 
-Build and maintain your own product index using Catalog's browse, crawl, extract, and product endpoints. Choose the approach that best fits your needs: browse existing vendors that Catalog has already discovered, or crawl and extract new vendors to ensure you have the latest data.
+Build and maintain your own product index using Catalog's browse, crawl, and product endpoints. Choose the approach that best fits your needs: browse existing vendors that Catalog has already discovered, or crawl new vendors to ensure you have the latest data.
 
 <Note>
-This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v1/api-reference/endpoints/discover/get-vendors), discovering new products via [Start Crawl](/v1/api-reference/endpoints/discover/start-crawl), enhancing them with [Start Extract](/v1/api-reference/endpoints/extract/start-extract), and adding missing products via [Get Products](/v1/api-reference/endpoints/extract/retrieve-products).
+This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v1/api-reference/endpoints/discover/get-vendors), discovering new products via [Start Crawl](/v1/api-reference/endpoints/discover/start-crawl), and adding missing products via [Get Products](/v1/api-reference/endpoints/extract/retrieve-products).
 </Note>
 
 ## Option 1: Browse Existing Vendors
@@ -54,9 +54,9 @@ Once you have a list of product URLs, use the **Get Products** endpoint (`POST /
 
 You can repeat this process on a schedule (e.g., every few hours) to keep your index fresh.
 
-## Option 2: Crawl and Extract
+## Option 2: Crawl New Vendors
 
-If your vendor is not yet available in Catalog, or you want to ensure you have the most up-to-date product data, use the crawl and extract workflow. This is also the recommended approach for discovering and indexing new vendors.
+If your vendor is not yet available in Catalog, or you want to ensure you have the most up-to-date product data, use the crawl workflow. This is the recommended approach for discovering and indexing new vendors.
 
 ### Step 1: Start with Crawl
 
@@ -86,49 +86,9 @@ Use the **Start Crawl** endpoint (`POST /v1/crawl`) to discover all products fro
 **Billing Requirement:** Crawl requests require auto top-up to be enabled in your billing settings. This ensures you have sufficient credits to complete the crawl operation.
 </Note>
 
-### Step 2: Enhance with Extract
+### Step 2: Add Missing Products
 
-After crawling (or while a crawl is running), use the **Start Extract** endpoint (`POST /v1/extract`) to enhance products with full details, AI enrichment, reviews, and image tags.
-
-**Typical flow:**
-
-1. Start extraction by calling `POST /v1/extract` with the domain:
-   ```json
-   {
-     "domain": "example.com",
-     "enable_enrichment": true,
-     "enable_reviews": true,
-     "enable_image_tags": true,
-     "country_code": "us"
-   }
-   ```
-
-2. Optionally provide a `crawl_id` to wait for crawl completion before starting extraction:
-   ```json
-   {
-     "domain": "example.com",
-     "crawl_id": "crawl-example-com-a1b2c3d4"
-   }
-   ```
-
-3. Receive an `execution_id` immediately (format: `extract-{vendor}-{uuid}`)
-
-4. Poll the [Get Execution Status](/v1/api-reference/endpoints/extract/get-extract-status) endpoint:
-   - Check `status` and `meta.progress` for real-time progress
-   - When `status === "completed"`, results are available with pagination
-   - Use `page` and `limit` query parameters to retrieve results in chunks
-
-5. For each result in the completed execution:
-   - If `success === true`: Upsert the enhanced product into your index
-   - If `success === false`: Log the `outcome`/reason and decide whether to retry later
-
-<Note>
-**Crawl Requirement:** Product extraction can only be performed on websites whose products are currently being crawled or have already been crawled. The extraction uses the product listings discovered during the crawl process.
-</Note>
-
-### Step 3: Add Missing Products
-
-Use the **Get Products** endpoint (`POST /v1/products`) to add any products that weren't discovered during crawl/extract, or to refresh specific products from your own URL list.
+Use the **Get Products** endpoint (`POST /v1/products`) to add any products that weren't discovered during crawl, or to refresh specific products from your own URL list.
 
 **Use cases:**
 - Products from your internal catalog
@@ -165,15 +125,14 @@ Use the **Get Products** endpoint (`POST /v1/products`) to add any products that
 - You want to quickly index products without waiting for crawl/extract
 - You're building on top of Catalog's existing product database
 
-**Use Crawl and Extract (Option 2)** when:
+**Use Crawl New Vendors (Option 2)** when:
 - Your vendor is not yet available in Catalog
 - You want to ensure you have the most up-to-date product data
 - You need to discover new products and collections from a vendor
-- You want AI-enriched attributes, reviews, and image tags
 
 In practice, many integrations combine both approaches:
 - Browse existing vendors for quick indexing
-- Crawl and extract new vendors or refresh existing ones periodically
+- Crawl new vendors or refresh existing ones periodically
 - Use the Products endpoint for targeted updates of specific items
 
 ## Keeping Your Index Fresh
@@ -181,8 +140,6 @@ In practice, many integrations combine both approaches:
 To maintain a high-quality product index:
 
 **Schedule re-crawling:** Periodically re-crawl vendor websites to discover new products and collections.
-
-**Schedule re-extraction:** Re-run extraction to capture price, availability, and content changes for existing products.
 
 **Monitor failures:** Use `success` and `outcome` fields to detect:
 - Non-product URLs
@@ -198,9 +155,6 @@ To maintain a high-quality product index:
 <CardGroup cols={2}>
   <Card title="Start Crawl" icon="spider" href="/v1/api-reference/endpoints/discover/start-crawl">
     Discover products from a vendor website
-  </Card>
-  <Card title="Start Extract" icon="wand-magic-sparkles" href="/v1/api-reference/endpoints/extract/start-extract">
-    Enhance products with full details and AI enrichment
   </Card>
   <Card title="Get Products" icon="box" href="/v1/api-reference/endpoints/extract/retrieve-products">
     Bulk fetch product details by URLs

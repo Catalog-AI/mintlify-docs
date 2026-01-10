@@ -51,11 +51,7 @@
                       "v1/api-reference/endpoints/extract/retrieve-products",
                       "v1/api-reference/endpoints/extract/list-products-executions",
                       "v1/api-reference/endpoints/extract/get-products-execution-status",
-                      "v1/api-reference/endpoints/extract/cancel-products-execution",
-                      "v1/api-reference/endpoints/extract/start-extract",
-                      "v1/api-reference/endpoints/extract/list-extract-executions",
-                      "v1/api-reference/endpoints/extract/get-extract-status",
-                      "v1/api-reference/endpoints/extract/cancel-extract-execution"
+                      "v1/api-reference/endpoints/extract/cancel-products-execution"
                     ]
                   },
                   {
@@ -133,8 +129,11 @@
                   {
                     "group": "Extract",
                     "pages": [
-                      "v2/api-reference/endpoints/extract/retrieve-products",
-                      "v2/api-reference/endpoints/extract/get-execution-status"
+                      "v2/api-reference/endpoints/extract/extract-direct-urls",
+                      "v2/api-reference/endpoints/extract/extract-vendor-based",
+                      "v2/api-reference/endpoints/extract/list-extract-executions",
+                      "v2/api-reference/endpoints/extract/get-extract-status",
+                      "v2/api-reference/endpoints/extract/cancel-extract-execution"
                     ]
                   },
                   {
@@ -163,7 +162,15 @@
                   "resources/error-codes",
                   "resources/rate-limits"
                 ]
+              },
+              {
+                "group": "Migration Guides",
+                "pages": [
+                  "migration-guides/migration-from-api-to-v2",
+                  "migration-guides/migrating-from-v1-to-v2"
+                ]
               }
+              
             ]
           },
           {

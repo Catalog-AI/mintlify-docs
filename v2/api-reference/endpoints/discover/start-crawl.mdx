@@ -80,7 +80,7 @@ curl -X POST https://api.getcatalog.ai/v2/crawl \
   -H "Content-Type: application/json" \
   -H "x-api-key: $CATALOG_API_KEY" \
   -d '{
-    "url": "https://www.example.com"
+    "url": "skims.com"
   }'
 ```
 
@@ -93,7 +93,7 @@ const response = await fetch('https://api.getcatalog.ai/v2/crawl', {
     'x-api-key': 'YOUR_API_KEY'
   },
   body: JSON.stringify({
-    url: 'https://www.example.com'
+    url: 'skims.com'
   })
 });
 
@@ -116,7 +116,7 @@ response = requests.post(
         'x-api-key': 'YOUR_API_KEY'
     },
     json={
-        'url': 'https://www.example.com'
+        'url': 'skims.com'
     }
 )
 
@@ -135,10 +135,10 @@ print(f"Credits used: {data['meta']['credits_used']}")
 
 ```json POST Response (202 Accepted)
 {
-  "execution_id": "crawl-example-com-a1b2c3d4",
+  "execution_id": "crawl-skims-com-4ddfa1c9",
   "status": "pending",
   "meta": {
-    "credits_used": 100
+    "credits_used": 0
   }
 }
 ```
