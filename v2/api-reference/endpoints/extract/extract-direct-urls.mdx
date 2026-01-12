@@ -121,6 +121,21 @@ Start asynchronous product extraction from a list of direct product URLs. This e
 **HTTP Status Code:** This endpoint returns `202 Accepted` to indicate the request has been accepted for processing. The response body contains the execution details you need to track the crawl progress.
 </Note>
 
+## Response Schema and Enable Flags
+
+The `/v2/extract` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present in product objects returned in the `data` array, but will be `null` when the corresponding flag is `false`.
+
+**Field Mappings:**
+
+| Flag | Affected Fields |
+|------|----------------|
+| `enable_reviews` | `reviews` |
+| `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` |
+| `enable_image_tags` | `images[].attributes` |
+| `enable_brand_pdp` | `brand_pdp` |
+| `enable_similar_products` | `similar_products` |
+| `enable_reddit_insights` | `reddit_insights` |
+
 <RequestExample>
 
 ```bash cURL

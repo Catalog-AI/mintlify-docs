@@ -267,6 +267,21 @@ print(f"Products to process: {data['meta']['products_to_process']}")
 
 </ResponseExample>
 
+## Response Schema and Enable Flags
+
+The `/v2/extract` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present in product objects returned in the `data` array, but will be `null` when the corresponding flag is `false`.
+
+**Field Mappings:**
+
+| Flag | Affected Fields |
+|------|----------------|
+| `enable_reviews` | `reviews` |
+| `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` |
+| `enable_image_tags` | `images[].attributes` |
+| `enable_brand_pdp` | `brand_pdp` |
+| `enable_similar_products` | `similar_products` |
+| `enable_reddit_insights` | `reddit_insights` |
+
 ## Workflow
 
 1. **Crawl the Domain (if not already done):** First, use the [Start Crawl](/v2/api-reference/endpoints/crawl/start-crawl) endpoint to discover products from the domain. Wait for the crawl to complete or use the `crawl_id` parameter in step 2.

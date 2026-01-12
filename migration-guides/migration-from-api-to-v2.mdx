@@ -151,6 +151,59 @@ POST /v2/extract
 - Removed `force_extraction` parameter in v2 (always extracts)
 - HTTP status code changed to `202 Accepted` for POST (was `200 OK`)
 
+#### Enable Flags and Response Schema
+
+The `/v2/extract` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present, but will be `null` when the corresponding flag is `false` or when data is unavailable.
+
+**Field Mappings:**
+
+| Flag | Affected Fields | Behavior When `false` |
+|------|----------------|----------------------|
+| `enable_reviews` | `reviews` | Always `null` |
+| `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` | All set to `null` |
+| `enable_image_tags` | `images[].attributes` | Each image's `attributes` field is `null` |
+| `enable_brand_pdp` | `brand_pdp` | Always `null` |
+| `enable_similar_products` | `similar_products` | Always `null` |
+| `enable_reddit_insights` | `reddit_insights` | Always `null` |
+
+**Example Response Comparison:**
+
+With `enable_reviews: false`:
+```json
+{
+  "id": "prod_123",
+  "title": "Product Title",
+  "reviews": null,
+  "attributes": null,
+  "product_type": null,
+  ...
+}
+```
+
+With `enable_reviews: true` and `enable_enrichment: true`:
+```json
+{
+  "id": "prod_123",
+  "title": "Product Title",
+  "reviews": [
+    {
+      "rating": 5,
+      "text": "Great product!",
+      ...
+    }
+  ],
+  "attributes": {
+    "material": "Cotton",
+    "color": "Blue",
+    ...
+  },
+  "product_type": "Apparel",
+  ...
+}
+```
+
+**Note**: The same behavior applies to both single product and batch product extraction. The response schema is identical regardless of the number of products requested.
+
 #### 2. **Batch Products Endpoint**
 
 **API:**
@@ -312,6 +365,59 @@ POST /v2/extract
 - Requires polling `GET /v2/extract/{execution_id}` to retrieve results
 - Support for pagination when retrieving results (use `page` and `page_size` query parameters)
 
+#### Enable Flags and Response Schema
+
+The `/v2/extract` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present, but will be `null` when the corresponding flag is `false` or when data is unavailable.
+
+**Field Mappings:**
+
+| Flag | Affected Fields | Behavior When `false` |
+|------|----------------|----------------------|
+| `enable_reviews` | `reviews` | Always `null` |
+| `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` | All set to `null` |
+| `enable_image_tags` | `images[].attributes` | Each image's `attributes` field is `null` |
+| `enable_brand_pdp` | `brand_pdp` | Always `null` |
+| `enable_similar_products` | `similar_products` | Always `null` |
+| `enable_reddit_insights` | `reddit_insights` | Always `null` |
+
+**Example Response Comparison:**
+
+With `enable_reviews: false`:
+```json
+{
+  "id": "prod_123",
+  "title": "Product Title",
+  "reviews": null,
+  "attributes": null,
+  "product_type": null,
+  ...
+}
+```
+
+With `enable_reviews: true` and `enable_enrichment: true`:
+```json
+{
+  "id": "prod_123",
+  "title": "Product Title",
+  "reviews": [
+    {
+      "rating": 5,
+      "text": "Great product!",
+      ...
+    }
+  ],
+  "attributes": {
+    "material": "Cotton",
+    "color": "Blue",
+    ...
+  },
+  "product_type": "Apparel",
+  ...
+}
+```
+
+**Note**: The same behavior applies to both single product and batch product extraction. The response schema is identical regardless of the number of products requested.
+
 #### 3. **Polling for Results**
 
 Since `/v2/extract` is asynchronous, you must poll for results:
@@ -468,6 +574,76 @@ POST /v2/search
 4. **Update query parameters:** Change `limit` to `page_size` in request body
 5. **Handle default change:** Adjust for default `page_size` change from 10 to 20, or set explicitly
 6. **Update pagination field names:** Change `currentPage` to `page`, `pageSize` to `page_size`
+
+---
+
+## Agentic Search Endpoint
+
+The Agentic Search endpoint uses AI to find products based on natural language queries.
+
+### Major Changes
+
+**API:**
+```
+POST /api/search
+```
+
+**v2:**
+```
+POST /v2/agentic-search
+```
+
+**Key Difference:**
+- `/api/search` is a traditional search endpoint
+- `/v2/agentic-search` uses AI-powered semantic search with web browsing capabilities
+
+### Enable Flags and Response Schema
+
+The `/v2/agentic-search` endpoint uses the same product processing pipeline as `/v2/extract`, so the response schema behavior matches extract endpoints.
+
+**Field Mappings:**
+
+| Flag | Affected Fields | Behavior When `false` |
+|------|----------------|----------------------|
+| `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` | All set to `null` |
+
+**Note**: Agentic search currently only supports `enable_enrichment`. Other flags (reviews, image tags, etc.) are not available for agentic search results.
+
+**Example Response:**
+
+With `enable_enrichment: false`:
+```json
+{
+  "data": [
+    {
+      "id": "prod_123",
+      "title": "Product Title",
+      "attributes": null,
+      "product_type": null,
+      ...
+    }
+  ]
+}
+```
+
+With `enable_enrichment: true`:
+```json
+{
+  "data": [
+    {
+      "id": "prod_123",
+      "title": "Product Title",
+      "attributes": {
+        "material": "Cotton",
+        "style": "Casual",
+        ...
+      },
+      "product_type": "Apparel",
+      ...
+    }
+  ]
+}
+```
 
 ---
 
@@ -772,6 +948,37 @@ All v2 endpoints follow a consistent response structure:
 - `page_size` (search): Changed from 10 (API) to 20 (v2)
 - `page_size` (vendors): No pagination in API, default 20 in v2
 - `page_size` (usage): No pagination in API, default 20 in v2
+
+### Enable Flags and Response Schema Behavior
+
+All endpoints that support `enable_*` flags maintain a **consistent response schema**. Fields are always present in the response, but will be `null` (or empty objects/arrays) when the corresponding flag is `false` or when data is unavailable.
+
+**Key Principles:**
+
+- **Schema Consistency**: The response structure never changes based on flag values
+- **Type Safety**: Your code can always expect the same structure
+- **Predictable Parsing**: No need to check for field existence
+- **Clear Intent**: `null` explicitly indicates the feature was disabled or data unavailable
+
+**Important**: Fields are never omitted from the response. They are either populated with data or set to `null`.
+
+**Affected Endpoints:**
+
+- `/v1/products` - Product extraction (async)
+- `/v2/extract` - Product extraction (async)
+- `/v2/agentic-search` - AI-powered product search (async)
+- `/v2/agentic-search-mini` - Lightweight AI product search (sync)
+
+**Common Enable Flags:**
+
+- `enable_enrichment`: Controls AI-generated attributes and categorization
+- `enable_reviews`: Controls product review data
+- `enable_image_tags`: Controls AI-generated image tags
+- `enable_brand_pdp`: Controls brand product detail page discovery
+- `enable_similar_products`: Controls similar products discovery
+- `enable_reddit_insights`: Controls Reddit insights gathering
+
+See endpoint-specific sections below for detailed field mappings.
 
 ---
 

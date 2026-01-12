@@ -90,6 +90,17 @@ Start asynchronous batch processing for multiple product URLs. This endpoint ret
 3. Use pagination parameters (`page`, `limit`) to retrieve results in chunks
 </Note>
 
+## Response Schema and Enable Flags
+
+The `/v1/products` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present in product objects, but will be `null` when the corresponding flag is `false`.
+
+**Field Mappings:**
+
+| Flag        | Affected Fields |
+|---------|------------------------|
+| `enable_reviews` | `reviews` |
+| `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` |
+| `enable_image_tags` | `images[].attributes` |
 
 <RequestExample>
 

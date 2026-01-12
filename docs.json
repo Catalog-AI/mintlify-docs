@@ -139,8 +139,11 @@
                   {
                     "group": "Search",
                     "pages": [
+                      "v2/api-reference/endpoints/search/agentic-search-mini",
                       "v2/api-reference/endpoints/search/agentic-search",
-                      "v2/api-reference/endpoints/search/agentic-search-mini"
+                      "v2/api-reference/endpoints/search/list-agentic-search-executions",
+                      "v2/api-reference/endpoints/search/get-agentic-search-status",
+                      "v2/api-reference/endpoints/search/cancel-agentic-search-execution"
                     ]
                   },
                   "v2/api-reference/endpoints/affiliate/generate-links",
