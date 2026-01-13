@@ -610,25 +610,30 @@ DELETE /v2/extract/{execution_id}
 
 ## Search Endpoints
 
-The Search endpoints have minimal changes, primarily focused on response format consistency.
+The Search endpoints have undergone significant changes in v2. The most important change is that **Agentic Search is now asynchronous in v2** (it was synchronous in v1).
 
 ### Major Changes
 
-#### 1. **Agentic Search Endpoint**
+#### 1. **Agentic Search Endpoint - Now Asynchronous**
 
-**v1:**
+**v1 (Synchronous):**
 ```
 POST /v1/agentic-search
 ```
+- Returns products immediately in the response
+- HTTP status: `200 OK`
+- Blocks until search completes
 
-**v2:**
+**v2 (Asynchronous):**
 ```
 POST /v2/agentic-search
 ```
+- Returns an `execution_id` immediately
+- HTTP status: `202 Accepted`
+- Search processes asynchronously in the background
+- Use the status endpoint to check progress and retrieve results
 
-**Response Format:**
-
-**v1:**
+**v1 POST Response (Synchronous):**
 ```json
 {
   "products": [...],
@@ -639,42 +644,125 @@ POST /v2/agentic-search
 }
 ```
 
-**v2:**
+**v2 POST Response (Asynchronous):**
 ```json
 {
-  "data": [...],
-  "pagination": {
-    "page": 1,
-    "page_size": 8,
-    "total_items": 100,
-    "total_pages": 13,
-    "has_next": true,
-    "has_prev": false
-  },
+  "execution_id": "agentic-a1b2c3d4-1735123456789",
+  "status": "pending",
   "meta": {
-    "totalItems": 100,
-    "urls": [...]
+    "credits_used": 25
   }
 }
 ```
 
 **Key Changes:**
-- Response field changed from `products` to `data`
-- Added `pagination` object with consistent pagination structure
-- `meta` object structure remains similar but now includes pagination-related fields
+- **v2 is asynchronous:** POST endpoint returns `execution_id` instead of products
+- **HTTP status code:** Changed from `200 OK` to `202 Accepted`
+- **Response structure:** No products in POST response; use status endpoint to retrieve results
+- **Execution management:** New endpoints for checking status, listing executions, and canceling
 
-#### 2. **Agentic Search Mini Endpoint**
+#### 2. **New v2 Endpoints for Agentic Search**
 
-Similar changes as Agentic Search:
+v2 introduces new endpoints to manage asynchronous search executions:
+
+**Get Execution Status:**
+```
+GET /v2/agentic-search/{execution_id}
+```
+- Check execution progress and retrieve results when complete
+- Returns products in `data` array when status is `"completed"`
+- Includes progress tracking via `meta.progress`
+- Supports pagination for results
+
+**List Executions:**
+```
+GET /v2/agentic-search?status=completed&page_size=20
+```
+- View all your search executions
+- Filter by status (`processing`, `completed`, `failed`)
+- See execution IDs and creation timestamps
+
+**Cancel Execution:**
+```
+DELETE /v2/agentic-search/{execution_id}
+```
+- Cancel a running search execution
+- Only works for executions with status `"pending"` or `"running"`
+
+#### 3. **Get Execution Status Response Format**
+
+When checking status in v2, the response format when `status` is `"completed"`:
+
+```json
+{
+  "execution_id": "agentic-a1b2c3d4-1735123456789",
+  "status": "completed",
+  "error": null,
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "page_size": 50,
+    "total_items": 8,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  },
+  "meta": {
+    "query": "A Barbour jacket suitable for the office",
+    "progress": {
+      "products_processed": 8,
+      "products_total": 8,
+      "percent_complete": 100
+    },
+    "start_date": "2025-01-15T10:30:00.000Z",
+    "stop_date": "2025-01-15T10:32:30.000Z",
+    "duration_ms": 150000,
+    "result": {
+      "products_requested": 8,
+      "products_successful": 8,
+      "products_failed": 0
+    }
+  }
+}
+```
+
+**Key Differences from v1:**
+- Products are in `data` array (not `products`)
+- Added `pagination` object
+- Added `execution_id` in response
+- Added `meta.progress` for real-time progress tracking
+- Added timing information (`start_date`, `stop_date`, `duration_ms`)
+- Added `meta.result` with execution statistics
+
+#### 4. **Agentic Search Mini Endpoint**
+
+Similar changes as Agentic Search but the endpoint is still synchronous:
 - Response field changed from `products` to `data`
 - Added `pagination` object
 - `meta` structure updated
 
 ### Migration Steps for Search Endpoints
 
-1. **Update response parsing:** Change `products` to `data`
-2. **Handle pagination:** Access pagination information from `pagination` object instead of `meta`
-3. **Preserve meta data:** Original `meta` fields like `totalItems` and `urls` remain in `meta` object
+1. **Implement async pattern:** 
+   - POST endpoint now returns `execution_id` instead of products
+   - Store the `execution_id` from the POST response
+   - Poll the GET status endpoint to check for completion
+2. **Update status checking:**
+   - Use `GET /v2/agentic-search/{execution_id}` to check status
+   - Handle status values: `"pending"`, `"running"`, `"completed"`, `"failed"`
+   - Implement polling logic (recommended: 5-10 second intervals)
+3. **Update response parsing:** 
+   - Products are now in `data` array (not `products`) when retrieved from status endpoint
+   - Access pagination from `pagination` object
+   - Original `meta` fields like `totalItems` and `urls` are in `meta` object (when available)
+4. **Handle new features:**
+   - Monitor `meta.progress` for real-time progress updates
+   - Use timing information (`duration_ms`) for performance monitoring
+   - Consider using the list executions endpoint for execution management
+5. **Update error handling:**
+   - Check `status` field for `"failed"` state
+   - Read `error` field for error messages
+   - Handle HTTP `202 Accepted` status code for POST requests
 
 ---
 

@@ -28,7 +28,7 @@ The product extraction endpoints have undergone the most significant changes, mo
 
 ### Major Changes
 
-#### 1. **Single Product Endpoint**
+#### 1. **Products Endpoint**
 
 **API:**
 ```
@@ -156,278 +156,10 @@ POST /v2/extract
 - HTTP status code changed to `202 Accepted` for POST (was `200 OK`)
 - Execution ID format: `extract-urls-{uuid}` for direct URLs mode
 
-#### Enable Flags and Response Schema
-
-The `/v2/extract` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present, but will be `null` when the corresponding flag is `false` or when data is unavailable.
-
-**Field Mappings:**
-
-| Flag | Affected Fields | Behavior When `false` |
-|------|----------------|----------------------|
-| `enable_reviews` | `reviews` | Always `null` |
-| `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` | All set to `null` |
-| `enable_image_tags` | `images[].attributes` | Each image's `attributes` field is `null` |
-| `enable_brand_pdp` | `brand_pdp` | Always `null` |
-| `enable_similar_products` | `similar_products` | Always `null` |
-| `enable_reddit_insights` | `reddit_insights` | Always `null` |
-
-**Example Response Comparison:**
-
-With `enable_reviews: false`:
-```json
-{
-  "id": "prod_123",
-  "title": "Product Title",
-  "reviews": null,
-  "attributes": null,
-  "product_type": null,
-  ...
-}
-```
-
-With `enable_reviews: true` and `enable_enrichment: true`:
-```json
-{
-  "id": "prod_123",
-  "title": "Product Title",
-  "reviews": [
-    {
-      "rating": 5,
-      "text": "Great product!",
-      ...
-    }
-  ],
-  "attributes": {
-    "material": "Cotton",
-    "color": "Blue",
-    ...
-  },
-  "product_type": "Apparel",
-  ...
-}
-```
 
 **Note**: The same behavior applies to both single product and batch product extraction. The response schema is identical regardless of the number of products requested.
 
-#### 2. **Batch Products Endpoint**
-
-**API:**
-```
-POST /api/products
-```
-
-**v2:**
-```
-POST /v2/extract
-```
-
-**Key Difference:**
-- `/api/products` returns all products immediately (synchronous, blocking)
-- `/v2/extract` returns an execution ID and requires polling for results (asynchronous, non-blocking)
-- `/api/products` supports up to 100 URLs per request
-- `/v2/extract` supports up to 1000 URLs per request
-
-**API Request:**
-```json
-{
-  "urls": [
-    "https://example.com/product1",
-    "https://example.com/product2"
-  ],
-  "enable_enrichment": true,
-  "enable_reviews": false,
-  "enable_image_tags": false,
-  "regenerate_description_html": false,
-  "country_code": "us",
-  "populate_description_html_from_html": false
-}
-```
-
-**API Response:**
-```json
-{
-  "products": [
-    {
-      "url": "https://example.com/product1",
-      "product": {
-        "id": "prod_123",
-        "title": "Product 1",
-        "price_amount": 29.99,
-        "price_currency": "USD",
-        ...
-      },
-      "success": true
-    },
-    {
-      "url": "https://example.com/product2",
-      "product": {
-        "id": "prod_456",
-        "title": "Product 2",
-        "price_amount": 49.99,
-        "price_currency": "USD",
-        ...
-      },
-      "success": true
-    }
-  ],
-  "meta": {
-    "total_requested": 2,
-    "total_successful": 2,
-    "total_failed": 0,
-    "urls_processed": [
-      "https://example.com/product1",
-      "https://example.com/product2"
-    ]
-  }
-}
-```
-
-**v2 Request:**
-```json
-{
-  "urls": [
-    "https://example.com/product1",
-    "https://example.com/product2"
-  ],
-  "enable_enrichment": false,
-  "enable_reviews": false,
-  "enable_image_tags": false,
-  "regenerate_description_html": false,
-  "country_code": "us",
-  "populate_description_html_from_html": false
-}
-```
-
-**v2 POST Response:**
-```json
-{
-  "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
-  "status": "pending",
-  "meta": {
-    "credits_used": 2,
-    "url_count": 2
-  }
-}
-```
-
-**v2 Status Response (when completed):**
-```json
-{
-  "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
-  "status": "completed",
-  "error": null,
-  "data": [
-    {
-      "id": "prod_123",
-      "title": "Product 1",
-      "price": {
-        "current_value": 29.99,
-        "compare_at_value": null,
-        "currency": "USD"
-      },
-      "url": "https://example.com/product1",
-      ...
-    },
-    {
-      "id": "prod_456",
-      "title": "Product 2",
-      "price": {
-        "current_value": 49.99,
-        "compare_at_value": null,
-        "currency": "USD"
-      },
-      "url": "https://example.com/product2",
-      ...
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "page_size": 50,
-    "total_items": 2,
-    "total_pages": 1,
-    "has_next": false,
-    "has_prev": false
-  },
-  "meta": {
-    "progress": {
-      "products_processed": 2,
-      "products_total": 2,
-      "percent_complete": 100
-    },
-    "result": {
-      "products_requested": 2,
-      "products_successful": 2,
-      "products_failed": 0
-    }
-  }
-}
-```
-
-**Key Changes:**
-- Response structure changed from array of `{url, product, success}` objects to flat `data` array of products
-- Failed products are excluded from `data` array (check `meta.result.products_failed` for failures)
-- Price format changed from `price_amount`/`price_currency` to `price` JSON object
-- `enable_enrichment` default changed from `true` to `false` in v2
-- HTTP status code changed to `202 Accepted` for POST (was `200 OK`)
-- Requires polling `GET /v2/extract/{execution_id}` to retrieve results
-- Support for pagination when retrieving results (use `page` and `page_size` query parameters)
-- URL limit increased from 100 (API) to 1000 (v2) per request
-- Execution ID format: `extract-urls-{uuid}` for direct URLs mode
-
-#### Enable Flags and Response Schema
-
-The `/v2/extract` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present, but will be `null` when the corresponding flag is `false` or when data is unavailable.
-
-**Field Mappings:**
-
-| Flag | Affected Fields | Behavior When `false` |
-|------|----------------|----------------------|
-| `enable_reviews` | `reviews` | Always `null` |
-| `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` | All set to `null` |
-| `enable_image_tags` | `images[].attributes` | Each image's `attributes` field is `null` |
-| `enable_brand_pdp` | `brand_pdp` | Always `null` |
-| `enable_similar_products` | `similar_products` | Always `null` |
-| `enable_reddit_insights` | `reddit_insights` | Always `null` |
-
-**Example Response Comparison:**
-
-With `enable_reviews: false`:
-```json
-{
-  "id": "prod_123",
-  "title": "Product Title",
-  "reviews": null,
-  "attributes": null,
-  "product_type": null,
-  ...
-}
-```
-
-With `enable_reviews: true` and `enable_enrichment: true`:
-```json
-{
-  "id": "prod_123",
-  "title": "Product Title",
-  "reviews": [
-    {
-      "rating": 5,
-      "text": "Great product!",
-      ...
-    }
-  ],
-  "attributes": {
-    "material": "Cotton",
-    "color": "Blue",
-    ...
-  },
-  "product_type": "Apparel",
-  ...
-}
-```
-
-**Note**: The same behavior applies to both single product and batch product extraction. The response schema is identical regardless of the number of products requested.
-
-#### 3. **Polling for Results**
+#### 2. **Polling for Results**
 
 Since `/v2/extract` is asynchronous, you must poll for results:
 
@@ -498,12 +230,12 @@ The Search endpoint has undergone moderate changes, primarily in response format
 
 **API:**
 ```
-POST /api/search
+POST /api/agentic-search-mini
 ```
 
 **v2:**
 ```
-POST /v2/search
+POST /v2/agentic-search-mini
 ```
 
 **Request Format:**
@@ -605,54 +337,6 @@ POST /v2/agentic-search
 **Key Difference:**
 - `/api/search` is a traditional search endpoint
 - `/v2/agentic-search` uses AI-powered semantic search with web browsing capabilities
-
-### Enable Flags and Response Schema
-
-The `/v2/agentic-search` endpoint uses the same product processing pipeline as `/v2/extract`, so the response schema behavior matches extract endpoints.
-
-**Field Mappings:**
-
-| Flag | Affected Fields | Behavior When `false` |
-|------|----------------|----------------------|
-| `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` | All set to `null` |
-
-**Note**: Agentic search currently only supports `enable_enrichment`. Other flags (reviews, image tags, etc.) are not available for agentic search results.
-
-**Example Response:**
-
-With `enable_enrichment: false`:
-```json
-{
-  "data": [
-    {
-      "id": "prod_123",
-      "title": "Product Title",
-      "attributes": null,
-      "product_type": null,
-      ...
-    }
-  ]
-}
-```
-
-With `enable_enrichment: true`:
-```json
-{
-  "data": [
-    {
-      "id": "prod_123",
-      "title": "Product Title",
-      "attributes": {
-        "material": "Cotton",
-        "style": "Casual",
-        ...
-      },
-      "product_type": "Apparel",
-      ...
-    }
-  ]
-}
-```
 
 ---
 
@@ -960,7 +644,7 @@ All v2 endpoints follow a consistent response structure:
 
 ### Enable Flags and Response Schema Behavior
 
-All endpoints that support `enable_*` flags maintain a **consistent response schema**. Fields are always present in the response, but will be `null` (or empty objects/arrays) when the corresponding flag is `false` or when data is unavailable.
+All endpoints that support `enable_*` flags maintain a **consistent response schema**. Fields are always present in the response, but will be `null` (or empty objects/arrays) when the corresponding flag is `false`.
 
 **Key Principles:**
 
