@@ -138,13 +138,13 @@ Retrieve the status and results for an asynchronous crawl job started via the [S
 
 ```bash cURL
 # Check execution status
-curl -X GET "https://api.getcatalog.ai/v2/crawl/crawl-example-com-a1b2c3d4" \
+curl -X GET "https://api.getcatalog.ai/v2/crawl/crawl-skims-com-a1b2c3d4" \
   -H "x-api-key: $CATALOG_API_KEY"
 ```
 
 ```javascript JavaScript
 // Check execution status
-const executionId = 'crawl-example-com-a1b2c3d4';
+const executionId = 'crawl-skims-com-a1b2c3d4';
 
 const response = await fetch(
   `https://api.getcatalog.ai/v2/crawl/${executionId}`,
@@ -181,7 +181,7 @@ if (data.status === 'completed') {
 import requests
 import time
 
-execution_id = 'crawl-example-com-a1b2c3d4'
+execution_id = 'crawl-skims-com-a1b2c3d4'
 
 # Poll for completion
 while True:
@@ -219,11 +219,11 @@ while True:
 
 ```json Status: Running
 {
-  "execution_id": "crawl-example-com-a1b2c3d4",
+  "execution_id": "crawl-skims-com-a1b2c3d4",
   "status": "running",
   "error": null,
   "meta": {
-    "vendor": "example.com",
+    "vendor": "skims.com",
     "start_date": "2025-01-15T10:30:00.000Z",
     "stop_date": null,
     "duration_ms": 45000,
@@ -255,11 +255,11 @@ while True:
 
 ```json Status: Completed
 {
-  "execution_id": "crawl-example-com-a1b2c3d4",
+  "execution_id": "crawl-skims-com-a1b2c3d4",
   "status": "completed",
   "error": null,
   "meta": {
-    "vendor": "example.com",
+    "vendor": "skims.com",
     "start_date": "2025-01-15T10:30:00.000Z",
     "stop_date": "2025-01-15T10:45:30.000Z",
     "duration_ms": 930000,
@@ -292,11 +292,11 @@ while True:
 
 ```json Status: Failed
 {
-  "execution_id": "crawl-example-com-a1b2c3d4",
+  "execution_id": "crawl-skims-com-a1b2c3d4",
   "status": "failed",
   "error": "Execution failed. Please check the execution details or contact support.",
   "meta": {
-    "vendor": "example.com",
+    "vendor": "skims.com",
     "start_date": "2025-01-15T10:30:00.000Z",
     "stop_date": "2025-01-15T10:32:15.000Z",
     "duration_ms": 135000,

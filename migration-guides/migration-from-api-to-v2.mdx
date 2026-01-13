@@ -5,6 +5,10 @@ description: "Complete guide to migrating from Catalog API /api endpoints to v2 
 
 This guide covers all changes between Catalog API `/api` endpoints and v2 endpoints to help you successfully migrate your integration. The `/api` endpoints use synchronous processing with legacy response formats, while v2 endpoints use standardized response envelopes and asynchronous processing where applicable.
 
+<Note>
+**Legacy Endpoints:** The `/api` endpoints are still available for backward compatibility but are considered legacy. New integrations should use v2 endpoints for better performance, scalability, and consistency.
+</Note>
+
 ## Overview of Changes
 
 The main improvements in v2 include:
@@ -150,6 +154,7 @@ POST /v2/extract
 - `enable_enrichment` default changed from `true` to `false` in v2
 - Removed `force_extraction` parameter in v2 (always extracts)
 - HTTP status code changed to `202 Accepted` for POST (was `200 OK`)
+- Execution ID format: `extract-urls-{uuid}` for direct URLs mode
 
 #### Enable Flags and Response Schema
 
@@ -219,6 +224,8 @@ POST /v2/extract
 **Key Difference:**
 - `/api/products` returns all products immediately (synchronous, blocking)
 - `/v2/extract` returns an execution ID and requires polling for results (asynchronous, non-blocking)
+- `/api/products` supports up to 100 URLs per request
+- `/v2/extract` supports up to 1000 URLs per request
 
 **API Request:**
 ```json
@@ -364,6 +371,8 @@ POST /v2/extract
 - HTTP status code changed to `202 Accepted` for POST (was `200 OK`)
 - Requires polling `GET /v2/extract/{execution_id}` to retrieve results
 - Support for pagination when retrieving results (use `page` and `page_size` query parameters)
+- URL limit increased from 100 (API) to 1000 (v2) per request
+- Execution ID format: `extract-urls-{uuid}` for direct URLs mode
 
 #### Enable Flags and Response Schema
 

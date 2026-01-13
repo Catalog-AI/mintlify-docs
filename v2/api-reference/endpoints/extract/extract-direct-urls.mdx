@@ -114,6 +114,10 @@ Start asynchronous product extraction from a list of direct product URLs. This e
     <ResponseField name="url_count" type="number">
       Total number of URLs submitted for processing
     </ResponseField>
+
+    <ResponseField name="urls_to_process" type="number">
+      Number of URLs that will actually be processed. For direct URLs mode, this equals `url_count` since all submitted URLs are processed.
+    </ResponseField>
   </Expandable>
 </ResponseField>
 
@@ -179,7 +183,7 @@ const response = await fetch('https://api.getcatalog.ai/v2/extract', {
 });
 
 const { execution_id, status, meta } = await response.json();
-console.log(`Execution started: ${execution_id}, URLs: ${meta.url_count}, Credits used: ${meta.credits_used}`);
+console.log(`Execution started: ${execution_id}, URLs: ${meta.url_count}, URLs to process: ${meta.urls_to_process}, Credits used: ${meta.credits_used}`);
 
 // Poll for results using the execution_id
 // See Get Extract Execution Status endpoint documentation for details
@@ -213,7 +217,7 @@ response = requests.post(
 
 data = response.json()
 execution_id = data['execution_id']
-print(f"Execution started: {execution_id}, URLs: {data['meta']['url_count']}, Credits used: {data['meta']['credits_used']}")
+print(f"Execution started: {execution_id}, URLs: {data['meta']['url_count']}, Credits used: {data['meta']['credits_used']}")print(f"Execution started: {execution_id}, URLs: {data['meta']['url_count']}, URLs to process: {data['meta']['urls_to_process']}, Credits used: {data['meta']['credits_used']}")
 
 # Poll for results using the execution_id
 # See Get Extract Execution Status endpoint documentation for details
@@ -223,13 +227,14 @@ print(f"Execution started: {execution_id}, URLs: {data['meta']['url_count']}, Cr
 
 <ResponseExample>
 
-```json POST Response (HTTP 202)
+```json POST Response
 {
   "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
   "status": "pending",
   "meta": {
     "credits_used": 10,
-    "url_count": 2
+    "url_count": 2,
+    "urls_to_process": 2
   }
 }
 ```
