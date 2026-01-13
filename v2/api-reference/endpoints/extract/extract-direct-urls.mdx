@@ -14,8 +14,8 @@ Start asynchronous product extraction from a list of direct product URLs. This e
 
 <Tip>
 **Managing Executions:** 
-- **View All Executions:** You can view all your extraction executions using the [List Extract Executions](/v2/api-reference/endpoints/extract/list-executions) endpoint to see all processing jobs, their statuses, and when they were created.
-- **Cancel Running Executions:** If you need to stop a running execution, use the [Cancel Extract Execution](/v2/api-reference/endpoints/extract/cancel-execution) endpoint.
+- **View All Executions:** You can view all your extraction executions using the [List Extract Executions](/v2/api-reference/endpoints/extract/list-extract-executions) endpoint to see all processing jobs, their statuses, and when they were created.
+- **Cancel Running Executions:** If you need to stop a running execution, use the [Cancel Extract Execution](/v2/api-reference/endpoints/extract/cancel-extract-execution) endpoint.
 </Tip>
 
 ## Request
@@ -217,7 +217,7 @@ response = requests.post(
 
 data = response.json()
 execution_id = data['execution_id']
-print(f"Execution started: {execution_id}, URLs: {data['meta']['url_count']}, Credits used: {data['meta']['credits_used']}")print(f"Execution started: {execution_id}, URLs: {data['meta']['url_count']}, URLs to process: {data['meta']['urls_to_process']}, Credits used: {data['meta']['credits_used']}")
+print(f"Execution started: {execution_id}, URLs: {data['meta']['url_count']}, URLs to process: {data['meta']['urls_to_process']}, Credits used: {data['meta']['credits_used']}")
 
 # Poll for results using the execution_id
 # See Get Extract Execution Status endpoint documentation for details

@@ -4,7 +4,7 @@ api: "GET https://api.getcatalog.ai/v2/crawl/{execution_id}"
 description: "Check the status of an asynchronous crawl job"
 ---
 
-Retrieve the status and results for an asynchronous crawl job started via the [Start Crawl](/v2/api-reference/endpoints/crawl/start-crawl) endpoint.
+Retrieve the status and results for an asynchronous crawl job started via the [Start Crawl](/v2/api-reference/endpoints/discover/start-crawl) endpoint.
 
 <Tip>
 **When to use:** After starting a crawl job with the POST endpoint, use this endpoint to:
@@ -15,7 +15,7 @@ Retrieve the status and results for an asynchronous crawl job started via the [S
 </Tip>
 
 <Note>
-**Cancel Running Executions:** If you need to stop a crawl that is currently running, use the [Cancel Crawl Execution](/v2/api-reference/endpoints/crawl/cancel-execution) endpoint to stop the execution.
+**Cancel Running Executions:** If you need to stop a crawl that is currently running, use the [Cancel Crawl Execution](/v2/api-reference/endpoints/discover/cancel-crawl-execution) endpoint to stop the execution.
 </Note>
 
 ## Request
@@ -25,7 +25,7 @@ Retrieve the status and results for an asynchronous crawl job started via the [S
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID returned from the [Start Crawl](/v2/api-reference/endpoints/crawl/start-crawl) POST endpoint
+  The execution ID returned from the [Start Crawl](/v2/api-reference/endpoints/discover/start-crawl) POST endpoint
   
   **Format:** `crawl-{hostname}-{uuid}`
   
@@ -335,4 +335,4 @@ For best results when waiting for completion:
 4. **Timeout:** Set a maximum wait time based on the size of the vendor website
 5. **Step Monitoring:** Use the `steps` array in the response to see which phase of the crawl is currently executing
 6. **Progress Tracking:** Monitor `meta.progress` to see real-time counts of collections and listings discovered
-7. **Cancellation:** If a crawl is taking too long or you need to stop it, use the [Cancel Crawl Execution](/v2/api-reference/endpoints/crawl/cancel-execution) endpoint to stop running executions
+7. **Cancellation:** If a crawl is taking too long or you need to stop it, use the [Cancel Crawl Execution](/v2/api-reference/endpoints/discover/cancel-crawl-execution) endpoint to stop running executions
