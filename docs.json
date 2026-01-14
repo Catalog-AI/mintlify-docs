@@ -198,7 +198,7 @@
     "primary": {
       "type": "button",
       "label": "Get API Key",
-      "href": "mailto:founders@getcatalog.ai"
+      "href": "https://dashboard.getcatalog.ai"
     }
   },
   "contextual": {
