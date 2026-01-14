@@ -14,87 +14,6 @@
   "navigation": {
     "versions": [
       {
-        "version": "v1",
-        "anchors": [
-          {
-            "anchor": "Documentation",
-            "icon": "book-open",
-            "groups": [
-              {
-                "group": "Get Started",
-                "pages": [
-                  "v1/welcome",
-                  "v1/quickstart",
-                  "v1/authentication"
-                ]
-              },
-              {
-                "group": "API Reference",
-                "pages": [
-                  "v1/api-reference/overview",
-                  {
-                    "group": "Discover",
-                    "pages": [
-                      "v1/api-reference/endpoints/discover/start-crawl",
-                      "v1/api-reference/endpoints/discover/list-crawl-executions",
-                      "v1/api-reference/endpoints/discover/get-crawl-status",
-                      "v1/api-reference/endpoints/discover/cancel-crawl-execution",
-                      "v1/api-reference/endpoints/discover/get-vendors",
-                      "v1/api-reference/endpoints/discover/get-collections",
-                      "v1/api-reference/endpoints/discover/get-products"
-                    ]
-                  },
-                  {
-                    "group": "Extract",
-                    "pages": [
-                      "v1/api-reference/endpoints/extract/retrieve-products",
-                      "v1/api-reference/endpoints/extract/list-products-executions",
-                      "v1/api-reference/endpoints/extract/get-products-execution-status",
-                      "v1/api-reference/endpoints/extract/cancel-products-execution"
-                    ]
-                  },
-                  {
-                    "group": "Search",
-                    "pages": [
-                      "v1/api-reference/endpoints/search/agentic-search",
-                      "v1/api-reference/endpoints/search/agentic-search-mini"
-                    ]
-                  },
-                  "v1/api-reference/endpoints/affiliate/generate-links",
-                  "v1/api-reference/endpoints/usage/get-usage"
-                ]
-              },
-              {
-                "group": "Guides",
-                "pages": [
-                  "v1/guides/pagination",
-                  "v1/guides/product-index",
-                  "v1/guides/product-comparison",
-                  "v1/guides/ai-shopping-assistant"
-                ]
-              },
-              {
-                "group": "Resources",
-                "pages": [
-                  "resources/error-codes",
-                  "resources/rate-limits"
-                ]
-              }
-            ]
-          },
-          {
-            "anchor": "Website",
-            "href": "https://www.getcatalog.ai",
-            "icon": "globe"
-          },
-          {
-            "anchor": "Support",
-            "href": "mailto:founders@getcatalog.ai",
-            "icon": "envelope"
-          }
-        ]
-      },
-      {
         "version": "v2",
         "default": true,
         "anchors": [
@@ -173,7 +92,87 @@
                   "migration-guides/migrating-from-v1-to-v2"
                 ]
               }
-              
+            ]
+          },
+          {
+            "anchor": "Website",
+            "href": "https://www.getcatalog.ai",
+            "icon": "globe"
+          },
+          {
+            "anchor": "Support",
+            "href": "mailto:founders@getcatalog.ai",
+            "icon": "envelope"
+          }
+        ]
+      },
+      {
+        "version": "v1",
+        "anchors": [
+          {
+            "anchor": "Documentation",
+            "icon": "book-open",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "v1/welcome",
+                  "v1/quickstart",
+                  "v1/authentication"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "v1/api-reference/overview",
+                  {
+                    "group": "Discover",
+                    "pages": [
+                      "v1/api-reference/endpoints/discover/start-crawl",
+                      "v1/api-reference/endpoints/discover/list-crawl-executions",
+                      "v1/api-reference/endpoints/discover/get-crawl-status",
+                      "v1/api-reference/endpoints/discover/cancel-crawl-execution",
+                      "v1/api-reference/endpoints/discover/get-vendors",
+                      "v1/api-reference/endpoints/discover/get-collections",
+                      "v1/api-reference/endpoints/discover/get-products"
+                    ]
+                  },
+                  {
+                    "group": "Extract",
+                    "pages": [
+                      "v1/api-reference/endpoints/extract/retrieve-products",
+                      "v1/api-reference/endpoints/extract/list-products-executions",
+                      "v1/api-reference/endpoints/extract/get-products-execution-status",
+                      "v1/api-reference/endpoints/extract/cancel-products-execution"
+                    ]
+                  },
+                  {
+                    "group": "Search",
+                    "pages": [
+                      "v1/api-reference/endpoints/search/agentic-search",
+                      "v1/api-reference/endpoints/search/agentic-search-mini"
+                    ]
+                  },
+                  "v1/api-reference/endpoints/affiliate/generate-links",
+                  "v1/api-reference/endpoints/usage/get-usage"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "v1/guides/pagination",
+                  "v1/guides/product-index",
+                  "v1/guides/product-comparison",
+                  "v1/guides/ai-shopping-assistant"
+                ]
+              },
+              {
+                "group": "Resources",
+                "pages": [
+                  "resources/error-codes",
+                  "resources/rate-limits"
+                ]
+              }
             ]
           },
           {
