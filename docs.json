@@ -15,7 +15,6 @@
     "versions": [
       {
         "version": "v1",
-        "default": true,
         "anchors": [
           {
             "anchor": "Documentation",
@@ -97,6 +96,7 @@
       },
       {
         "version": "v2",
+        "default": true,
         "anchors": [
           {
             "anchor": "Documentation",
