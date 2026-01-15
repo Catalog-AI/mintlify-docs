@@ -30,7 +30,7 @@ Convert product URLs into affiliate tracking links using the Wildfire network.
   **Example:**
   ```json
   [
-    "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+    "https://skims.com/products/cotton-jersey-long-sleeve-t-shirt-soot",
     "https://www.adidas.com/us/gazelle-shoes/BB5476.html",
     "https://www.amazon.com/dp/B08XYZ123"
   ]
@@ -125,7 +125,7 @@ curl -X POST https://api.getcatalog.ai/v2/affiliate \
   -H "x-api-key: $CATALOG_API_KEY" \
   -d '{
     "urls": [
-      "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+      "https://skims.com/products/cotton-jersey-long-sleeve-t-shirt-soot",
       "https://www.adidas.com/us/gazelle-shoes/BB5476.html",
       "https://www.amazon.com/dp/B08XYZ123"
     ]
@@ -141,7 +141,7 @@ const response = await fetch('https://api.getcatalog.ai/v2/affiliate', {
   },
   body: JSON.stringify({
     urls: [
-      'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+      'https://skims.com/products/cotton-jersey-long-sleeve-t-shirt-soot',
       'https://www.adidas.com/us/gazelle-shoes/BB5476.html',
       'https://www.amazon.com/dp/B08XYZ123'
     ]
@@ -164,7 +164,7 @@ response = requests.post(
     },
     json={
         'urls': [
-            'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+            'https://skims.com/products/cotton-jersey-long-sleeve-t-shirt-soot',
             'https://www.adidas.com/us/gazelle-shoes/BB5476.html',
             'https://www.amazon.com/dp/B08XYZ123'
         ]
@@ -185,7 +185,7 @@ print(f"Successful: {data['meta']['successful']}, Failed: {data['meta']['failed'
   "data": [
     {
       "wildfire_link": "https://wild.link/e?d=37430269&dc=www.nike.com&url=https%3A%2F%2Fwww.nike.com%2Ft%2Fair-force-1-07-mens-shoes-5QFp5Z%2FCW2288-111",
-      "original_url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+      "original_url": "https://skims.com/products/cotton-jersey-long-sleeve-t-shirt-soot",
       "device_id": "37430269",
       "success": true
     },
