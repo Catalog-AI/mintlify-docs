@@ -6,7 +6,7 @@ description: "How to build and maintain your own product index using the Catalog
 Build and maintain your own product index using Catalog's browse, crawl, and product endpoints. Choose the approach that best fits your needs: browse existing vendors that Catalog has already discovered, or crawl new vendors to ensure you have the latest data.
 
 <Note>
-This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v1/api-reference/endpoints/discover/get-vendors), discovering new products via [Start Crawl](/v1/api-reference/endpoints/discover/start-crawl), and adding missing products via [Get Products](/v1/api-reference/endpoints/extract/retrieve-products).
+This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v1/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Start Crawl](/v1/api-reference/endpoints/discover/start-crawl), and adding missing products via [Get Products](/v1/api-reference/endpoints/extract/retrieve-products).
 </Note>
 
 ## Option 1: Browse Existing Vendors
@@ -60,10 +60,9 @@ If your vendor is not yet available in Catalog, or you want to ensure you have t
 
 ### Step 1: Start with Crawl
 
-Use the **Start Crawl** endpoint (`POST /v1/crawl`) to discover all products from a vendor website. This endpoint:
+Use the **Start Crawl** endpoint (`POST /v1/crawl`) to discover all product listings from a vendor website. This endpoint:
 - Discovers collections from the vendor
 - Extracts product listings from each collection
-- Processes product details for all discovered products
 
 **Typical flow:**
 
@@ -88,7 +87,7 @@ Use the **Start Crawl** endpoint (`POST /v1/crawl`) to discover all products fro
 
 ### Step 2: Add Missing Products
 
-Use the **Get Products** endpoint (`POST /v1/products`) to add any products that weren't discovered during crawl, or to refresh specific products from your own URL list.
+Use the **Get Products** endpoint (`POST /v1/products`) to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
 
 **Use cases:**
 - Products from your internal catalog
@@ -128,7 +127,7 @@ Use the **Get Products** endpoint (`POST /v1/products`) to add any products that
 **Use Crawl New Vendors (Option 2)** when:
 - Your vendor is not yet available in Catalog
 - You want to ensure you have the most up-to-date product data
-- You need to discover new products and collections from a vendor
+- You need to discover new product listings and collections from a vendor
 
 In practice, many integrations combine both approaches:
 - Browse existing vendors for quick indexing
@@ -139,7 +138,7 @@ In practice, many integrations combine both approaches:
 
 To maintain a high-quality product index:
 
-**Schedule re-crawling:** Periodically re-crawl vendor websites to discover new products and collections.
+**Schedule re-crawling:** Periodically re-crawl vendor websites to discover new product listings and collections.
 
 **Monitor failures:** Use `success` and `outcome` fields to detect:
 - Non-product URLs
@@ -154,7 +153,7 @@ To maintain a high-quality product index:
 
 <CardGroup cols={2}>
   <Card title="Start Crawl" icon="spider" href="/v1/api-reference/endpoints/discover/start-crawl">
-    Discover products from a vendor website
+    Discover product listings from a vendor website
   </Card>
   <Card title="Get Products" icon="box" href="/v1/api-reference/endpoints/extract/retrieve-products">
     Bulk fetch product details by URLs

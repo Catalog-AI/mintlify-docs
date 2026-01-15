@@ -1,18 +1,17 @@
 ---
 title: "Start Crawl"
 api: "POST https://api.getcatalog.ai/v1/crawl"
-description: "Start asynchronous crawling of a vendor website to discover collections and products"
+description: "Start asynchronous crawling of a vendor website to discover collections and product listings"
 ---
 
-Start an asynchronous crawl of a vendor website. This endpoint discovers collections and products from the specified domain, then extracts product details. Returns immediately with an `execution_id` that you can use to check status.
+Start an asynchronous crawl of a vendor website. This endpoint discovers collections and product listings from the specified domain. Returns immediately with an `execution_id` that you can use to check status.
 
 <Tip>
-**When to use:** Discover and index all products from a vendor website. The crawl process will:
+**When to use:** Discover and index all product listings from a vendor website. The crawl process will:
 1. Discover collections from the vendor
 2. Extract product listings from each collection
-3. Process product details for all discovered products
 
-This is ideal for initial indexing of a new vendor or keeping your catalog up-to-date with a vendor's full inventory.
+This is ideal for initial discovery of a new vendor. Use the [Get Products](/v1/api-reference/endpoints/extract/retrieve-products) endpoint to get full product details from discovered listings.
 </Tip>
 
 <Note>

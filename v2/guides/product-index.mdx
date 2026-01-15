@@ -6,7 +6,7 @@ description: "How to build and maintain your own product index using the Catalog
 Build and maintain your own product index using Catalog's browse, crawl, and extract endpoints. Choose the approach that best fits your needs: browse existing vendors that Catalog has already discovered, or crawl and extract new vendors to ensure you have the latest data.
 
 <Note>
-This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v2/api-reference/endpoints/discover/get-vendors), discovering new products via [Start Crawl](/v2/api-reference/endpoints/discover/start-crawl), extracting products via [Extract Vendor-Based](/v2/api-reference/endpoints/extract/extract-vendor-based) or [Extract Direct URLs](/v2/api-reference/endpoints/extract/extract-direct-urls), and adding missing products via [Extract Direct URLs](/v2/api-reference/endpoints/extract/extract-direct-urls).
+This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v2/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Start Crawl](/v2/api-reference/endpoints/discover/start-crawl), extracting products via [Extract Vendor-Based](/v2/api-reference/endpoints/extract/extract-vendor-based) or [Extract Direct URLs](/v2/api-reference/endpoints/extract/extract-direct-urls), and adding missing products via [Extract Direct URLs](/v2/api-reference/endpoints/extract/extract-direct-urls).
 </Note>
 
 ## Option 1: Browse Existing Vendors
@@ -70,10 +70,9 @@ If your vendor is not yet available in Catalog, or you want to ensure you have t
 
 ### Step 1: Start with Crawl
 
-Use the **Start Crawl** endpoint (`POST /v2/crawl`) to discover all products from a vendor website. This endpoint:
+Use the **Start Crawl** endpoint (`POST /v2/crawl`) to discover all product listings from a vendor website. This endpoint:
 - Discovers collections from the vendor
 - Extracts product listings from each collection
-- Processes product details for all discovered products
 
 **Typical flow:**
 
@@ -136,12 +135,12 @@ After crawling (or while a crawl is running), use the **Extract Vendor-Based** e
    - If `success === false`: Log the `outcome`/reason and decide whether to retry later
 
 <Note>
-**Crawl Requirement:** Product extraction can only be performed on websites whose products are currently being crawled or have already been crawled. The extraction uses the product listings discovered during the crawl process.
+**Crawl Requirement:** Product extraction can only be performed on websites whose product listings are currently being crawled or have already been crawled. The extraction uses the product listings discovered during the crawl process.
 </Note>
 
 ### Step 3: Add Missing Products (Direct URLs Mode)
 
-Use the **Extract Direct URLs** endpoint (`POST /v2/extract`) to add any products that weren't discovered during crawl/extract, or to refresh specific products from your own URL list.
+Use the **Extract Direct URLs** endpoint (`POST /v2/extract`) to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
 
 **Use cases:**
 - Products from your internal catalog
@@ -181,7 +180,7 @@ Use the **Extract Direct URLs** endpoint (`POST /v2/extract`) to add any product
 **Use Crawl and Extract (Option 2)** when:
 - Your vendor is not yet available in Catalog
 - You want to ensure you have the most up-to-date product data
-- You need to discover new products and collections from a vendor
+- You need to discover new product listings and collections from a vendor
 - You want AI-enriched attributes, reviews, and image tags
 
 In practice, many integrations combine both approaches:
@@ -193,7 +192,7 @@ In practice, many integrations combine both approaches:
 
 To maintain a high-quality product index:
 
-**Schedule re-crawling:** Periodically re-crawl vendor websites to discover new products and collections.
+**Schedule re-crawling:** Periodically re-crawl vendor websites to discover new product listings and collections.
 
 **Schedule re-extraction:** Re-run extraction to capture price, availability, and content changes for existing products.
 
@@ -210,7 +209,7 @@ To maintain a high-quality product index:
 
 <CardGroup cols={2}>
   <Card title="Start Crawl" icon="spider" href="/v2/api-reference/endpoints/discover/start-crawl">
-    Discover products from a vendor website
+    Discover product listings from a vendor website
   </Card>
   <Card title="Extract Vendor-Based" icon="wand-magic-sparkles" href="/v2/api-reference/endpoints/extract/extract-vendor-based">
     Extract products from a vendor domain with full details and AI enrichment

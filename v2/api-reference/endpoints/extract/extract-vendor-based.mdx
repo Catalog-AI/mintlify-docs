@@ -7,7 +7,7 @@ description: "Start asynchronous product extraction for a merchant domain from d
 Start asynchronous product extraction for a merchant domain. This endpoint extracts products from a domain's product listings that were previously discovered via crawl, and returns immediately with an `execution_id` that you can use to check status and retrieve results.
 
 <Note>
-**Crawl Requirement:** Product extraction can only be performed on websites whose products are currently being crawled or have already been crawled. Before starting an extraction, you must first run a [crawl](/v2/api-reference/endpoints/discover/start-crawl) to discover and index the domain's products. The extraction will use the product listings discovered during the crawl process.
+**Crawl Requirement:** Product extraction can only be performed on websites whose product listings are currently being crawled or have already been crawled. Before starting an extraction, you must first run a [crawl](/v2/api-reference/endpoints/discover/start-crawl) to discover and index the domain's product listings. The extraction will use the product listings discovered during the crawl process.
 
 **Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-execution-status) endpoint to check progress and retrieve results when processing completes.
 </Note>
@@ -16,7 +16,7 @@ Start asynchronous product extraction for a merchant domain. This endpoint extra
 **Managing Executions:** 
 - **View All Executions:** You can view all your extraction executions using the [List Extract Executions](/v2/api-reference/endpoints/extract/list-extract-executions) endpoint to see all processing jobs, their statuses, and when they were created.
 - **Cancel Running Executions:** If you need to stop a running execution, use the [Cancel Extract Execution](/v2/api-reference/endpoints/extract/cancel-extract-execution) endpoint.
-- **Waiting for Crawl:** You can optionally provide a `crawl_id` to wait for a crawl execution to complete before starting extraction. This is useful when you want to ensure products are discovered before extraction begins.
+- **Waiting for Crawl:** You can optionally provide a `crawl_id` to wait for a crawl execution to complete before starting extraction. This is useful when you want to ensure product listings are discovered before extraction begins.
 - **Direct URLs Alternative:** If you have specific product URLs, use the [Extract Direct URLs](/v2/api-reference/endpoints/extract/extract-direct-urls) endpoint instead, which doesn't require a prior crawl.
 </Tip>
 
@@ -50,7 +50,7 @@ Start asynchronous product extraction for a merchant domain. This endpoint extra
 <ParamField body="crawl_id" type="string" optional>
   Optional crawl execution ID to wait for before starting extraction. If provided, extraction will be queued and will start automatically when the crawl execution completes.
   
-  **Use Case:** Use this when you want to ensure products are discovered via crawl before extraction begins. The extraction will remain in `pending` status with `waiting_for` in the meta until the crawl completes.
+  **Use Case:** Use this when you want to ensure product listings are discovered via crawl before extraction begins. The extraction will remain in `pending` status with `waiting_for` in the meta until the crawl completes.
   
   **Format:** `crawl-{vendor}-{uuid}`
   
@@ -258,7 +258,7 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
 ```json Error Response (No Listings Found)
 {
   "error": {
-    "message": "No listings found for this domain. Use /v2/crawl first to discover products.",
+    "message": "No listings found for this domain. Use /v2/crawl first to discover product listings.",
     "code": "VALIDATION_ERROR",
     "request_id": "req-12345678-1234-1234-1234-123456789abc"
   }
@@ -284,7 +284,7 @@ The `/v2/extract` endpoint maintains a consistent response schema regardless of 
 
 ## Workflow
 
-1. **Crawl the Domain (if not already done):** First, use the [Start Crawl](/v2/api-reference/endpoints/discover/start-crawl) endpoint to discover products from the domain. Wait for the crawl to complete or use the `crawl_id` parameter in step 2.
+1. **Crawl the Domain (if not already done):** First, use the [Start Crawl](/v2/api-reference/endpoints/discover/start-crawl) endpoint to discover product listings from the domain. Wait for the crawl to complete or use the `crawl_id` parameter in step 2.
 2. **Start Extraction:** Send a POST request with your vendor domain to start async extraction. If the domain hasn't been crawled yet, provide the `crawl_id` from step 1 to wait for crawl completion.
 3. **Get Execution ID:** Receive an `execution_id` immediately in the response
 4. **Check Status:** Poll the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-execution-status) endpoint using the `execution_id`. If the extraction is waiting for a crawl, the status will show `pending` with `waiting_for` in the meta.
