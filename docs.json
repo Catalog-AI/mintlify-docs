@@ -42,7 +42,7 @@
                       "v2/api-reference/endpoints/discover/cancel-crawl-execution",
                       "v2/api-reference/endpoints/discover/get-vendors",
                       "v2/api-reference/endpoints/discover/get-collections",
-                      "v2/api-reference/endpoints/discover/get-products"
+                      "v2/api-reference/endpoints/discover/get-listings"
                     ]
                   },
                   {
@@ -139,7 +139,7 @@
                       "v1/api-reference/endpoints/discover/cancel-crawl-execution",
                       "v1/api-reference/endpoints/discover/get-vendors",
                       "v1/api-reference/endpoints/discover/get-collections",
-                      "v1/api-reference/endpoints/discover/get-products"
+                      "v1/api-reference/endpoints/discover/get-listings"
                     ]
                   },
                   {
