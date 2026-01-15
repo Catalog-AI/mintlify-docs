@@ -4,20 +4,20 @@ api: "GET https://api.getcatalog.ai/v2/extract"
 description: "Retrieve a list of recent extraction executions"
 ---
 
-Retrieve a list of recent extraction executions for your organization. This endpoint allows you to see all extraction jobs you've started (both direct URLs and vendor-based), their current status, and when they were created.
+Retrieve a list of recent extraction executions for your organization. This endpoint allows you to see all extraction jobs you've started, their current status, and when they were created.
 
 <Tip>
 **When to use:** Monitor all your extraction operations in one place. Use this endpoint to:
-- See all extraction executions you've started (both direct URLs and vendor-based modes)
+- See all extraction executions you've started
 - Filter by status (processing, completed, failed)
 - Track when extraction jobs were initiated
 - Find execution IDs for status checks
 </Tip>
 
 <Note>
-**Unified Listing:** This endpoint returns executions from both extraction modes:
-- **Direct URLs mode:** Execution IDs formatted as `extract-urls-{uuid}`
-- **Vendor-based mode:** Execution IDs formatted as `extract-{vendor}-{uuid}`
+**Unified Listing:** This endpoint returns all extraction executions:
+- When using `urls`: Execution IDs formatted as `extract-urls-{uuid}`
+- When using `vendor`: Execution IDs formatted as `extract-{vendor}-{uuid}`
 
 Both types of executions appear in the same list and can be filtered and managed together.
 </Note>
@@ -57,8 +57,8 @@ Both types of executions appear in the same list and can be filtered and managed
       Unique execution identifier. Use this ID with the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-execution-status) endpoint to check detailed status and results.
       
       **Formats:**
-      - `extract-urls-{uuid}` - Direct URLs mode
-      - `extract-{vendor}-{uuid}` - Vendor-based mode (e.g., `extract-nike-com-51d87084`)
+      - `extract-urls-{uuid}` - When using `urls`
+      - `extract-{vendor}-{uuid}` - When using `vendor` (e.g., `extract-nike-com-51d87084`)
     </ResponseField>
     
     <ResponseField name="status" type="string">
@@ -158,15 +158,15 @@ const processingResponse = await fetch(
 const processingData = await processingResponse.json();
 console.log(`Found ${processingData.data.length} processing executions`);
 
-// Filter by execution ID format to separate direct URLs vs vendor-based
-const directUrlExecutions = processingData.data.filter(
+// Filter by execution ID format to separate urls vs vendor input
+const urlsExecutions = processingData.data.filter(
   exec => exec.execution_id.startsWith('extract-urls-')
 );
 const vendorExecutions = processingData.data.filter(
   exec => exec.execution_id.startsWith('extract-') && !exec.execution_id.startsWith('extract-urls-')
 );
-console.log(`${directUrlExecutions.length} direct URL executions`);
-console.log(`${vendorExecutions.length} vendor-based executions`);
+console.log(`${urlsExecutions.length} executions using urls`);
+console.log(`${vendorExecutions.length} executions using vendor`);
 ```
 
 ```python Python
@@ -194,7 +194,7 @@ failed_data = failed_response.json()
 print(f"Found {len(failed_data['data'])} failed executions")
 
 # Filter by execution ID format
-direct_url_executions = [
+urls_executions = [
     exec for exec in failed_data['data']
     if exec['execution_id'].startswith('extract-urls-')
 ]
@@ -202,8 +202,8 @@ vendor_executions = [
     exec for exec in failed_data['data']
     if exec['execution_id'].startswith('extract-') and not exec['execution_id'].startswith('extract-urls-')
 ]
-print(f"{len(direct_url_executions)} direct URL executions")
-print(f"{len(vendor_executions)} vendor-based executions")
+print(f"{len(urls_executions)} executions using urls")
+print(f"{len(vendor_executions)} executions using vendor")
 ```
 
 </RequestExample>

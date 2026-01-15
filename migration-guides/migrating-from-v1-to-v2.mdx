@@ -328,25 +328,25 @@ DELETE /v1/extract/{execution_id} (Cancel)
 
 **v2:**
 ```
-POST /v2/extract (Direct URLs mode OR Vendor-based mode)
+POST /v2/extract (with urls or vendor parameter)
 GET /v2/extract (List executions)
 GET /v2/extract/{execution_id} (Get status)
 DELETE /v2/extract/{execution_id} (Cancel)
 ```
 
-**Note:** In v2, both direct URLs and vendor-based extraction use the same endpoint (`/v2/extract`). The mode is determined by the request body: use `urls` for direct URLs mode, or `vendor` for vendor-based mode.
+**Note:** In v2, both direct URLs and vendor-based extraction use the same endpoint (`/v2/extract`). The input source is determined by the request body: use `urls` for direct product URLs, or `vendor` for extracting from a vendor domain.
 
 #### 2. **Unified Extraction Endpoint**
 
-v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into a single `/v2/extract` endpoint with two modes:
+v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into a single `/v2/extract` endpoint with two input source options:
 
-**Direct URLs Mode** (Migrated from v1 `/v1/products`):
+**Using `urls` parameter** (Migrated from v1 `/v1/products`):
 - Use when you have specific product URLs
 - Post to `/v2/extract` with `urls` array in the request body
 - Works the same way as v1 `/v1/products` but with updated response format
 - Execution ID format: `extract-urls-{uuid}`
 
-**Vendor-Based Mode** (Migrated from v1 `/v1/extract`):
+**Using `vendor` parameter** (Migrated from v1 `/v1/extract`):
 - Use when you want to extract all products from a vendor domain
 - Post to `/v2/extract` with `vendor` field in the request body
 - Requires prior crawl or can wait for a crawl using `crawl_id` parameter
@@ -368,7 +368,7 @@ v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into 
 }
 ```
 
-**v2 Request - Direct URLs Mode (POST /v2/extract):**
+**v2 Request - Using `urls` (POST /v2/extract):**
 ```json
 {
   "urls": ["https://example.com/product"],
@@ -399,7 +399,7 @@ v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into 
 }
 ```
 
-**v2 Request - Vendor-Based Mode (POST /v2/extract):**
+**v2 Request - Using `vendor` (POST /v2/extract):**
 ```json
 {
   "vendor": "nike.com",  // Changed from "domain" in v1
@@ -459,8 +459,8 @@ v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into 
 - Format: `products-batch-{uuid}`
 
 **v2:**
-- Direct URLs mode: `extract-urls-{uuid}`
-- Vendor-based mode: `extract-{vendor}-{uuid}` (dots in vendor replaced with dashes)
+- When using `urls`: `extract-urls-{uuid}`
+- When using `vendor`: `extract-{vendor}-{uuid}` (dots in vendor replaced with dashes)
 
 #### 6. **List Executions Endpoint Changes**
 

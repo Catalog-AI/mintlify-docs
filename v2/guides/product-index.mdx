@@ -6,7 +6,7 @@ description: "How to build and maintain your own product index using the Catalog
 Build and maintain your own product index using Catalog's browse, crawl, and extract endpoints. Choose the approach that best fits your needs: browse existing vendors that Catalog has already discovered, or crawl and extract new vendors to ensure you have the latest data.
 
 <Note>
-This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v2/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Start Crawl](/v2/api-reference/endpoints/discover/start-crawl), extracting products via [Extract Vendor-Based](/v2/api-reference/endpoints/extract/extract-vendor-based) or [Extract Direct URLs](/v2/api-reference/endpoints/extract/extract-direct-urls), and adding missing products via [Extract Direct URLs](/v2/api-reference/endpoints/extract/extract-direct-urls).
+This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v2/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Start Crawl](/v2/api-reference/endpoints/discover/start-crawl), and extracting products via [Extract](/v2/api-reference/endpoints/extract/extract) using either direct URLs or a vendor domain.
 </Note>
 
 ## Option 1: Browse Existing Vendors
@@ -95,9 +95,9 @@ Use the **Start Crawl** endpoint (`POST /v2/crawl`) to discover all product list
 **Billing Requirement:** Crawl requests require auto top-up to be enabled in your billing settings. This ensures you have sufficient credits to complete the crawl operation.
 </Note>
 
-### Step 2: Extract Products (Vendor-Based Mode)
+### Step 2: Extract Products from Vendor
 
-After crawling (or while a crawl is running), use the **Extract Vendor-Based** endpoint (`POST /v2/extract`) to enhance products with full details, AI enrichment, reviews, and image tags from all discovered listings.
+After crawling (or while a crawl is running), use the **Extract** endpoint (`POST /v2/extract`) with a vendor domain to enhance products with full details, AI enrichment, reviews, and image tags from all discovered listings.
 
 **Typical flow:**
 
@@ -138,9 +138,9 @@ After crawling (or while a crawl is running), use the **Extract Vendor-Based** e
 **Crawl Requirement:** Product extraction can only be performed on websites whose product listings are currently being crawled or have already been crawled. The extraction uses the product listings discovered during the crawl process.
 </Note>
 
-### Step 3: Add Missing Products (Direct URLs Mode)
+### Step 3: Add Missing Products with Direct URLs
 
-Use the **Extract Direct URLs** endpoint (`POST /v2/extract`) to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
+Use the **Extract** endpoint (`POST /v2/extract`) with direct URLs to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
 
 **Use cases:**
 - Products from your internal catalog
@@ -203,7 +203,7 @@ To maintain a high-quality product index:
 
 **Prune stale products:** Remove (or downgrade) products that consistently fail to process or are no longer available.
 
-**Use Extract Direct URLs for targeted updates:** For specific products that need frequent updates (e.g., featured items), use Extract Direct URLs to refresh them more frequently than the full extract cycle.
+**Use direct URLs for targeted updates:** For specific products that need frequent updates (e.g., featured items), use the Extract endpoint with direct URLs to refresh them more frequently than the full extract cycle.
 
 ## Related endpoints
 
@@ -211,10 +211,7 @@ To maintain a high-quality product index:
   <Card title="/crawl" icon="spider" href="/v2/api-reference/endpoints/discover/start-crawl">
     Discover collections and product listings for a specific vendor
   </Card>
-  <Card title="/extract" icon="wand-magic-sparkles" href="/v2/api-reference/endpoints/extract/extract-vendor-based">
-    Extract high-quality, real-time product data
-  </Card>
-  <Card title="/extract" icon="box" href="/v2/api-reference/endpoints/extract/extract-direct-urls">
+  <Card title="/extract" icon="box" href="/v2/api-reference/endpoints/extract/extract">
     Extract high-quality, real-time product data
   </Card>
   <Card title="/vendors" icon="store" href="/v2/api-reference/endpoints/discover/get-vendors">

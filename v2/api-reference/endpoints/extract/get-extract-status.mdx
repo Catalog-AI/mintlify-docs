@@ -4,7 +4,7 @@ api: "GET https://api.getcatalog.ai/v2/extract/{execution_id}"
 description: "Check the status and retrieve results for an asynchronous extraction job"
 ---
 
-Retrieve the status, progress, and results for an asynchronous extraction job started via the [Extract Direct URLs](/v2/api-reference/endpoints/extract/extract-direct-urls) or [Extract Vendor-Based](/v2/api-reference/endpoints/extract/extract-vendor-based) endpoints.
+Retrieve the status, progress, and results for an asynchronous extraction job started via the [Extract](/v2/api-reference/endpoints/extract/extract) endpoint.
 
 <Tip>
 **When to use:** After starting an extraction job with the POST endpoint, use this endpoint to:
@@ -15,9 +15,9 @@ Retrieve the status, progress, and results for an asynchronous extraction job st
 </Tip>
 
 <Note>
-**Supported Execution Types:** This endpoint works for both extraction modes:
-- **Direct URLs mode:** Execution IDs formatted as `extract-urls-{uuid}`
-- **Vendor-based mode:** Execution IDs formatted as `extract-{vendor}-{uuid}` (e.g., `extract-nike-com-51d87084`)
+**Supported Execution Types:** This endpoint works for all extraction jobs:
+- When using `urls`: Execution IDs formatted as `extract-urls-{uuid}`
+- When using `vendor`: Execution IDs formatted as `extract-{vendor}-{uuid}` (e.g., `extract-nike-com-51d87084`)
 
 Both types of executions use the same status endpoint and return the same response structure.
 </Note>
@@ -29,11 +29,11 @@ Both types of executions use the same status endpoint and return the same respon
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID returned from the [Extract Direct URLs](/v2/api-reference/endpoints/extract/extract-direct-urls) or [Extract Vendor-Based](/v2/api-reference/endpoints/extract/extract-vendor-based) POST endpoint
+  The execution ID returned from the [Extract](/v2/api-reference/endpoints/extract/extract) POST endpoint
   
   **Formats:**
-  - `extract-urls-{uuid}` - Direct URLs mode (e.g., `extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7`)
-  - `extract-{vendor}-{uuid}` - Vendor-based mode (e.g., `extract-nike-com-51d87084`)
+  - `extract-urls-{uuid}` - When using `urls` (e.g., `extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7`)
+  - `extract-{vendor}-{uuid}` - When using `vendor` (e.g., `extract-nike-com-51d87084`)
   
   **Note:** If the execution ID does not exist or doesn't belong to your organization, the endpoint returns a 404 Not Found error.
 </ParamField>
@@ -302,11 +302,11 @@ Both types of executions use the same status endpoint and return the same respon
 <RequestExample>
 
 ```bash cURL
-# Check execution status (direct URLs mode)
+# Check execution status (urls input)
 curl -X GET "https://api.getcatalog.ai/v2/extract/extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7" \
   -H "x-api-key: $CATALOG_API_KEY"
 
-# Check execution status (vendor-based mode)
+# Check execution status (vendor input)
 curl -X GET "https://api.getcatalog.ai/v2/extract/extract-nike-com-51d87084" \
   -H "x-api-key: $CATALOG_API_KEY"
 

@@ -19,9 +19,9 @@ Cancel a running extraction execution. This endpoint stops an active extraction 
 - Executions that are waiting for a crawl to complete (status `"pending"` with `waiting_for` in meta) cannot be canceled until they start running
 - The endpoint will return an error if you attempt to cancel a non-running execution
 
-**Supported Execution Types:** This endpoint works for both extraction modes:
-- **Direct URLs mode:** Execution IDs formatted as `extract-urls-{uuid}`
-- **Vendor-based mode:** Execution IDs formatted as `extract-{vendor}-{uuid}` (e.g., `extract-nike-com-51d87084`)
+**Supported Execution Types:** This endpoint works for all extraction jobs:
+- When using `urls`: Execution IDs formatted as `extract-urls-{uuid}`
+- When using `vendor`: Execution IDs formatted as `extract-{vendor}-{uuid}` (e.g., `extract-nike-com-51d87084`)
 </Note>
 
 ## Request
@@ -34,8 +34,8 @@ Cancel a running extraction execution. This endpoint stops an active extraction 
   The execution ID of the extraction job to cancel
   
   **Formats:**
-  - `extract-urls-{uuid}` - Direct URLs mode (e.g., `extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7`)
-  - `extract-{vendor}-{uuid}` - Vendor-based mode (e.g., `extract-nike-com-51d87084`)
+  - `extract-urls-{uuid}` - When using `urls` (e.g., `extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7`)
+  - `extract-{vendor}-{uuid}` - When using `vendor` (e.g., `extract-nike-com-51d87084`)
   
   **Note:** If the execution ID does not exist or doesn't belong to your organization, the endpoint returns a 404 Not Found error.
 </ParamField>
@@ -63,17 +63,17 @@ Cancel a running extraction execution. This endpoint stops an active extraction 
 <RequestExample>
 
 ```bash cURL
-# Cancel a running execution (direct URLs mode)
+# Cancel a running execution (urls input)
 curl -X DELETE "https://api.getcatalog.ai/v2/extract/extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7" \
   -H "x-api-key: $CATALOG_API_KEY"
 
-# Cancel a running execution (vendor-based mode)
+# Cancel a running execution (vendor input)
 curl -X DELETE "https://api.getcatalog.ai/v2/extract/extract-nike-com-51d87084" \
   -H "x-api-key: $CATALOG_API_KEY"
 ```
 
 ```javascript JavaScript
-// Cancel execution (direct URLs mode)
+// Cancel execution
 const executionId = 'extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7';
 
 const response = await fetch(

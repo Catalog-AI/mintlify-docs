@@ -48,8 +48,7 @@
                   {
                     "group": "Extract",
                     "pages": [
-                      "v2/api-reference/endpoints/extract/extract-direct-urls",
-                      "v2/api-reference/endpoints/extract/extract-vendor-based",
+                      "v2/api-reference/endpoints/extract/extract",
                       "v2/api-reference/endpoints/extract/list-extract-executions",
                       "v2/api-reference/endpoints/extract/get-extract-status",
                       "v2/api-reference/endpoints/extract/cancel-extract-execution"
