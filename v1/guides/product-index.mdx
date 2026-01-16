@@ -41,7 +41,7 @@ Use the **Get All Products** endpoint (`POST /v1/listings`) to page through all 
 
 ### Step 4: Hydrate full product data
 
-Once you have a list of product URLs, use the **Get Products** endpoint (`POST /v1/products`) to hydrate many URLs in a single request (1-1000 URLs per request).
+Once you have a list of product URLs, use the **Get Products** endpoint (`POST /v1/products`) to hydrate many URLs in a single request (up to 1000 URLs per request).
 
 **Typical flow:**
 
@@ -97,7 +97,7 @@ Use the **Get Products** endpoint (`POST /v1/products`) to add any products whos
 
 **Typical flow:**
 
-1. Collect URLs that need to be added or refreshed (1-1000 URLs per request)
+1. Collect URLs that need to be added or refreshed (up to 1000 URLs per request)
 
 2. Call `POST /v1/products` with your batch:
    ```json

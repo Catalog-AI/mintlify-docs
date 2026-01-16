@@ -19,42 +19,42 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 ### Discover
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
-| [`/v1/crawl`](/v1/api-reference/endpoints/discover/start-crawl) | POST | Start asynchronous crawling of a vendor website |
-| [`/v1/crawl`](/v1/api-reference/endpoints/discover/list-crawl-executions) | GET | List recent crawl executions |
-| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/get-crawl-status) | GET | Check the status of a crawl execution |
-| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/cancel-crawl-execution) | DELETE | Cancel a running crawl execution |
-| [`/v1/vendors`](/v1/api-reference/endpoints/discover/get-vendors) | GET | List all vendors with product counts |
-| [`/v1/collections`](/v1/api-reference/endpoints/discover/get-collections) | POST | List collections for a vendor |
-| [`/v1/listings`](/v1/api-reference/endpoints/discover/get-listings) | POST | List products from a vendor or collection |
+|:---------|:-------|:------------|
+| [`/v1/crawl`](/v1/api-reference/endpoints/discover/start-crawl) | POST | Start async discovery of collections and product listings for a specific vendor |
+| [`/v1/crawl`](/v1/api-reference/endpoints/discover/list-crawl-executions) | GET | List all crawls with status |
+| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/get-crawl-status) | GET | Get crawl status and results |
+| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/cancel-crawl-execution) | DELETE | Cancel a running crawl |
+| [`/v1/vendors`](/v1/api-reference/endpoints/discover/get-vendors) | GET | List all indexed vendors |
+| [`/v1/collections`](/v1/api-reference/endpoints/discover/get-collections) | POST | Get all collections for a vendor |
+| [`/v1/listings`](/v1/api-reference/endpoints/discover/get-listings) | POST | Get product listings |
 
 ### Extract
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
-| [`/v1/products`](/v1/api-reference/endpoints/extract/retrieve-products) | POST | Start async batch processing of product URLs (1-1000 URLs) |
-| [`/v1/products`](/v1/api-reference/endpoints/extract/list-products-executions) | GET | List recent product processing executions |
-| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status) | GET | Check status and retrieve results for a batch processing job |
-| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/cancel-products-execution) | DELETE | Cancel a running product processing execution |
+|:---------|:-------|:------------|
+| [`/v1/products`](/v1/api-reference/endpoints/extract/retrieve-products) | POST | Start async extraction from product URLs (up to 1000) |
+| [`/v1/products`](/v1/api-reference/endpoints/extract/list-products-executions) | GET | List all extractions with status |
+| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status) | GET | Get extraction status and results |
+| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/cancel-products-execution) | DELETE | Cancel a running extraction |
 
 ### Search
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
-| [`/v1/agentic-search`](/v1/api-reference/endpoints/search/agentic-search) | POST | AI-powered search with customer profile personalization |
-| [`/v1/agentic-search-mini`](/v1/api-reference/endpoints/search/agentic-search-mini) | POST | Fast AI search returning up to 10 products |
+|:---------|:-------|:------------|
+| [`/v1/agentic-search`](/v1/api-reference/endpoints/search/agentic-search) | POST | AI-powered natural language search with customer profile personalization |
+| [`/v1/agentic-search-mini`](/v1/api-reference/endpoints/search/agentic-search-mini) | POST | Fast synchronous search returning up to 10 products |
 
 ### Affiliate
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
-| [`/v1/affiliate`](/v1/api-reference/endpoints/affiliate/generate-links) | POST | Generate affiliate tracking links |
+|:---------|:-------|:------------|
+| [`/v1/affiliate`](/v1/api-reference/endpoints/affiliate/generate-links) | POST | Convert URLs to affiliate links |
 
 ### Usage
 
 | Endpoint | Method | Description |
-|----------|--------|-------------|
-| [`/v1/usage`](/v1/api-reference/endpoints/usage/get-usage) | GET | Get API usage statistics |
+|:---------|:-------|:------------|
+| [`/v1/usage`](/v1/api-reference/endpoints/usage/get-usage) | GET | Get credit usage and API call statistics |
 
 ## Response format
 
@@ -87,7 +87,7 @@ Response structures vary by endpoint:
 }
 ```
 
-**Product execution status** returns:
+**`/{execution_id}`** endpoints also include `execution_id` and `status` fields:
 ```json
 {
   "status": "completed",
