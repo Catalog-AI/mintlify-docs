@@ -10,7 +10,7 @@ This guide covers all changes between Catalog API v1 and v2 to help you successf
 The main improvements in v2 include:
 
 - **Consistent Response Format:** All endpoints now follow a unified response structure with `data`, `pagination`, and `meta` fields
-- **Enhanced Extract Endpoints:** New vendor-based extraction mode and improved direct URL extraction
+- **Enhanced Extract Endpoints:** New vendor-based extraction mode and improved URL extraction
 - **Better Execution Management:** More detailed execution status tracking with progress, timing, and step information
 - **Improved Error Handling:** Enhanced error responses with additional context fields
 - **HTTP Status Codes:** Better adherence to REST standards (e.g., 202 Accepted for async operations)
@@ -307,7 +307,7 @@ POST /v2/collections
 
 ## Extract Endpoints
 
-The Extract endpoints have undergone significant changes in v2. Both `/v1/products` (direct URLs) and `/v1/extract` (vendor-based) endpoints have been unified into a single `/v2/extract` endpoint that offers two distinct modes of operation.
+The Extract endpoints have undergone significant changes in v2. Both `/v1/products` (URLs) and `/v1/extract` (vendor-based) endpoints have been unified into a single `/v2/extract` endpoint that offers two distinct modes of operation.
 
 ### Major Changes
 
@@ -315,7 +315,7 @@ The Extract endpoints have undergone significant changes in v2. Both `/v1/produc
 
 **v1:**
 ```
-POST /v1/products (Direct URLs)
+POST /v1/products (URLs)
 GET /v1/products (List executions)
 GET /v1/products/{execution_id} (Get status)
 DELETE /v1/products/{execution_id} (Cancel)
@@ -334,7 +334,7 @@ GET /v2/extract/{execution_id} (Get status)
 DELETE /v2/extract/{execution_id} (Cancel)
 ```
 
-**Note:** In v2, both direct URLs and vendor-based extraction use the same endpoint (`/v2/extract`). The input source is determined by the request body: use `urls` for direct product URLs, or `vendor` for extracting from a vendor domain.
+**Note:** In v2, both URLs and vendor-based extraction use the same endpoint (`/v2/extract`). The input source is determined by the request body: use `urls` for product URLs, or `vendor` for extracting from a vendor.
 
 #### 2. **Unified Extraction Endpoint**
 
@@ -347,7 +347,7 @@ v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into 
 - Execution ID format: `extract-urls-{uuid}`
 
 **Using `vendor` parameter** (Migrated from v1 `/v1/extract`):
-- Use when you want to extract all products from a vendor domain
+- Use when you want to extract all products from a vendor
 - Post to `/v2/extract` with `vendor` field in the request body
 - Requires prior crawl or can wait for a crawl using `crawl_id` parameter
 - Useful for bulk extraction from discovered listings
@@ -594,17 +594,17 @@ DELETE /v2/extract/{execution_id}
 ### Migration Steps for Extract Endpoints
 
 1. **Update endpoint paths:** 
-   - Change `/v1/products` to `/v2/extract` (for direct URLs)
+   - Change `/v1/products` to `/v2/extract` (for URLs)
    - Change `/v1/extract` to `/v2/extract` (for vendor-based extraction)
 2. **Update request parameters:**
    - For vendor-based: Change `domain` parameter to `vendor` in request body
    - Set `enable_enrichment`, `enable_reviews`, and `enable_image_tags` explicitly if you were relying on v1 defaults
 3. **Update execution ID handling:** 
-   - Direct URLs: Change format from `products-batch-{uuid}` to `extract-urls-{uuid}`
+   - URLs: Change format from `products-batch-{uuid}` to `extract-urls-{uuid}`
    - Vendor-based: Execution ID format remains `extract-{vendor}-{uuid}` (unchanged)
 4. **Update response parsing:** Change `results.products` to `data`, `results.meta` to `meta.result`
 5. **Update query parameters:** Change `limit` to `page_size` in status endpoint
-6. **Unified endpoint:** Both extraction modes now use the same `/v2/extract` endpoint - choose mode via request body (`urls` for direct URLs, `vendor` for vendor-based)
+6. **Unified endpoint:** Both extraction modes now use the same `/v2/extract` endpoint - choose mode via request body (`urls` for URLs, `vendor` for vendor-based)
 
 ---
 

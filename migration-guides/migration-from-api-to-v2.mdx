@@ -76,7 +76,7 @@ POST /v2/extract
 }
 ```
 
-**v2 Request (Direct URLs Mode):**
+**v2 Request (URLs Mode):**
 ```json
 {
   "urls": ["https://example.com/product"],
@@ -154,7 +154,7 @@ POST /v2/extract
 - `enable_enrichment` default changed from `true` to `false` in v2
 - Removed `force_extraction` parameter in v2 (always extracts)
 - HTTP status code changed to `202 Accepted` for POST (was `200 OK`)
-- Execution ID format: `extract-urls-{uuid}` for direct URLs mode
+- Execution ID format: `extract-urls-{uuid}` for URLs mode
 
 
 **Note**: The same behavior applies to both single product and batch product extraction. The response schema is identical regardless of the number of products requested.

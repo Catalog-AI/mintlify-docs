@@ -6,7 +6,7 @@ description: "How to build and maintain your own product index using the Catalog
 Build and maintain your own product index using Catalog's browse, crawl, and extract endpoints. Choose the approach that best fits your needs: browse existing vendors that Catalog has already discovered, or crawl and extract new vendors to ensure you have the latest data.
 
 <Note>
-This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v2/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Crawl](/v2/api-reference/endpoints/discover/crawl), and extracting products via [Extract](/v2/api-reference/endpoints/extract/extract) using either direct URLs or a vendor domain.
+This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v2/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Crawl](/v2/api-reference/endpoints/discover/crawl), and extracting products via [Extract](/v2/api-reference/endpoints/extract/extract) using either URLs or a vendor.
 </Note>
 
 ## Option 1: Browse Existing Vendors
@@ -41,7 +41,7 @@ Use the **Get Product Listings** endpoint (`POST /v2/listings`) to page through 
 
 ### Step 4: Hydrate full product data
 
-Once you have a list of product URLs, use the **Extract Direct URLs** endpoint (`POST /v2/extract`) to hydrate many URLs in a single request (up to 1000 URLs per request).
+Once you have a list of product URLs, use the **Extract** endpoint (`POST /v2/extract`) to hydrate many URLs in a single request (up to 1000 URLs per request).
 
 **Typical flow:**
 
@@ -97,11 +97,11 @@ Use the **Crawl** endpoint (`POST /v2/crawl`) to discover all product listings f
 
 ### Step 2: Extract Products from Vendor
 
-After crawling (or while a crawl is running), use the **Extract** endpoint (`POST /v2/extract`) with a vendor domain to enhance products with full details, AI enrichment, reviews, and image tags from all discovered listings.
+After crawling (or while a crawl is running), use the **Extract** endpoint (`POST /v2/extract`) with a vendor to enhance products with full details, AI enrichment, reviews, and image tags from all discovered listings.
 
 **Typical flow:**
 
-1. Start extraction by calling `POST /v2/extract` with the vendor domain:
+1. Start extraction by calling `POST /v2/extract` with the vendor:
    ```json
    {
      "vendor": "example.com",
@@ -138,9 +138,9 @@ After crawling (or while a crawl is running), use the **Extract** endpoint (`POS
 **Crawl Requirement:** Product extraction can only be performed on websites whose product listings are currently being crawled or have already been crawled. The extraction uses the product listings discovered during the crawl process.
 </Note>
 
-### Step 3: Add Missing Products with Direct URLs
+### Step 3: Add Missing Products with URLs
 
-Use the **Extract** endpoint (`POST /v2/extract`) with direct URLs to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
+Use the **Extract** endpoint (`POST /v2/extract`) with URLs to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
 
 **Use cases:**
 - Products from your internal catalog
@@ -186,7 +186,7 @@ Use the **Extract** endpoint (`POST /v2/extract`) with direct URLs to add any pr
 In practice, many integrations combine both approaches:
 - Browse existing vendors for quick indexing
 - Crawl and extract new vendors or refresh existing ones periodically
-- Use Extract Direct URLs for targeted updates of specific items
+- Use Extract with URLs for targeted updates of specific items
 
 ## Keeping Your Index Fresh
 
@@ -203,7 +203,7 @@ To maintain a high-quality product index:
 
 **Prune stale products:** Remove (or downgrade) products that consistently fail to process or are no longer available.
 
-**Use direct URLs for targeted updates:** For specific products that need frequent updates (e.g., featured items), use the Extract endpoint with direct URLs to refresh them more frequently than the full extract cycle.
+**Use URLs for targeted updates:** For specific products that need frequent updates (e.g., featured items), use the Extract endpoint with URLs to refresh them more frequently than the full extract cycle.
 
 ## Related endpoints
 

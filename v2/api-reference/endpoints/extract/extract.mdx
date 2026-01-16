@@ -1,12 +1,12 @@
 ---
 title: "Extract"
 api: "POST https://api.getcatalog.ai/v2/extract"
-description: "Async extract from URLs or a vendor domain. Returns immediately with an execution_id to check status and retrieve results."
+description: "Async extract from URLs or a vendor. Returns immediately with an execution_id to check status and retrieve results."
 ---
 
 You can extract products using one of two input sources:
-- **Direct URLs:** Provide an array of product URLs to extract (up to 1000 URLs per request)
-- **Vendor Domain:** Provide a vendor domain to extract products from previously discovered listings
+- **URLs:** Provide an array of product URLs to extract (up to 1000 URLs per request)
+- **Vendor:** Provide a vendor to extract products from previously discovered listings
 
 <Note>
 **Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-extract-status) endpoint to check progress and retrieve results when processing completes.
@@ -28,7 +28,7 @@ You can extract products using one of two input sources:
 
 Choose one of the following input sources:
 
-#### Input Source: Direct URLs
+#### Input Source: URLs
 
 <ParamField body="urls" type="string[]">
   Array of product URLs to extract (up to 1000 URLs per request). Use this when you have specific product URLs to extract.
@@ -52,19 +52,19 @@ Choose one of the following input sources:
   **Processing:** URLs are automatically chunked into batches of 100 for efficient processing.
 </ParamField>
 
-#### Input Source: Vendor Domain
+#### Input Source: Vendor
 
 <ParamField body="vendor" type="string">
-  The vendor domain to extract products from (e.g., "example.com" or "https://example.com"). Use this when you want to extract products from a vendor's previously discovered listings.
+  The vendor to extract products from (e.g., "example.com" or "https://example.com"). Use this when you want to extract products from a vendor's previously discovered listings.
   
   **Examples:**
   - `"nike.com"`
   - `"https://www.adidas.com"`
   - `"example-store.com"`
   
-  **Note:** The vendor domain will be normalized automatically. You can include or omit the protocol and www prefix.
+  **Note:** The domain will be normalized automatically. You can include or omit the protocol and www prefix.
   
-  **Important:** This vendor domain must have been crawled previously using the [Crawl](/v2/api-reference/endpoints/discover/crawl) endpoint, or you must provide a `crawl_id` to wait for an active crawl to complete. Extraction requires product listings to have been discovered via crawl.
+  **Important:** This vendor must have been crawled previously using the [Crawl](/v2/api-reference/endpoints/discover/crawl) endpoint, or you must provide a `crawl_id` to wait for an active crawl to complete. Extraction requires product listings to have been discovered via crawl.
 </ParamField>
 
 #### Vendor-Specific Parameters
@@ -191,7 +191,7 @@ The `/v2/extract` endpoint maintains a consistent response schema regardless of 
 
 <RequestExample>
 
-```bash cURL (Direct URLs)
+```bash cURL (URLs)
 curl -X POST https://api.getcatalog.ai/v2/extract \
   -H "Content-Type: application/json" \
   -H "x-api-key: $CATALOG_API_KEY" \
@@ -207,7 +207,7 @@ curl -X POST https://api.getcatalog.ai/v2/extract \
   }'
 ```
 
-```bash cURL (Vendor Domain)
+```bash cURL (Vendor)
 curl -X POST https://api.getcatalog.ai/v2/extract \
   -H "Content-Type: application/json" \
   -H "x-api-key: $CATALOG_API_KEY" \
@@ -219,8 +219,8 @@ curl -X POST https://api.getcatalog.ai/v2/extract \
   }'
 ```
 
-```javascript JavaScript (Direct URLs)
-// Start async extraction with direct URLs
+```javascript JavaScript (URLs)
+// Start async extraction with URLs
 const response = await fetch('https://api.getcatalog.ai/v2/extract', {
   method: 'POST',
   headers: {
@@ -246,8 +246,8 @@ console.log(`URLs to process: ${meta.urls_to_process}`);
 // Poll for results: GET /v2/extract/{execution_id}
 ```
 
-```javascript JavaScript (Vendor Domain)
-// Start async extraction from vendor domain
+```javascript JavaScript (Vendor)
+// Start async extraction from vendor
 const response = await fetch('https://api.getcatalog.ai/v2/extract', {
   method: 'POST',
   headers: {
@@ -270,10 +270,10 @@ console.log(`URLs to process: ${meta.urls_to_process}`);
 // Poll for results: GET /v2/extract/{execution_id}
 ```
 
-```python Python (Direct URLs)
+```python Python (URLs)
 import requests
 
-# Start async extraction with direct URLs
+# Start async extraction with URLs
 response = requests.post(
     'https://api.getcatalog.ai/v2/extract',
     headers={
@@ -300,10 +300,10 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
 # Poll for results: GET /v2/extract/{execution_id}
 ```
 
-```python Python (Vendor Domain)
+```python Python (Vendor)
 import requests
 
-# Start async extraction from vendor domain
+# Start async extraction from vendor
 response = requests.post(
     'https://api.getcatalog.ai/v2/extract',
     headers={
@@ -331,7 +331,7 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
 
 <ResponseExample>
 
-```json Response (Direct URLs)
+```json Response (URLs)
 {
   "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
   "status": "pending",
@@ -343,7 +343,7 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
 }
 ```
 
-```json Response (Vendor Domain)
+```json Response (Vendor)
 {
   "execution_id": "extract-nike-com-51d87084",
   "status": "pending",
@@ -355,7 +355,7 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
 }
 ```
 
-```json Response (Vendor Domain with crawl_id)
+```json Response (Vendor with crawl_id)
 {
   "execution_id": "extract-nike-com-51d87084",
   "status": "pending",
@@ -382,14 +382,14 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
 
 ## Workflow
 
-### Using Direct URLs
+### Using URLs
 
 1. **Start Extraction:** Send a POST request with your `urls` array
 2. **Get Execution ID:** Receive an `execution_id` immediately in the response (HTTP 202)
 3. **Check Status:** Poll the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-extract-status) endpoint using the `execution_id`
 4. **Retrieve Results:** When `status` is `"completed"`, results are available with pagination support
 
-### Using Vendor Domain
+### Using Vendor
 
 1. **Crawl the Domain (if not already done):** First, use the [Crawl](/v2/api-reference/endpoints/discover/crawl) endpoint to discover product listings from the domain. Wait for the crawl to complete or use the `crawl_id` parameter in step 2.
 2. **Start Extraction:** Send a POST request with your `vendor` domain. If the domain hasn't been crawled yet, provide the `crawl_id` from step 1 to wait for crawl completion.
