@@ -140,8 +140,7 @@ const response = await fetch('https://api.getcatalog.ai/v1/products', {
 
 const { execution_id } = await response.json();
 
-// Poll for results using the execution_id
-// See Get Execution Status endpoint documentation for details
+// Poll for results: GET /v1/products/{execution_id}
 ```
 
 ```python Python
@@ -169,8 +168,7 @@ response = requests.post(
 data = response.json()
 execution_id = data['execution_id']
 
-# Poll for results using the execution_id
-# See Get Execution Status endpoint documentation for details
+# Poll for results: GET /v1/products/{execution_id}
 ```
 
 </RequestExample>

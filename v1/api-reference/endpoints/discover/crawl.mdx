@@ -81,8 +81,7 @@ const response = await fetch('https://api.getcatalog.ai/v1/crawl', {
 const { execution_id } = await response.json();
 console.log(`Crawl started with execution ID: ${execution_id}`);
 
-// Poll for results using the execution_id
-// See Get Execution Status endpoint documentation for details
+// Poll for results: GET /v1/crawl/{execution_id}
 ```
 
 ```python Python
@@ -104,8 +103,7 @@ data = response.json()
 execution_id = data['execution_id']
 print(f"Crawl started with execution ID: {execution_id}")
 
-# Poll for results using the execution_id
-# See Get Execution Status endpoint documentation for details
+# Poll for results: GET /v1/crawl/{execution_id}
 ```
 
 </RequestExample>

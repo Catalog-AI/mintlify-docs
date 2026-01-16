@@ -1,5 +1,5 @@
 ---
-title: "Extract Products"
+title: "Extract"
 api: "POST https://api.getcatalog.ai/v2/extract"
 description: "Start asynchronous product extraction from URLs or a vendor domain"
 ---
@@ -245,8 +245,7 @@ const { execution_id, status, meta } = await response.json();
 console.log(`Execution started: ${execution_id}`);
 console.log(`URLs to process: ${meta.urls_to_process}`);
 
-// Poll for results using the execution_id
-// See Get Extract Execution Status endpoint documentation for details
+// Poll for results: GET /v2/extract/{execution_id}
 ```
 
 ```javascript JavaScript (Vendor Domain)
@@ -270,8 +269,7 @@ console.log(`Execution started: ${execution_id}`);
 console.log(`URLs found: ${meta.url_count}`);
 console.log(`URLs to process: ${meta.urls_to_process}`);
 
-// Poll for results using the execution_id
-// See Get Extract Execution Status endpoint documentation for details
+// Poll for results: GET /v2/extract/{execution_id}
 ```
 
 ```python Python (Direct URLs)
@@ -301,8 +299,7 @@ execution_id = data['execution_id']
 print(f"Execution started: {execution_id}")
 print(f"URLs to process: {data['meta']['urls_to_process']}")
 
-# Poll for results using the execution_id
-# See Get Extract Execution Status endpoint documentation for details
+# Poll for results: GET /v2/extract/{execution_id}
 ```
 
 ```python Python (Vendor Domain)
@@ -329,8 +326,7 @@ print(f"Execution started: {execution_id}")
 print(f"URLs found: {data['meta']['url_count']}")
 print(f"URLs to process: {data['meta']['urls_to_process']}")
 
-# Poll for results using the execution_id
-# See Get Extract Execution Status endpoint documentation for details
+# Poll for results: GET /v2/extract/{execution_id}
 ```
 
 </RequestExample>

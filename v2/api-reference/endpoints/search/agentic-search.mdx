@@ -194,8 +194,7 @@ const data = await response.json();
 console.log(`Search started with execution ID: ${data.execution_id}`);
 console.log(`Credits used: ${data.meta.credits_used}`);
 
-// Poll for results using the execution_id
-// See Get Execution Status endpoint documentation for details
+// Poll for results: GET /v2/agentic-search/{execution_id}
 ```
 
 ```python Python
@@ -254,8 +253,7 @@ execution_id = data['execution_id']
 print(f"Search started with execution ID: {execution_id}")
 print(f"Credits used: {data['meta']['credits_used']}")
 
-# Poll for results using the execution_id
-# See Get Execution Status endpoint documentation for details
+# Poll for results: GET /v2/agentic-search/{execution_id}
 ```
 
 </RequestExample>
