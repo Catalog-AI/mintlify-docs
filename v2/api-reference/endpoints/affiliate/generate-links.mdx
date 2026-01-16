@@ -1,10 +1,8 @@
 ---
 title: "Generate Affiliate Links"
 api: "POST https://api.getcatalog.ai/v2/affiliate"
-description: "Convert regular product URLs into Wildfire affiliate tracking links"
+description: "Convert URLs to affiliate links using the Wildfire network."
 ---
-
-Convert product URLs into affiliate tracking links using the Wildfire network.
 
 <Tip>
 **When to use:** Monetize product links by generating trackable affiliate URLs. Supports up to 100 URLs per request.
@@ -44,7 +42,7 @@ Convert product URLs into affiliate tracking links using the Wildfire network.
   
   <Expandable title="Affiliate Link Result">
     <ResponseField name="wildfire_link" type="string">
-      Generated Wildfire affiliate tracking link (empty string if generation failed)
+      Generated affiliate tracking link (empty string if generation failed)
     </ResponseField>
     
     <ResponseField name="original_url" type="string">
@@ -223,11 +221,8 @@ print(f"Successful: {data['meta']['successful']}, Failed: {data['meta']['failed'
 ## Important Notes
 
 <Warning>
-  - Affiliate links are generated using your configured Wildfire device ID
   - Not all product URLs may be supported by the Wildfire network
   - Commission rates and tracking depend on Wildfire's affiliate partnerships
-  - Always test generated links before using them in production
-  - The Wildfire device ID must be configured for your organization
 </Warning>
 
 

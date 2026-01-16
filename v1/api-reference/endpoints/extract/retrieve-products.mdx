@@ -1,10 +1,8 @@
 ---
 title: "Get Products by URLs"
 api: "POST https://api.getcatalog.ai/v1/products"
-description: "Start asynchronous batch processing of product URLs to retrieve detailed product information"
+description: "Async extract from product URLs (up to 1000). Returns immediately with an execution_id to check status and retrieve results."
 ---
-
-Start asynchronous batch processing for multiple product URLs. This endpoint returns immediately with an `execution_id` that you can use to check status and retrieve results. Supports processing 1 to 1000 URLs per request.
 
 <Note>
 **Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Execution Status](/v1/api-reference/endpoints/extract/get-products-execution-status) endpoint to check progress and retrieve results when processing completes.

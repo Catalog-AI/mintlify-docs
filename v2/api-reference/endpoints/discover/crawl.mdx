@@ -1,10 +1,8 @@
 ---
 title: "Crawl"
 api: "POST https://api.getcatalog.ai/v2/crawl"
-description: "Asynchronous crawling of a vendor website to discover collections and product listings"
+description: "Async discovery of collections and product listings for a vendor. Returns immediately with an execution_id to check status."
 ---
-
-Start an asynchronous crawl of a vendor website. This endpoint discovers collections and product listings from the specified domain. Returns immediately with an `execution_id` that you can use to check status.
 
 <Tip>
 **When to use:** Discover and index all product listings from a vendor website. The crawl process will:

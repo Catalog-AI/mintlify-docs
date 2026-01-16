@@ -1,10 +1,8 @@
 ---
 title: "Extract"
 api: "POST https://api.getcatalog.ai/v2/extract"
-description: "Start asynchronous product extraction from URLs or a vendor domain"
+description: "Async extract from URLs or a vendor domain. Returns immediately with an execution_id to check status and retrieve results."
 ---
-
-Start asynchronous product extraction to retrieve detailed product data. This endpoint returns immediately with an `execution_id` that you can use to check status and retrieve results.
 
 You can extract products using one of two input sources:
 - **Direct URLs:** Provide an array of product URLs to extract (up to 1000 URLs per request)
