@@ -362,9 +362,7 @@ v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into 
   "enable_enrichment": true,
   "country_code": "us",
   "enable_reviews": false,
-  "enable_image_tags": false,
-  "regenerate_description_html": true,
-  "populate_description_html_from_html": true
+  "enable_image_tags": false
 }
 ```
 
@@ -376,13 +374,10 @@ v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into 
   "country_code": "us",
   "enable_reviews": false,
   "enable_image_tags": false,
-  "regenerate_description_html": true,
-  "populate_description_html_from_html": true,
   // New optional parameters:
   "enable_brand_pdp": false,
   "enable_similar_products": false,
-  "enable_reddit_insights": false,
-  "persist_to_s3": false
+  "enable_reddit_insights": false
 }
 ```
 
@@ -412,8 +407,7 @@ v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into 
   // New optional parameters:
   "enable_brand_pdp": false,
   "enable_similar_products": false,
-  "enable_reddit_insights": false,
-  "persist_to_s3": false
+  "enable_reddit_insights": false
 }
 ```
 
@@ -422,7 +416,7 @@ v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into 
 - `enable_enrichment` default changed from `true` to `false` in v2
 - `enable_reviews` default changed from `true` to `false` in v2
 - `enable_image_tags` default changed from `true` to `false` in v2
-- New optional parameters: `enable_brand_pdp`, `enable_similar_products`, `enable_reddit_insights`, `persist_to_s3`
+- New optional parameters: `enable_brand_pdp`, `enable_similar_products`, `enable_reddit_insights`
 
 #### 4. **Response Format Changes**
 
