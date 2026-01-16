@@ -39,7 +39,7 @@ All error responses include a `Request-ID` header that matches the `request_id` 
 ## HTTP status codes
 
 | Status Code | Meaning | Description |
-|-------------|---------|-------------|
+|:------------|:--------|:------------|
 | `200` | Success | Request completed successfully |
 | `400` | Bad Request | Invalid request parameters or malformed JSON |
 | `401` | Unauthorized | Missing or invalid API key |
@@ -55,40 +55,40 @@ All error responses include a `Request-ID` header that matches the `request_id` 
 ### Authentication errors
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+|:-----|:------------|:------------|:-----------|
 | `UNAUTHORIZED` | 401 | Missing or invalid API key | Verify your API key is correct and included in the `x-api-key` header |
 | `FORBIDDEN` | 403 | API key access denied | Contact support to verify your API key permissions |
 
 ### Request validation errors
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+|:-----|:------------|:------------|:-----------|
 | `INVALID_REQUEST` | 400 | Invalid request format or missing required fields | Check the request format and ensure all required parameters are included |
 | `VALIDATION_ERROR` | 400 | Request format is valid but values are invalid | Check parameter values against endpoint requirements (e.g., URL format, array length limits) |
 
 ### Resource errors
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+|:-----|:------------|:------------|:-----------|
 | `NOT_FOUND` | 404 | Resource not found | Verify the endpoint URL and any resource IDs (e.g., execution IDs) |
 | `CONFLICT` | 409 | Resource state conflict | The requested operation conflicts with the current state (e.g., trying to cancel an execution that's already stopped) |
 
 ### Billing errors
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+|:-----|:------------|:------------|:-----------|
 | `INSUFFICIENT_CREDITS` | 402 | Not enough credits to complete the request | Add credits to your account or enable auto top-up. The response includes `credits_needed` and `credits_remaining` fields. |
 
 ### Rate limiting errors
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+|:-----|:------------|:------------|:-----------|
 | `RATE_LIMITED` | 429 | Too many requests in a short window | Respect `Retry-After` header, pace requests using `RateLimit-Remaining`, and back off (exponential recommended). Contact support if you need higher limits. |
 
 ### Server errors
 
 | Code | HTTP Status | Description | Resolution |
-|------|-------------|-------------|------------|
+|:-----|:------------|:------------|:-----------|
 | `INTERNAL_ERROR` | 500 | Unexpected server error | Retry the request; if persistent, contact support with the `request_id` |
 
 ## Handling errors
