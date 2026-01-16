@@ -40,12 +40,6 @@ Cancel a running extraction execution. This endpoint stops an active extraction 
   **Note:** If the execution ID does not exist or doesn't belong to your organization, the endpoint returns a 404 Not Found error.
 </ParamField>
 
-### Query Parameters
-
-<ParamField query="arn" type="string" optional>
-  Full AWS Step Functions execution ARN (optional override, used for advanced scenarios)
-</ParamField>
-
 ## Response
 
 <ResponseField name="status" type="string">
