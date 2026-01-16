@@ -36,7 +36,7 @@
                   {
                     "group": "Discover",
                     "pages": [
-                      "v2/api-reference/endpoints/discover/start-crawl",
+                      "v2/api-reference/endpoints/discover/crawl",
                       "v2/api-reference/endpoints/discover/list-crawl-executions",
                       "v2/api-reference/endpoints/discover/get-crawl-status",
                       "v2/api-reference/endpoints/discover/cancel-crawl-execution",
@@ -132,7 +132,7 @@
                   {
                     "group": "Discover",
                     "pages": [
-                      "v1/api-reference/endpoints/discover/start-crawl",
+                      "v1/api-reference/endpoints/discover/crawl",
                       "v1/api-reference/endpoints/discover/list-crawl-executions",
                       "v1/api-reference/endpoints/discover/get-crawl-status",
                       "v1/api-reference/endpoints/discover/cancel-crawl-execution",

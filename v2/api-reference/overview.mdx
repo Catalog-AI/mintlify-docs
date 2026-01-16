@@ -20,7 +20,7 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 
 | Endpoint | Method | Description |
 |:---------|:-------|:------------|
-| [`/v2/crawl`](/v2/api-reference/endpoints/discover/start-crawl) | POST | Start async discovery of collections and product listings for a specific vendor |
+| [`/v2/crawl`](/v2/api-reference/endpoints/discover/crawl) | POST | Async discovery of collections and product listings for a vendor |
 | [`/v2/crawl`](/v2/api-reference/endpoints/discover/list-crawl-executions) | GET | List all crawls with status |
 | [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/get-crawl-status) | GET | Get crawl status and results |
 | [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/cancel-crawl-execution) | DELETE | Cancel a running crawl |
@@ -32,7 +32,7 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 
 | Endpoint | Method | Description |
 |:---------|:-------|:------------|
-| [`/v2/extract`](/v2/api-reference/endpoints/extract/extract) | POST | Start async extraction for a specific vendor or set of product URLs |
+| [`/v2/extract`](/v2/api-reference/endpoints/extract/extract) | POST | Async extraction from URLs or a vendor domain |
 | [`/v2/extract`](/v2/api-reference/endpoints/extract/list-extract-executions) | GET | List all extractions with status |
 | [`/v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status) | GET | Get extraction status and results |
 | [`/v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/cancel-extract-execution) | DELETE | Cancel a running extraction |
@@ -41,7 +41,7 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 
 | Endpoint | Method | Description |
 |:---------|:-------|:------------|
-| [`/v2/agentic-search`](/v2/api-reference/endpoints/search/agentic-search) | POST | Start async natural language search with customer profile personalization |
+| [`/v2/agentic-search`](/v2/api-reference/endpoints/search/agentic-search) | POST | Async AI-powered search with customer profile personalization |
 | [`/v2/agentic-search-mini`](/v2/api-reference/endpoints/search/agentic-search-mini) | POST | Fast synchronous search returning up to 10 products |
 
 ### Affiliate

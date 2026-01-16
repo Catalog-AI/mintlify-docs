@@ -6,7 +6,7 @@ description: "How to build and maintain your own product index using the Catalog
 Build and maintain your own product index using Catalog's browse, crawl, and product endpoints. Choose the approach that best fits your needs: browse existing vendors that Catalog has already discovered, or crawl new vendors to ensure you have the latest data.
 
 <Note>
-This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v1/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Start Crawl](/v1/api-reference/endpoints/discover/start-crawl), and adding missing products via [Get Products](/v1/api-reference/endpoints/extract/retrieve-products).
+This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v1/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Crawl](/v1/api-reference/endpoints/discover/crawl), and adding missing products via [Get Products](/v1/api-reference/endpoints/extract/retrieve-products).
 </Note>
 
 ## Option 1: Browse Existing Vendors
@@ -34,7 +34,7 @@ This helps you build a more structured index (vendor → collection → products
 
 ### Step 3: List products per vendor or collection
 
-Use the **Get All Products** endpoint (`POST /v1/listings`) to page through all products for a vendor or collection. As you page through:
+Use the **Get Product Listings** endpoint (`POST /v1/listings`) to page through all products for a vendor or collection. As you page through:
 - Extract the **canonical product URLs** from each listing
 - Store product URLs in your own database or search index
 - Record lightweight metadata (vendor, handle/slug, collection, timestamps) for faster lookups
@@ -60,7 +60,7 @@ If your vendor is not yet available in Catalog, or you want to ensure you have t
 
 ### Step 1: Start with Crawl
 
-Use the **Start Crawl** endpoint (`POST /v1/crawl`) to discover all product listings from a vendor website. This endpoint:
+Use the **Crawl** endpoint (`POST /v1/crawl`) to discover all product listings from a vendor website. This endpoint:
 - Discovers collections from the vendor
 - Extracts product listings from each collection
 
@@ -152,7 +152,7 @@ To maintain a high-quality product index:
 ## Related endpoints
 
 <CardGroup cols={2}>
-  <Card title="/crawl" icon="spider" href="/v1/api-reference/endpoints/discover/start-crawl">
+  <Card title="/crawl" icon="spider" href="/v1/api-reference/endpoints/discover/crawl">
     Discover collections and product listings for a specific vendor
   </Card>
   <Card title="/products" icon="box" href="/v1/api-reference/endpoints/extract/retrieve-products">

@@ -4,7 +4,7 @@ api: "GET https://api.getcatalog.ai/v1/crawl/{execution_id}"
 description: "Check the status of an asynchronous crawl job"
 ---
 
-Retrieve the status and results for an asynchronous crawl job started via the [Start Crawl](/v1/api-reference/endpoints/discover/start-crawl) endpoint.
+Retrieve the status and results for an asynchronous crawl job started via the [Crawl](/v1/api-reference/endpoints/discover/crawl) endpoint.
 
 <Tip>
 **When to use:** After starting a crawl job with the POST endpoint, use this endpoint to:
@@ -26,7 +26,7 @@ Retrieve the status and results for an asynchronous crawl job started via the [S
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID returned from the [Start Crawl](/v1/api-reference/endpoints/discover/start-crawl) POST endpoint
+  The execution ID returned from the [Crawl](/v1/api-reference/endpoints/discover/crawl) POST endpoint
   
   **Format:** `crawl-{hostname}-{uuid}`
   

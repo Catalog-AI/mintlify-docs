@@ -4,7 +4,7 @@ api: "GET https://api.getcatalog.ai/v2/agentic-search/{execution_id}"
 description: "Check the status of an asynchronous agentic search job"
 ---
 
-Retrieve the status and results for an asynchronous agentic search job started via the [Start Agentic Search](/v2/api-reference/endpoints/search/agentic-search) endpoint.
+Retrieve the status and results for an asynchronous agentic search job started via the [Agentic Search](/v2/api-reference/endpoints/search/agentic-search) endpoint.
 
 <Tip>
 **When to use:** After starting a search job with the POST endpoint, use this endpoint to:
@@ -28,7 +28,7 @@ Retrieve the status and results for an asynchronous agentic search job started v
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID returned from the [Start Agentic Search](/v2/api-reference/endpoints/search/agentic-search) POST endpoint
+  The execution ID returned from the [Agentic Search](/v2/api-reference/endpoints/search/agentic-search) POST endpoint
   
   **Format:** `agentic-{uuid}-{timestamp}`
   
