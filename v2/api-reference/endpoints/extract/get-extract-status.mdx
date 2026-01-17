@@ -12,14 +12,6 @@ description: "Get extract status and results for an asynchronous extract job."
 - Check if extraction is waiting for a crawl to complete
 </Tip>
 
-<Note>
-**Supported Execution Types:** This endpoint works for all extraction jobs:
-- When using `urls`: Execution IDs formatted as `extract-urls-{uuid}`
-- When using `vendor`: Execution IDs formatted as `extract-{vendor}-{uuid}` (e.g., `extract-nike-com-51d87084`)
-
-Both types of executions use the same status endpoint and return the same response structure.
-</Note>
-
 ## Request
 
 <ParamField header="x-api-key" type="string" required>
@@ -28,12 +20,6 @@ Both types of executions use the same status endpoint and return the same respon
 
 <ParamField path="execution_id" type="string" required>
   The execution ID returned from [`POST /v2/extract`](/v2/api-reference/endpoints/extract/extract)
-  
-  **Formats:**
-  - `extract-urls-{uuid}` - When using `urls` (e.g., `extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7`)
-  - `extract-{vendor}-{uuid}` - When using `vendor` (e.g., `extract-nike-com-51d87084`)
-  
-  **Note:** If the execution ID does not exist or doesn't belong to your organization, the endpoint returns a 404 Not Found error.
 </ParamField>
 
 ### Query Parameters

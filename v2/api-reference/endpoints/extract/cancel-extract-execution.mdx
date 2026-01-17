@@ -16,10 +16,6 @@ description: "Cancel a running extract. Stops an active extract job that is curr
 - If an execution has already completed or failed, it cannot be canceled
 - Executions that are waiting for a crawl to complete (status `"pending"` with `waiting_for` in meta) cannot be canceled until they start running
 - The endpoint will return an error if you attempt to cancel a non-running execution
-
-**Supported Execution Types:** This endpoint works for all extraction jobs:
-- When using `urls`: Execution IDs formatted as `extract-urls-{uuid}`
-- When using `vendor`: Execution IDs formatted as `extract-{vendor}-{uuid}` (e.g., `extract-nike-com-51d87084`)
 </Note>
 
 ## Request
@@ -29,13 +25,7 @@ description: "Cancel a running extract. Stops an active extract job that is curr
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID of the extraction job to cancel
-  
-  **Formats:**
-  - `extract-urls-{uuid}` - When using `urls` (e.g., `extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7`)
-  - `extract-{vendor}-{uuid}` - When using `vendor` (e.g., `extract-nike-com-51d87084`)
-  
-  **Note:** If the execution ID does not exist or doesn't belong to your organization, the endpoint returns a 404 Not Found error.
+  The execution ID returned from [`POST /v2/extract`](/v2/api-reference/endpoints/extract/extract)
 </ParamField>
 
 ## Response
