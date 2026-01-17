@@ -3,7 +3,7 @@ title: "Building a Product Index"
 description: "How to build and maintain your own product index using the Catalog API"
 ---
 
-Build and maintain your own product index using Catalog's crawl, browse, and products endpoints. The typical workflow is: **crawl** a vendor to discover their product listings, **browse** the discovered data to curate which products you want, then **extract** full product data for your selected listings.
+Build and maintain your own product index using Catalog's crawl and products endpoints. The typical workflow is: **crawl** a vendor to discover their product listings, **browse** the discovered data to curate which products you want, then **extract** full product data for your selected listings.
 
 <Note>
 This guide covers the core workflow: discovering product listings via [`POST /v1/crawl`](/v1/api-reference/endpoints/crawl/crawl), browsing discovered data via [`GET /v1/vendors`](/v1/api-reference/endpoints/get-vendors), [`POST /v1/collections`](/v1/api-reference/endpoints/get-collections), and [`POST /v1/listings`](/v1/api-reference/endpoints/get-listings), and extracting products via [`POST /v1/products`](/v1/api-reference/endpoints/extract/retrieve-products).
@@ -37,7 +37,7 @@ The crawl process:
 
 ## Step 2: Browse Discovered Data
 
-After crawling, use the browse endpoints to explore and curate which products you want to extract. These endpoints return data from vendors you have crawled.
+After crawling, use the three browse endpoints to explore and curate which products you want to extract. These endpoints return data from vendors you have crawled.
 
 ### List your vendors
 
