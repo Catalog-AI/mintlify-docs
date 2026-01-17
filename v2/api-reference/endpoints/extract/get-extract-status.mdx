@@ -501,11 +501,3 @@ For best results when waiting for completion:
 4. **Exponential Backoff:** Consider increasing wait time for long-running jobs
 5. **Timeout:** Set a maximum wait time based on your batch size and whether you're waiting for a crawl
 
-## Status Transitions
-
-- **pending** → **running**: Execution has started processing
-- **pending** (with `waiting_for`) → **running**: Crawl completed, extraction started
-- **pending** (with `waiting_for`) → **failed**: The crawl being waited for failed or was canceled
-- **running** → **completed**: Execution finished successfully
-- **running** → **failed**: Execution encountered an error
-- **pending** → **failed**: Execution failed before starting (rare)
