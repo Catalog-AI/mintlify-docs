@@ -1,0 +1,172 @@
+---
+title: "List Agentic Searches"
+api: "GET https://api.getcatalog.ai/v2/agentic-search"
+description: "List all agentic searches with status. Shows all search jobs, their current status, and when they were created."
+---
+
+<Tip>
+**When to use:** Monitor all your agentic search operations in one place. Use this endpoint to:
+- See all search executions you've started
+- Filter by status (processing, completed, failed)
+- Track when searches were initiated
+- Find execution IDs for status checks
+</Tip>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="status" type="string" optional>
+  Filter executions by status. Possible values: `"processing"`, `"completed"`, `"failed"`
+  
+  **Note:** If not provided, all executions are returned regardless of status.
+</ParamField>
+
+<ParamField query="page_size" type="number" optional>
+  Number of executions to return per page (default: 20)
+  
+  **Note:** Executions are returned in reverse chronological order (most recent first).
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="array">
+  Array of execution summary objects
+  
+  <Expandable title="Execution Summary">
+    <ResponseField name="execution_id" type="string">
+      Unique execution identifier. Use this ID with [`GET /v2/agentic-search/{execution_id}`](/v2/api-reference/endpoints/search/get-agentic-search-status) to check detailed status and results.
+      
+      **Format:** `agentic-{uuid}-{timestamp}`
+    </ResponseField>
+    
+    <ResponseField name="status" type="string">
+      Current execution status
+      
+      **Possible values:**
+      - `"processing"` - Execution is currently running
+      - `"completed"` - Execution finished successfully
+      - `"failed"` - Execution failed or was aborted
+    </ResponseField>
+    
+    <ResponseField name="created_at" type="string">
+      ISO 8601 timestamp when the execution was created
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Pagination information for the response
+  
+  <Expandable title="Pagination Object">
+    <ResponseField name="page" type="number">
+      Current page number (always 1 for this endpoint)
+    </ResponseField>
+    
+    <ResponseField name="page_size" type="number">
+      Number of items per page
+    </ResponseField>
+    
+    <ResponseField name="total_items" type="number">
+      Total number of executions returned (may be less than or equal to page_size)
+    </ResponseField>
+    
+    <ResponseField name="total_pages" type="number">
+      Total number of pages (always 1 for this endpoint)
+    </ResponseField>
+    
+    <ResponseField name="has_next" type="boolean">
+      Whether there are more pages available (always false for this endpoint)
+    </ResponseField>
+    
+    <ResponseField name="has_prev" type="boolean">
+      Whether there are previous pages available (always false for this endpoint)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Metadata object (currently empty for this endpoint)
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+# Get all executions
+curl -X GET "https://api.getcatalog.ai/v2/agentic-search" \
+  -H "x-api-key: $CATALOG_API_KEY"
+
+# Get only completed executions
+curl -X GET "https://api.getcatalog.ai/v2/agentic-search?status=completed" \
+  -H "x-api-key: $CATALOG_API_KEY"
+
+# Get first 50 executions
+curl -X GET "https://api.getcatalog.ai/v2/agentic-search?page_size=50" \
+  -H "x-api-key: $CATALOG_API_KEY"
+```
+
+```javascript JavaScript
+// Get all executions
+const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+  headers: {
+    'x-api-key': 'YOUR_API_KEY'
+  }
+});
+
+const data = await response.json();
+console.log(`Found ${data.data.length} executions`);
+```
+
+```python Python
+import requests
+
+# Get all executions
+response = requests.get(
+    'https://api.getcatalog.ai/v2/agentic-search',
+    headers={'x-api-key': 'YOUR_API_KEY'}
+)
+
+data = response.json()
+print(f"Found {len(data['data'])} executions")
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "data": [
+    {
+      "execution_id": "agentic-a1b2c3d4-1735123456789",
+      "status": "completed",
+      "created_at": "2025-01-15T10:30:00.000Z"
+    },
+    {
+      "execution_id": "agentic-e5f6g7h8-1735127000000",
+      "status": "processing",
+      "created_at": "2025-01-15T11:00:00.000Z"
+    },
+    {
+      "execution_id": "agentic-i9j0k1l2-1735120000000",
+      "status": "failed",
+      "created_at": "2025-01-15T09:15:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 20,
+    "total_items": 3,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  },
+  "meta": {}
+}
+```
+
+</ResponseExample>

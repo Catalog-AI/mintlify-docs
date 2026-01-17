@@ -7,85 +7,194 @@
     "light": "#00D166",
     "dark": "#008F47"
   },
+  "interaction": {
+    "drilldown": false
+  },
   "favicon": "/logo/catalog-logo-black.svg",
   "navigation": {
-    "anchors": [
+    "versions": [
       {
-        "anchor": "Documentation",
-        "icon": "book-open",
-        "groups": [
+        "version": "v2",
+        "default": true,
+        "anchors": [
           {
-            "group": "Get Started",
-            "pages": [
-              "welcome",
-              "quickstart"
-            ]
-          },
-          {
-            "group": "API Reference",
-            "pages": [
-              "api-reference/overview",
+            "anchor": "Documentation",
+            "icon": "book-open",
+            "groups": [
               {
-                "group": "Search",
+                "group": "Get Started",
                 "pages": [
-                  "api-reference/endpoints/search/agentic-search",
-                  "api-reference/endpoints/search/agentic-search-mini",
-                  "api-reference/endpoints/search/regular-search"
+                  "v2/welcome",
+                  "v2/quickstart",
+                  "v2/authentication"
                 ]
               },
               {
-                "group": "Feed",
+                "group": "API Reference",
                 "pages": [
-                  "api-reference/endpoints/feed/get-feed"
+                  "v2/api-reference/overview",
+                  {
+                    "group": "Crawl",
+                    "pages": [
+                      "v2/api-reference/endpoints/crawl/crawl",
+                      "v2/api-reference/endpoints/crawl/list-crawl-executions",
+                      "v2/api-reference/endpoints/crawl/get-crawl-status",
+                      "v2/api-reference/endpoints/crawl/cancel-crawl-execution"
+                    ]
+                  },
+                  {
+                    "group": "Extract",
+                    "pages": [
+                      "v2/api-reference/endpoints/extract/extract",
+                      "v2/api-reference/endpoints/extract/list-extract-executions",
+                      "v2/api-reference/endpoints/extract/get-extract-status",
+                      "v2/api-reference/endpoints/extract/cancel-extract-execution"
+                    ]
+                  },
+                  {
+                    "group": "Search",
+                    "pages": [
+                      "v2/api-reference/endpoints/search/agentic-search-mini",
+                      "v2/api-reference/endpoints/search/agentic-search",
+                      "v2/api-reference/endpoints/search/list-agentic-search-executions",
+                      "v2/api-reference/endpoints/search/get-agentic-search-status",
+                      "v2/api-reference/endpoints/search/cancel-agentic-search-execution"
+                    ]
+                  },
+                  "v2/api-reference/endpoints/get-vendors",
+                  "v2/api-reference/endpoints/get-collections",
+                  "v2/api-reference/endpoints/get-listings",
+                  "v2/api-reference/endpoints/affiliate/generate-links",
+                  "v2/api-reference/endpoints/usage/get-usage"
                 ]
               },
               {
-                "group": "Product",
+                "group": "Guides",
                 "pages": [
-                  "api-reference/endpoints/products/get-product",
-                  "api-reference/endpoints/products/get-products"
+                  "v2/guides/pagination",
+                  "v2/guides/product-index",
+                  "v2/guides/product-comparison",
+                  "v2/guides/ai-shopping-assistant"
                 ]
               },
               {
-                "group": "Usage",
+                "group": "Resources",
                 "pages": [
-                  "api-reference/endpoints/usage/get-usage"
+                  "resources/error-codes",
+                  "resources/rate-limits"
                 ]
               },
               {
-                "group": "Affiliate",
+                "group": "Migration Guides",
                 "pages": [
-                  "api-reference/endpoints/affiliate/generate-links"
-                ]
-              },
-              {
-                "group": "Summaries",
-                "pages": [
-                  "api-reference/endpoints/summaries/list-vendors",
-                  "api-reference/endpoints/summaries/list-collections",
-                  "api-reference/endpoints/summaries/list-listings"
+                  "migration-guides/migration-from-api-to-v2",
+                  "migration-guides/migrating-from-v1-to-v2"
                 ]
               }
             ]
           },
           {
-            "group": "Guides",
-            "pages": [
-              "guides/filtering",
-              "guides/pagination"
-            ]
+            "anchor": "Dashboard",
+            "href": "https://dashboard.getcatalog.ai",
+            "icon": "gauge"
+          },
+          {
+            "anchor": "Website",
+            "href": "https://www.getcatalog.ai",
+            "icon": "globe"
+          },
+          {
+            "anchor": "Support",
+            "href": "mailto:founders@getcatalog.ai",
+            "icon": "envelope"
           }
         ]
       },
       {
-        "anchor": "Website",
-        "href": "https://www.getcatalog.ai",
-        "icon": "globe"
-      },
-      {
-        "anchor": "Support",
-        "href": "mailto:founders@getcatalog.ai",
-        "icon": "envelope"
+        "version": "v1",
+        "anchors": [
+          {
+            "anchor": "Documentation",
+            "icon": "book-open",
+            "groups": [
+              {
+                "group": "Get Started",
+                "pages": [
+                  "v1/welcome",
+                  "v1/quickstart",
+                  "v1/authentication"
+                ]
+              },
+              {
+                "group": "API Reference",
+                "pages": [
+                  "v1/api-reference/overview",
+                  {
+                    "group": "Crawl",
+                    "pages": [
+                      "v1/api-reference/endpoints/crawl/crawl",
+                      "v1/api-reference/endpoints/crawl/list-crawl-executions",
+                      "v1/api-reference/endpoints/crawl/get-crawl-status",
+                      "v1/api-reference/endpoints/crawl/cancel-crawl-execution"
+                    ]
+                  },
+                  {
+                    "group": "Extract",
+                    "pages": [
+                      "v1/api-reference/endpoints/extract/retrieve-products",
+                      "v1/api-reference/endpoints/extract/list-products-executions",
+                      "v1/api-reference/endpoints/extract/get-products-execution-status",
+                      "v1/api-reference/endpoints/extract/cancel-products-execution"
+                    ]
+                  },
+                  {
+                    "group": "Search",
+                    "pages": [
+                      "v1/api-reference/endpoints/search/agentic-search",
+                      "v1/api-reference/endpoints/search/agentic-search-mini"
+                    ]
+                  },
+                  "v1/api-reference/endpoints/get-vendors",
+                  "v1/api-reference/endpoints/get-collections",
+                  "v1/api-reference/endpoints/get-listings",
+                  "v1/api-reference/endpoints/affiliate/generate-links",
+                  "v1/api-reference/endpoints/usage/get-usage"
+                ]
+              },
+              {
+                "group": "Guides",
+                "pages": [
+                  "v1/guides/pagination",
+                  "v1/guides/product-index",
+                  "v1/guides/product-comparison",
+                  "v1/guides/ai-shopping-assistant"
+                ]
+              },
+              {
+                "group": "Resources",
+                "pages": [
+                  "resources/error-codes",
+                  "resources/rate-limits"
+                ]
+              }
+            ]
+          },
+          {
+            "anchor": "Dashboard",
+            "href": "https://dashboard.getcatalog.ai",
+            "icon": "gauge"
+          },
+          {
+            "anchor": "Website",
+            "href": "https://www.getcatalog.ai",
+            "icon": "globe"
+          },
+          {
+            "anchor": "Support",
+            "href": "mailto:founders@getcatalog.ai",
+            "icon": "envelope"
+          }
+        ]
       }
     ]
   },
@@ -97,7 +206,7 @@
     "primary": {
       "type": "button",
       "label": "Get API Key",
-      "href": "mailto:founders@getcatalog.ai"
+      "href": "https://dashboard.getcatalog.ai"
     }
   },
   "contextual": {

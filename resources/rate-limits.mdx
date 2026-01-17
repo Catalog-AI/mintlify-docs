@@ -1,0 +1,21 @@
+---
+title: "Rate Limits"
+description: "How Catalog rate limiting works and what to expect in responses"
+---
+
+The Catalog platform uses a global, IP-scoped rate limit to keep traffic fair and reliable without slowing typical usage.
+
+## Default policy
+
+- 50 requests per 4-second sliding window.
+- Counted per IP. If an IP cannot be determined, requests fall back to a shared global bucket.
+- Applies to all public API routes, including `/api/*`, `/v1/*`, `/v2/*`, and `/v3/*`. Admin pages stay protected separately.
+
+## Identification and scope
+
+- We use standard IP headers where available (`x-forwarded-for`, `x-real-ip`, `cf-connecting-ip`).
+
+## Headers and responses
+
+- Successful requests include: `RateLimit-Limit`, `RateLimit-Remaining`, and `RateLimit-Reset` (ISO timestamp).
+- Exceeded requests return `429 Too Many Requests` with a brief JSON error, plus the headers above and `Retry-After` (seconds). Content-Type is `application/json`.

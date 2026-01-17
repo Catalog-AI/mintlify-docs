@@ -1,0 +1,494 @@
+---
+title: "Building AI Shopping Assistants"
+description: "Learn how to build intelligent shopping assistants using Catalog's AI-powered search"
+---
+
+Build AI-powered shopping assistants that understand natural language queries and personalize recommendations. Catalog's [`POST /v2/agentic-search`](/v2/api-reference/endpoints/search/agentic-search) provides the intelligence you need to create conversational shopping experiences.
+
+## Overview
+
+AI shopping assistants help users find products through natural language. They:
+- Understand context from conversational queries
+- Learn preferences from user interactions
+- Provide personalized recommendations
+- Guide discovery with clarifying questions
+
+## Core Concepts
+
+### Natural Language Queries
+
+Catalog's Agentic Search understands complex, conversational queries without requiring structured filters:
+
+```javascript
+// Examples of natural language queries
+const queries = [
+  "I need a jacket for my office job that's not too formal",
+  "Show me sustainable dresses for a summer wedding",
+  "I want sneakers for daily walks that are comfortable and stylish"
+];
+```
+
+### Customer Profiles
+
+Build customer profiles to improve personalization. Profiles can include:
+- **Style preferences**: fit, color, aesthetic, silhouettes
+- **Usage context**: activities, environment, travel needs
+- **Purchase behavior**: value priorities, buying frequency
+- **Avoids**: things the customer doesn't like
+
+## Building Your Assistant
+
+<Tabs>
+  <Tab title="Python">
+    ### Step 1: Basic Search
+
+    Start with a simple search using natural language queries:
+
+    ```python
+    import requests
+    import os
+
+    def search_products(query, customer_profile=None):
+        """Search for products using natural language query"""
+        payload = {'query': query}
+        
+        if customer_profile:
+            payload['customer_profile'] = customer_profile
+        
+        response = requests.post(
+            'https://api.getcatalog.ai/v2/agentic-search',
+            headers={
+                'Content-Type': 'application/json',
+                'x-api-key': os.getenv('CATALOG_API_KEY')
+            },
+            json=payload
+        )
+        
+        data = response.json()
+        return data['data']  # Array of products
+
+    # Example usage
+    products = search_products(
+        "I need a versatile blazer for work and casual outings"
+    )
+    print(f"Found {len(products)} products")
+    ```
+
+    ### Step 2: Customer Profiles
+
+    Create and use customer profiles to personalize search results:
+
+    ```python
+    def build_profile(form_data):
+        """Build a customer profile from user preferences"""
+        return {
+            'style': {
+                'fit': form_data.get('fit'),
+                'color': form_data.get('color_preference'),
+                'aesthetic': form_data.get('aesthetics', []),
+                'silhouette': form_data.get('silhouettes', []),
+                'avoid': form_data.get('avoid_items', [])
+            },
+            'preferences': {
+                'in_stock_only': form_data.get('in_stock_only', True),
+                'comfort_priority': form_data.get('comfort_priority', False)
+            },
+            'usage_context': {
+                'activities': form_data.get('activities', []),
+                'environment': form_data.get('environment'),
+                'travel_friendly': form_data.get('travel_friendly')
+            },
+            'purchase_behavior': {
+                'value': form_data.get('value_proposition'),
+                'buying_frequency': form_data.get('buying_frequency')
+            }
+        }
+
+    # Example profile
+    profile = build_profile({
+        'fit': 'relaxed',
+        'color_preference': 'earth tones, neutrals',
+        'aesthetics': ['minimal', 'understated'],
+        'activities': ['office', 'coffee runs'],
+        'comfort_priority': True,
+        'in_stock_only': True
+    })
+
+    # Use profile in search
+    products = search_products(
+        "A jacket suitable for the office",
+        profile
+    )
+    ```
+
+    ### Step 3: Simple Assistant
+
+    Build a basic assistant that handles queries and returns formatted results:
+
+    ```python
+    class ShoppingAssistant:
+        def __init__(self, api_key):
+            self.api_key = api_key
+            self.profiles = {}  # In production, store in database
+        
+        def get_profile(self, user_id):
+            """Get or create customer profile"""
+            if user_id not in self.profiles:
+                self.profiles[user_id] = {}
+            return self.profiles[user_id]
+        
+        def search(self, user_id, query):
+            """Search for products with user profile"""
+            profile = self.get_profile(user_id)
+            
+            response = requests.post(
+                'https://api.getcatalog.ai/v2/agentic-search',
+                headers={
+                    'Content-Type': 'application/json',
+                    'x-api-key': self.api_key
+                },
+                json={
+                    'query': query,
+                    'customer_profile': profile if profile else None
+                }
+            )
+            
+            data = response.json()
+            return data['data']
+        
+        def format_response(self, products, query):
+            """Format search results for display"""
+            if len(products) == 0:
+                return {
+                    'message': "I couldn't find products matching your search. Try rephrasing or being more specific.",
+                    'products': []
+                }
+            
+            formatted_products = []
+            for product in products:
+                formatted_products.append({
+                    'title': product.get('title'),
+                    'brand': product.get('brand'),
+                    'price': f"${product.get('price_amount', 0)}",
+                    'url': product.get('url'),
+                    'image': product.get('images', [{}])[0].get('url') if product.get('images') else ''
+                })
+            
+            return {
+                'message': f"I found {len(products)} products matching '{query}':",
+                'products': formatted_products
+            }
+
+    # Usage
+    assistant = ShoppingAssistant(os.getenv('CATALOG_API_KEY'))
+    
+    response = assistant.search('user123', 'I need a jacket for work')
+    result = assistant.format_response(response, 'I need a jacket for work')
+    
+    print(result['message'])
+    for product in result['products']:
+        print(f"- {product['title']} by {product['brand']} - {product['price']}")
+    ```
+
+    ### Step 4: Error Handling
+
+    Always handle errors gracefully:
+
+    ```python
+    def search_with_error_handling(query, profile=None):
+        """Search with comprehensive error handling"""
+        try:
+            response = requests.post(
+                'https://api.getcatalog.ai/v2/agentic-search',
+                headers={
+                    'Content-Type': 'application/json',
+                    'x-api-key': os.getenv('CATALOG_API_KEY')
+                },
+                json={
+                    'query': query,
+                    'customer_profile': profile
+                }
+            )
+            
+            if response.status_code == 429:
+                raise Exception('Rate limit exceeded. Please try again in a moment.')
+            elif response.status_code == 401:
+                raise Exception('Authentication failed. Please check your API key.')
+            elif not response.ok:
+                raise Exception(f'API error: {response.status_code}')
+            
+            data = response.json()
+            
+            if not data.get('data') or len(data['data']) == 0:
+                return {
+                    'success': False,
+                    'message': "I couldn't find products matching your search.",
+                    'products': []
+                }
+            
+            return {
+                'success': True,
+                'products': data['data'],
+                'message': f"Found {len(data['data'])} products."
+            }
+        
+        except Exception as error:
+            return {
+                'success': False,
+                'message': f'An error occurred: {str(error)}',
+                'products': []
+            }
+    ```
+  </Tab>
+
+  <Tab title="JavaScript">
+    ### Step 1: Basic Search
+
+    Start with a simple search using natural language queries:
+
+    ```javascript
+    async function searchProducts(query, customerProfile = null) {
+      const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.CATALOG_API_KEY
+        },
+        body: JSON.stringify({
+          query,
+          ...(customerProfile && { customer_profile: customerProfile })
+        })
+      });
+      
+      const data = await response.json();
+      return data.data; // Array of products
+    }
+
+    // Example usage
+    const products = await searchProducts(
+      "I need a versatile blazer for work and casual outings"
+    );
+    console.log(`Found ${products.length} products`);
+    ```
+
+    ### Step 2: Customer Profiles
+
+    Create and use customer profiles to personalize search results:
+
+    ```javascript
+    function buildProfile(formData) {
+      return {
+        style: {
+          fit: formData.fit,
+          color: formData.colorPreference,
+          aesthetic: formData.aesthetics || [],
+          silhouette: formData.silhouettes || [],
+          avoid: formData.avoidItems || []
+        },
+        preferences: {
+          in_stock_only: formData.inStockOnly ?? true,
+          comfort_priority: formData.comfortPriority ?? false
+        },
+        usage_context: {
+          activities: formData.activities || [],
+          environment: formData.environment,
+          travel_friendly: formData.travelFriendly
+        },
+        purchase_behavior: {
+          value: formData.valueProposition,
+          buying_frequency: formData.buyingFrequency
+        }
+      };
+    }
+
+    // Example profile
+    const profile = buildProfile({
+      fit: 'relaxed',
+      colorPreference: 'earth tones, neutrals',
+      aesthetics: ['minimal', 'understated'],
+      activities: ['office', 'coffee runs'],
+      comfortPriority: true,
+      inStockOnly: true
+    });
+
+    // Use profile in search
+    const products = await searchProducts(
+      "A jacket suitable for the office",
+      profile
+    );
+    ```
+
+    ### Step 3: Simple Assistant
+
+    Build a basic assistant that handles queries and returns formatted results:
+
+    ```javascript
+    class ShoppingAssistant {
+      constructor(apiKey) {
+        this.apiKey = apiKey;
+        this.profiles = new Map(); // In production, store in database
+      }
+      
+      getProfile(userId) {
+        if (!this.profiles.has(userId)) {
+          this.profiles.set(userId, {});
+        }
+        return this.profiles.get(userId);
+      }
+      
+      async search(userId, query) {
+        const profile = this.getProfile(userId);
+        
+        const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': this.apiKey
+          },
+          body: JSON.stringify({
+            query,
+            customer_profile: Object.keys(profile).length > 0 ? profile : null
+          })
+        });
+        
+        const data = await response.json();
+        return data.data;
+      }
+      
+      formatResponse(products, query) {
+        if (products.length === 0) {
+          return {
+            message: "I couldn't find products matching your search. Try rephrasing or being more specific.",
+            products: []
+          };
+        }
+        
+        const formattedProducts = products.map(product => ({
+          title: product.title,
+          brand: product.brand,
+          price: `$${product.price_amount}`,
+          url: product.url,
+          image: product.images?.[0]?.url
+        }));
+        
+        return {
+          message: `I found ${products.length} products matching '${query}':`,
+          products: formattedProducts
+        };
+      }
+    }
+
+    // Usage
+    const assistant = new ShoppingAssistant(process.env.CATALOG_API_KEY);
+    
+    const products = await assistant.search('user123', 'I need a jacket for work');
+    const result = assistant.formatResponse(products, 'I need a jacket for work');
+    
+    console.log(result.message);
+    result.products.forEach(product => {
+      console.log(`- ${product.title} by ${product.brand} - ${product.price}`);
+    });
+    ```
+
+    ### Step 4: Error Handling
+
+    Always handle errors gracefully:
+
+    ```javascript
+    async function searchWithErrorHandling(query, profile = null) {
+      try {
+        const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': process.env.CATALOG_API_KEY
+          },
+          body: JSON.stringify({
+            query,
+            customer_profile: profile
+          })
+        });
+        
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error('Rate limit exceeded. Please try again in a moment.');
+          } else if (response.status === 401) {
+            throw new Error('Authentication failed. Please check your API key.');
+          } else {
+            throw new Error(`API error: ${response.status}`);
+          }
+        }
+        
+        const data = await response.json();
+        
+        if (!data.data || data.data.length === 0) {
+          return {
+            success: false,
+            message: "I couldn't find products matching your search.",
+            products: []
+          };
+        }
+        
+        return {
+          success: true,
+          products: data.data,
+          message: `Found ${data.data.length} products.`
+        };
+        
+      } catch (error) {
+        return {
+          success: false,
+          message: `An error occurred: ${error.message}`,
+          products: []
+        };
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Best Practices
+
+### Profile Building
+
+<Tip>
+Build customer profiles incrementally through conversation rather than requiring lengthy onboarding forms. Extract preferences naturally from user queries.
+</Tip>
+
+- Start with minimal profiles and enrich over time
+- Extract preferences from natural language queries
+- Store profiles securely and update them with each interaction
+
+### Response Formatting
+
+Format product responses to be user-friendly:
+- Include key product details: title, brand, price, image
+- Provide direct links to purchase
+- Show relevant attributes (color, material, style)
+
+### Monetization
+
+Monetize your shopping assistant by converting product URLs into affiliate tracking links. Use [`POST /v2/affiliate`](/v2/api-reference/endpoints/affiliate/generate-links) to create trackable affiliate links for products returned in search results. This allows you to earn commissions when users make purchases through your assistant.
+
+### Rate Limiting
+
+Respect API rate limits and implement appropriate retry logic:
+- Default: 50 requests per 4-second sliding window
+- Implement exponential backoff for retries
+- Use [`POST /v2/agentic-search-mini`](/v2/api-reference/endpoints/search/agentic-search-mini) for high-frequency preview features
+
+See [Rate Limits](/resources/rate-limits) for detailed information.
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="/agentic-search" icon="magnifying-glass" href="/v2/api-reference/endpoints/search/agentic-search">
+    AI-powered semantic search tailored to customer profiles
+  </Card>
+  <Card title="/agentic-search-mini" icon="bolt" href="/v2/api-reference/endpoints/search/agentic-search-mini">
+    Fast, intelligent product discovery with optional AI-powered attribute enrichment
+  </Card>
+  <Card title="/affiliate" icon="link" href="/v2/api-reference/endpoints/affiliate/generate-links">
+    Generate affiliate links to earn up to 5% on purchases across 50k+ vendors
+  </Card>
+</CardGroup>

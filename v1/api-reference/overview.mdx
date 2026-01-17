@@ -1,0 +1,134 @@
+---
+title: "Overview"
+description: "Complete reference for the Catalog API endpoints"
+---
+
+The Catalog API enables AI-powered product search across the web, discovery and indexing of product listings, real-time extraction of rich product data, and affiliate link generation for monetization. All endpoints return JSON responses.
+## Base URL
+
+```
+https://api.getcatalog.ai
+```
+
+## Authentication
+
+All requests require an API key in the `x-api-key` header. See [Authentication](/v1/authentication) for details.
+
+## Endpoints
+
+### Crawl
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/crawl`](/v1/api-reference/endpoints/crawl/crawl) | POST | Async discovery of collections and product listings for a vendor |
+| [`/v1/crawl`](/v1/api-reference/endpoints/crawl/list-crawl-executions) | GET | List all crawls with status |
+| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/crawl/get-crawl-status) | GET | Get crawl status and results |
+| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/crawl/cancel-crawl-execution) | DELETE | Cancel a running crawl |
+
+### Catalog
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/vendors`](/v1/api-reference/endpoints/get-vendors) | GET | List your crawled vendors |
+| [`/v1/collections`](/v1/api-reference/endpoints/get-collections) | POST | Get collections for a vendor |
+| [`/v1/listings`](/v1/api-reference/endpoints/get-listings) | POST | Get product listings |
+
+### Extract
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/products`](/v1/api-reference/endpoints/extract/retrieve-products) | POST | Async extraction of product data from product URLs (up to 1000) |
+| [`/v1/products`](/v1/api-reference/endpoints/extract/list-products-executions) | GET | List all extracts with status |
+| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status) | GET | Get extract status and results |
+| [`/v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/cancel-products-execution) | DELETE | Cancel a running extract |
+
+### Search
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/agentic-search`](/v1/api-reference/endpoints/search/agentic-search) | POST | AI-powered natural language search with customer profile personalization |
+| [`/v1/agentic-search-mini`](/v1/api-reference/endpoints/search/agentic-search-mini) | POST | Fast synchronous search returning up to 10 products |
+
+### Affiliate
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/affiliate`](/v1/api-reference/endpoints/affiliate/generate-links) | POST | Convert URLs to affiliate links |
+
+### Usage
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/usage`](/v1/api-reference/endpoints/usage/get-usage) | GET | Get credit usage and API call statistics |
+
+## Response format
+
+Response structures vary by endpoint:
+
+**Listings endpoints** (vendors, collections, listings) return:
+```json
+{
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "page_size": 10,
+    "total_items": 100,
+    "total_pages": 10,
+    "has_next": true,
+    "has_prev": false
+  },
+  "meta": {}
+}
+```
+
+**Search endpoints** (agentic-search, agentic-search-mini) return:
+```json
+{
+  "products": [...],
+  "meta": {
+    "totalItems": 100,
+    "urls": [...]
+  }
+}
+```
+
+**`/{execution_id}`** endpoints also include `execution_id` and `status` fields:
+```json
+{
+  "status": "completed",
+  "results": {
+    "products": [...],
+    "meta": {
+      "total_requested": 100,
+      "total_successful": 98,
+      "total_failed": 2
+    }
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total_items": 100,
+    "total_pages": 2,
+    "has_next": true
+  }
+}
+```
+
+## Error handling
+
+Errors return appropriate HTTP status codes with structured error details:
+
+**Standard error responses** (400, 401, 402, 403, 404, 409, 429, 500):
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human-readable error description",
+    "request_id": "req_..."
+  }
+}
+```
+
+All error responses include a `Request-ID` header that matches the `request_id` in the response body.
+
+See [Error Codes](/resources/error-codes) for the complete reference.

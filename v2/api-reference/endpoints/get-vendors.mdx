@@ -1,0 +1,167 @@
+---
+title: "Get Vendors"
+api: "GET https://api.getcatalog.ai/v2/vendors"
+description: "List all indexed vendors with product counts and latest update timestamps."
+---
+
+<Tip>
+**When to use:** Discover available vendors before browsing their collections or building a product index. See [Building a Product Index](/v2/guides/product-index).
+</Tip>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+<ParamField query="page" type="number" optional>
+  Page number (1-indexed, default: 1)
+</ParamField>
+
+<ParamField query="page_size" type="number" optional>
+  Items per page (default: 20, max: 100)
+</ParamField>
+
+## Response
+
+<ResponseField name="data" type="array">
+  Array of vendor summary objects
+  
+  <Expandable title="Vendor Summary Object">
+    <ResponseField name="vendor" type="string">
+      The vendor/brand name
+    </ResponseField>
+    
+    <ResponseField name="product_count" type="number">
+      Total number of products from this vendor
+    </ResponseField>
+    
+    <ResponseField name="latest_product_update_by_catalog" type="string">
+      ISO 8601 timestamp of the most recently updated product from this vendor
+    </ResponseField>
+    
+    <ResponseField name="in_affiliate_network" type="boolean">
+      Whether this vendor is part of the affiliate network
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Pagination metadata
+  
+  <Expandable title="Pagination Object">
+    <ResponseField name="page" type="number">
+      Current page number
+    </ResponseField>
+    
+    <ResponseField name="page_size" type="number">
+      Number of items per page
+    </ResponseField>
+    
+    <ResponseField name="total_items" type="number">
+      Total number of vendors available
+    </ResponseField>
+    
+    <ResponseField name="total_pages" type="number">
+      Total number of pages
+    </ResponseField>
+    
+    <ResponseField name="has_next" type="boolean">
+      Whether there is a next page
+    </ResponseField>
+    
+    <ResponseField name="has_prev" type="boolean">
+      Whether there is a previous page
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="meta" type="object">
+  Response metadata (currently empty for this endpoint)
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+curl -X GET "https://api.getcatalog.ai/v2/vendors?page=1&page_size=5" \
+  -H "x-api-key: $CATALOG_API_KEY"
+```
+
+```javascript JavaScript
+const response = await fetch('https://api.getcatalog.ai/v2/vendors?page=1&page_size=5', {
+  headers: {
+    'x-api-key': 'YOUR_API_KEY'
+  }
+});
+
+const data = await response.json();
+console.log(`Found ${data.pagination.total_items} vendors`);
+console.log(`Page ${data.pagination.page} of ${data.pagination.total_pages}`);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://api.getcatalog.ai/v2/vendors',
+    headers={'x-api-key': 'YOUR_API_KEY'},
+    params={'page': 1, 'page_size': 5}
+)
+
+data = response.json()
+print(f"Found {data['pagination']['total_items']} vendors")
+print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}")
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success Response
+{
+  "data": [
+    {
+      "vendor": "12thtribe.com",
+      "latest_product_update_by_catalog": "2025-11-16T00:21:21.414453+00:00",
+      "product_count": 1253,
+      "in_affiliate_network": false
+    },
+    {
+      "vendor": "18east.co",
+      "latest_product_update_by_catalog": "2026-01-04T18:48:00.329426+00:00",
+      "product_count": 387,
+      "in_affiliate_network": false
+    },
+    {
+      "vendor": "1stclass-vintage.com",
+      "latest_product_update_by_catalog": "2025-11-23T23:02:28.336691+00:00",
+      "product_count": 1484,
+      "in_affiliate_network": false
+    },
+    {
+      "vendor": "2cuteclothing.com",
+      "latest_product_update_by_catalog": "2025-12-19T17:47:02.397774+00:00",
+      "product_count": 254,
+      "in_affiliate_network": false
+    },
+    {
+      "vendor": "31philliplim.com",
+      "latest_product_update_by_catalog": "2025-11-23T23:25:40.15897+00:00",
+      "product_count": 2644,
+      "in_affiliate_network": true
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 5,
+    "total_items": 540,
+    "total_pages": 108,
+    "has_next": true,
+    "has_prev": false
+  },
+  "meta": {}
+}
+```
+
+</ResponseExample>
+

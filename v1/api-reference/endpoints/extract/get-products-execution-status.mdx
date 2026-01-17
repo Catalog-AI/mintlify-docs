@@ -1,0 +1,407 @@
+---
+title: "Get Execution Status"
+api: "GET https://api.getcatalog.ai/v1/products/{execution_id}"
+description: "Get extract status and results for an asynchronous extract job."
+---
+
+<Tip>
+**When to use:** After starting a batch processing job with the POST endpoint, use this endpoint to:
+- Check if processing is complete
+- Monitor real-time progress
+- Retrieve paginated results when processing completes
+</Tip>
+
+<Tip>
+**Managing Executions:** 
+- **View All Executions:** Use [`GET /v1/products`](/v1/api-reference/endpoints/extract/list-products-executions) to see all your processing jobs
+- **Cancel Running Executions:** If you need to stop a running execution, use [`DELETE /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/cancel-products-execution)
+</Tip>
+
+<Note>
+**Authentication Required:** This endpoint requires a valid API key. The API key is verified, but execution IDs are not restricted to specific API keys. Keep your execution IDs secure.
+</Note>
+
+## Request
+
+<ParamField header="x-api-key" type="string" required>
+  Your API key for authentication
+</ParamField>
+
+<ParamField path="execution_id" type="string" required>
+  The execution ID returned from [`POST /v1/products`](/v1/api-reference/endpoints/extract/retrieve-products)
+  
+  **Format:** `products-batch-{uuid}`
+  
+  **Note:** If the execution ID does not exist, the endpoint returns a 404 Not Found error.
+</ParamField>
+
+### Query Parameters
+
+<ParamField query="page" type="number" default="1">
+  Page number for paginated results (only applicable when status is "completed")
+  
+  **Minimum:** 1
+</ParamField>
+
+<ParamField query="limit" type="number" default="50">
+  Number of results per page (only applicable when status is "completed")
+  
+  **Maximum:** 100
+</ParamField>
+
+## Response
+
+<ResponseField name="status" type="string">
+  Current execution status
+  
+  **Possible values:**
+  - `"pending"` - Execution has been created but not yet started
+  - `"running"` - Execution is currently processing
+  - `"completed"` - Execution finished successfully
+  - `"failed"` - Execution failed or was aborted
+</ResponseField>
+
+<ResponseField name="progress" type="object | null">
+  Real-time progress information (null if not available)
+  
+  <Expandable title="Progress Properties">
+    <ResponseField name="products_processed" type="number">
+      Number of products successfully processed so far
+    </ResponseField>
+    
+    <ResponseField name="urls_completed" type="number">
+      Number of URLs that have been completed (successfully or with errors)
+    </ResponseField>
+    
+    <ResponseField name="total_urls" type="number">
+      Total number of URLs in the batch
+    </ResponseField>
+    
+    <ResponseField name="percent_complete" type="number">
+      Percentage of completion (0-100)
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="error" type="string | null">
+  Error message (always present, null if execution is successful or still running)
+</ResponseField>
+
+<ResponseField name="results" type="object" optional>
+  Product results (only present when status is "completed")
+  
+  <Expandable title="Results Properties">
+    <ResponseField name="products" type="array">
+      Array of product results, one for each input URL
+      
+      <Expandable title="Product Result">
+        <ResponseField name="url" type="string">
+          Original URL that was processed
+        </ResponseField>
+        
+        <ResponseField name="success" type="boolean">
+          Whether the product was successfully processed
+        </ResponseField>
+        
+        <ResponseField name="product" type="object | null">
+          Product data (null if processing failed)
+          
+          <Expandable title="Product Properties">
+            <ResponseField name="id" type="string">
+              Unique product identifier
+            </ResponseField>
+            
+            <ResponseField name="title" type="string">
+              Product title
+            </ResponseField>
+            
+            <ResponseField name="description" type="string">
+              Detailed product description
+            </ResponseField>
+            
+            <ResponseField name="vendor" type="string">
+              Store/retailer name (e.g., "net-a-porter", "Nike")
+            </ResponseField>
+            
+            <ResponseField name="brand" type="string | null">
+              Product brand name (e.g., "LOEFFLER RANDALL", "Nike")
+            </ResponseField>
+            
+            <ResponseField name="url" type="string">
+              Product URL
+            </ResponseField>
+            
+            <ResponseField name="handle" type="string">
+              Product handle/slug
+            </ResponseField>
+            
+            <ResponseField name="is_available" type="boolean">
+              Product availability status
+            </ResponseField>
+            
+            <ResponseField name="price_amount" type="number | null">
+              Price in dollars
+            </ResponseField>
+            
+            <ResponseField name="price_currency" type="string | null">
+              Currency code (e.g., "USD")
+            </ResponseField>
+            
+            <ResponseField name="min_price" type="number | null">
+              Minimum price for variants
+            </ResponseField>
+            
+            <ResponseField name="max_price" type="number | null">
+              Maximum price for variants
+            </ResponseField>
+            
+            <ResponseField name="images" type="array">
+              Array of product images
+            </ResponseField>
+            
+            <ResponseField name="options" type="array">
+              Array of product options (size, color, etc.)
+            </ResponseField>
+            
+            <ResponseField name="variants" type="array">
+              Array of product variants with detailed information
+            </ResponseField>
+            
+            <ResponseField name="store_canonical_url" type="string | null">
+              Canonical store URL
+            </ResponseField>
+            
+            <ResponseField name="store_domain" type="string">
+              Store domain
+            </ResponseField>
+            
+            <ResponseField name="platform" type="string | null">
+              E-commerce platform (null if not identified)
+            </ResponseField>
+            
+            <ResponseField name="platform_id" type="string | null">
+              Platform-specific ID
+            </ResponseField>
+            
+            <ResponseField name="description_html" type="string | null">
+              HTML-formatted description
+            </ResponseField>
+            
+            <ResponseField name="product_type" type="string | null">
+              Product type/category
+            </ResponseField>
+            
+            <ResponseField name="google_product_category_id" type="string | null">
+              Google product category identifier
+            </ResponseField>
+            
+            <ResponseField name="google_product_category_path" type="string | null">
+              Full Google product category path
+            </ResponseField>
+            
+            <ResponseField name="tags" type="array">
+              Array of product tags/categories
+            </ResponseField>
+            
+            <ResponseField name="video_url" type="string | null">
+              Product video URL (if available)
+            </ResponseField>
+            
+            <ResponseField name="updated_at" type="string">
+              Last update timestamp (ISO 8601)
+            </ResponseField>
+            
+            <ResponseField name="attributes" type="object">
+              Comprehensive product attributes (when AI enrichment is enabled)
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="outcome" type="string" optional>
+          Machine-readable reason for failure (only present when success is false and a specific reason is available)
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+    
+    <ResponseField name="meta" type="object">
+      Processing metadata and summary statistics
+      
+      <Expandable title="Meta Properties">
+        <ResponseField name="total_requested" type="number">
+          Total number of URLs requested for processing
+        </ResponseField>
+        
+        <ResponseField name="total_successful" type="number">
+          Number of URLs successfully processed
+        </ResponseField>
+        
+        <ResponseField name="total_failed" type="number">
+          Number of URLs that failed to process
+        </ResponseField>
+      </Expandable>
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="pagination" type="object" optional>
+  Pagination information (only present when status is "completed" and results are available)
+  
+  <Expandable title="Pagination Properties">
+    <ResponseField name="page" type="number">
+      Current page number
+    </ResponseField>
+    
+    <ResponseField name="limit" type="number">
+      Number of results per page
+    </ResponseField>
+    
+    <ResponseField name="total_items" type="number">
+      Total number of results across all pages
+    </ResponseField>
+    
+    <ResponseField name="total_pages" type="number">
+      Total number of pages
+    </ResponseField>
+    
+    <ResponseField name="has_next" type="boolean">
+      Whether there is a next page
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+
+```bash cURL
+# Check execution status
+curl -X GET "https://api.getcatalog.ai/v1/products/products-batch-550e8400-e29b-41d4-a716-446655440000" \
+  -H "x-api-key: $CATALOG_API_KEY"
+
+# Get results with pagination
+curl -X GET "https://api.getcatalog.ai/v1/products/products-batch-550e8400-e29b-41d4-a716-446655440000?page=1&limit=50" \
+  -H "x-api-key: $CATALOG_API_KEY"
+```
+
+```javascript JavaScript
+// Check execution status
+const executionId = 'products-batch-550e8400-e29b-41d4-a716-446655440000';
+
+const response = await fetch(
+  `https://api.getcatalog.ai/v1/products/${executionId}?page=1&limit=50`,
+  {
+    headers: {
+      'x-api-key': 'YOUR_API_KEY'
+    }
+  }
+);
+
+const data = await response.json();
+
+if (data.status === 'completed') {
+  console.log('Results:', data.results.products);
+  console.log('Total successful:', data.results.meta.total_successful);
+} else if (data.status === 'running') {
+  console.log(`Progress: ${data.progress.percent_complete}%`);
+} else if (data.status === 'failed') {
+  console.error('Error:', data.error);
+}
+```
+
+```python Python
+import requests
+import time
+
+execution_id = 'products-batch-550e8400-e29b-41d4-a716-446655440000'
+
+# Poll for completion
+while True:
+    response = requests.get(
+        f'https://api.getcatalog.ai/v1/products/{execution_id}',
+        headers={'x-api-key': 'YOUR_API_KEY'},
+        params={'page': 1, 'limit': 50}
+    )
+    
+    data = response.json()
+    
+    if data['status'] == 'completed':
+        print('Results:', data['results']['products'])
+        print('Total successful:', data['results']['meta']['total_successful'])
+        break
+    elif data['status'] == 'running':
+        progress = data.get('progress', {})
+        print(f"Progress: {progress.get('percent_complete', 0)}%")
+        time.sleep(5)  # Wait 5 seconds before next poll
+    elif data['status'] == 'failed':
+        print('Error:', data.get('error'))
+        break
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Status: Running
+{
+  "status": "running",
+  "progress": {
+    "products_processed": 45,
+    "urls_completed": 45,
+    "total_urls": 100,
+    "percent_complete": 45
+  },
+  "error": null
+}
+```
+
+```json Status: Completed
+{
+  "status": "completed",
+  "progress": null,
+  "error": null,
+  "results": {
+    "products": [
+      {
+        ...
+      },
+      {
+        ...
+      }
+    ],
+    "meta": {
+      "total_successful": 2,
+      "total_requested": 2,
+      "total_failed": 0
+    }
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total_items": 2,
+    "total_pages": 1,
+    "has_next": false
+  }
+}
+```
+
+```json Status: Failed
+{
+  "status": "failed",
+  "progress": {
+    "products_processed": 12,
+    "urls_completed": 12,
+    "total_urls": 100,
+    "percent_complete": 12
+  },
+  "error": "The operation failed. Please retry or contact support with this execution ID."
+}
+```
+
+</ResponseExample>
+
+## Polling Strategy
+
+For best results when waiting for completion:
+
+1. **Initial Poll:** Check status immediately after receiving `execution_id`
+2. **Polling Interval:** Wait 5-10 seconds between polls for running executions
+3. **Exponential Backoff:** Consider increasing wait time for long-running jobs
+4. **Timeout:** Set a maximum wait time based on your batch size

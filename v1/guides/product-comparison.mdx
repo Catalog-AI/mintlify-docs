@@ -1,0 +1,602 @@
+---
+title: "Product Comparison"
+description: "Learn how to build product comparison features using Catalog's product retrieval capabilities"
+---
+
+Build product comparison tools that help users make informed purchasing decisions. Catalog's product endpoints provide detailed, normalized product data that makes comparing products across different vendors straightforward.
+
+## Overview
+
+Product comparison helps users:
+- **Evaluate alternatives** side-by-side
+- **Compare key attributes** like price, materials, features, and specifications
+- **Make informed decisions** based on normalized data
+
+## Core Concepts
+
+### Normalized Product Data
+
+Catalog provides normalized product data with consistent structure across different vendors:
+- **Pricing**: Normalized price amounts and currency
+- **Attributes**: Standardized attribute structure (color, material, style, etc.)
+- **Variants**: Consistent variant information
+- **Availability**: Standardized availability status
+
+### Comparison Dimensions
+
+Compare products across multiple dimensions:
+- **Price**: Current price, price ranges, sale status
+- **Specifications**: Materials, dimensions, care instructions
+- **Attributes**: Style, color, aesthetic, features
+- **Availability**: Stock status, variant availability
+
+## Building Your Comparison Tool
+
+<Tabs>
+  <Tab title="Python">
+    ### Step 1: Retrieve Products
+
+    Retrieve products you want to compare using the Get Products endpoint:
+
+    ```python
+    import requests
+    import time
+    import os
+
+    def retrieve_products_for_comparison(urls):
+        """Retrieve products for comparison"""
+        # Start async batch processing
+        response = requests.post(
+            'https://api.getcatalog.ai/v1/products',
+            headers={
+                'Content-Type': 'application/json',
+                'x-api-key': os.getenv('CATALOG_API_KEY')
+            },
+            json={
+                'urls': urls,
+                'enable_enrichment': True,  # Enable enrichment for better attributes
+                'country_code': 'us'
+            }
+        )
+        
+        data = response.json()
+        execution_id = data['execution_id']
+        print(f"Processing started: {execution_id}")
+        
+        # Poll for results
+        return poll_for_results(execution_id)
+
+    def poll_for_results(execution_id):
+        """Poll for execution results"""
+        while True:
+            response = requests.get(
+                f'https://api.getcatalog.ai/v1/products/{execution_id}',
+                headers={'x-api-key': os.getenv('CATALOG_API_KEY')}
+            )
+            
+            data = response.json()
+            
+            if data['status'] == 'completed':
+                # Extract successful products
+                return [
+                    item['product']
+                    for item in data['data']
+                    if item['success'] and item.get('product')
+                ]
+            elif data['status'] == 'failed':
+                raise Exception(f"Processing failed: {data.get('error', 'Unknown error')}")
+            
+            # Wait before next poll
+            time.sleep(2)
+
+    # Usage
+    product_urls = [
+        'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+        'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+    ]
+
+    products = retrieve_products_for_comparison(product_urls)
+    print(f"Retrieved {len(products)} products for comparison")
+    ```
+
+    ### Step 2: Extract Comparison Attributes
+
+    Extract and normalize comparison attributes from product data:
+
+    ```python
+    def extract_comparison_attributes(product):
+        """Extract comparison attributes from product data"""
+        attrs = product.get('attributes', {})
+        
+        return {
+            # Basic info
+            'title': product.get('title'),
+            'brand': product.get('brand'),
+            'vendor': product.get('vendor'),
+            'url': product.get('url'),
+            
+            # Pricing
+            'price': product.get('price_amount'),
+            'currency': product.get('price_currency'),
+            'min_price': product.get('min_price'),
+            'max_price': product.get('max_price'),
+            'on_sale': product.get('min_price', 0) < product.get('max_price', 0),
+            
+            # Availability
+            'available': product.get('is_available', False),
+            'available_variants': len([v for v in product.get('variants', []) if v.get('isAvailable')]),
+            'total_variants': len(product.get('variants', [])),
+            
+            # Attributes
+            'color': attrs.get('color', {}).get('merchant_label') or attrs.get('color') or 'N/A',
+            'material': attrs.get('material', {}).get('primary') or attrs.get('material') or 'N/A',
+            'style': attrs.get('style', []),
+            
+            # Media
+            'image_count': len(product.get('images', [])),
+            'primary_image': product.get('images', [{}])[0].get('url') if product.get('images') else None,
+            
+            # Description
+            'summary': attrs.get('summary') or product.get('description', '')[:200] or ''
+        }
+
+    # Extract attributes for all products
+    comparison_data = [extract_comparison_attributes(p) for p in products]
+    print('Comparison attributes extracted')
+    ```
+
+    ### Step 3: Create Comparison
+
+    Build a comparison class to organize and display products side-by-side:
+
+    ```python
+    class ProductComparison:
+        def __init__(self, products):
+            self.products = [extract_comparison_attributes(p) for p in products]
+        
+        def generate_comparison_table(self):
+            """Generate comparison table data"""
+            rows = [
+                {
+                    'label': 'Product',
+                    'values': [
+                        {
+                            'title': p['title'],
+                            'brand': p['brand'],
+                            'image': p['primary_image']
+                        }
+                        for p in self.products
+                    ]
+                },
+                {
+                    'label': 'Price',
+                    'values': [f"${p['price']} {p['currency']}" for p in self.products]
+                },
+                {
+                    'label': 'Price Range',
+                    'values': [
+                        f"${p['min_price']}" if p['min_price'] == p['max_price']
+                        else f"${p['min_price']} - ${p['max_price']}"
+                        for p in self.products
+                    ]
+                },
+                {
+                    'label': 'Availability',
+                    'values': [
+                        f"In Stock ({p['available_variants']}/{p['total_variants']} variants)"
+                        if p['available']
+                        else 'Out of Stock'
+                        for p in self.products
+                    ]
+                },
+                {
+                    'label': 'Color',
+                    'values': [p['color'] for p in self.products]
+                },
+                {
+                    'label': 'Material',
+                    'values': [p['material'] for p in self.products]
+                },
+                {
+                    'label': 'Style',
+                    'values': [', '.join(p['style']) if p['style'] else 'N/A' for p in self.products]
+                }
+            ]
+            return rows
+        
+        def find_best_value(self):
+            """Find best value (lowest price among available products)"""
+            available = [p for p in self.products if p['available']]
+            if not available:
+                return None
+            
+            return min(available, key=lambda p: p['price'])
+        
+        def get_summary(self):
+            """Get comparison summary"""
+            best_value = self.find_best_value()
+            all_available = all(p['available'] for p in self.products)
+            prices = [p['min_price'] for p in self.products]
+            
+            return {
+                'total_products': len(self.products),
+                'all_available': all_available,
+                'best_value': {
+                    'title': best_value['title'],
+                    'price': best_value['price'],
+                    'currency': best_value['currency']
+                } if best_value else None,
+                'price_range': {
+                    'min': min(prices),
+                    'max': max(prices)
+                }
+            }
+
+    # Usage
+    comparison = ProductComparison(products)
+    table = comparison.generate_comparison_table()
+    summary = comparison.get_summary()
+
+    print('Comparison Summary:', summary)
+    for row in table:
+        print(f"{row['label']}: {row['values']}")
+    ```
+
+    ### Step 4: Error Handling
+
+    Handle cases where some products fail to retrieve:
+
+    ```python
+    def retrieve_products_with_errors(urls):
+        """Retrieve products with error handling"""
+        response = requests.post(
+            'https://api.getcatalog.ai/v1/products',
+            headers={
+                'Content-Type': 'application/json',
+                'x-api-key': os.getenv('CATALOG_API_KEY')
+            },
+            json={
+                'urls': urls,
+                'enable_enrichment': True,
+                'country_code': 'us'
+            }
+        )
+        
+        data = response.json()
+        execution_id = data['execution_id']
+        results = poll_for_results(execution_id)
+        
+        successful = []
+        failed = []
+        
+        for result in results:
+            if result.get('success') and result.get('product'):
+                successful.append(result['product'])
+            else:
+                failed.append({
+                    'url': result.get('url'),
+                    'reason': result.get('outcome', 'Unknown error')
+                })
+        
+        return {
+            'products': successful,
+            'errors': failed,
+            'success_rate': (len(successful) / len(urls)) * 100 if urls else 0
+        }
+    ```
+  </Tab>
+
+  <Tab title="JavaScript">
+    ### Step 1: Retrieve Products
+
+    Retrieve products you want to compare using the Get Products endpoint:
+
+    ```javascript
+    async function retrieveProductsForComparison(urls) {
+      // Start async batch processing
+      const response = await fetch('https://api.getcatalog.ai/v1/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.CATALOG_API_KEY
+        },
+        body: JSON.stringify({
+          urls: urls,
+          enable_enrichment: true, // Enable enrichment for better attributes
+          country_code: 'us'
+        })
+      });
+      
+      const { execution_id } = await response.json();
+      console.log(`Processing started: ${execution_id}`);
+      
+      // Poll for results
+      return await pollForResults(execution_id);
+    }
+
+    async function pollForResults(executionId) {
+      while (true) {
+        const response = await fetch(
+          `https://api.getcatalog.ai/v1/products/${executionId}`,
+          {
+            headers: {
+              'x-api-key': process.env.CATALOG_API_KEY
+            }
+          }
+        );
+        
+        const data = await response.json();
+        
+        if (data.status === 'completed') {
+          // Extract successful products
+          return data.data
+            .filter(item => item.success && item.product)
+            .map(item => item.product);
+        } else if (data.status === 'failed') {
+          throw new Error(`Processing failed: ${data.error}`);
+        }
+        
+        // Wait before next poll
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+
+    // Usage
+    const productUrls = [
+      'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
+      'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
+    ];
+
+    const products = await retrieveProductsForComparison(productUrls);
+    console.log(`Retrieved ${products.length} products for comparison`);
+    ```
+
+    ### Step 2: Extract Comparison Attributes
+
+    Extract and normalize comparison attributes from product data:
+
+    ```javascript
+    function extractComparisonAttributes(product) {
+      const attrs = product.attributes || {};
+      
+      return {
+        // Basic info
+        title: product.title,
+        brand: product.brand,
+        vendor: product.vendor,
+        url: product.url,
+        
+        // Pricing
+        price: product.price_amount,
+        currency: product.price_currency,
+        minPrice: product.min_price,
+        maxPrice: product.max_price,
+        onSale: product.min_price < product.max_price,
+        
+        // Availability
+        available: product.is_available,
+        availableVariants: product.variants?.filter(v => v.isAvailable).length || 0,
+        totalVariants: product.variants?.length || 0,
+        
+        // Attributes
+        color: attrs.color?.merchant_label || attrs.color || 'N/A',
+        material: attrs.material?.primary || attrs.material || 'N/A',
+        style: attrs.style || [],
+        
+        // Media
+        imageCount: product.images?.length || 0,
+        primaryImage: product.images?.[0]?.url || null,
+        
+        // Description
+        summary: attrs.summary || product.description?.substring(0, 200) || ''
+      };
+    }
+
+    // Extract attributes for all products
+    const comparisonData = products.map(extractComparisonAttributes);
+    console.log('Comparison attributes extracted:', comparisonData);
+    ```
+
+    ### Step 3: Create Comparison
+
+    Build a comparison class to organize and display products side-by-side:
+
+    ```javascript
+    class ProductComparison {
+      constructor(products) {
+        this.products = products.map(extractComparisonAttributes);
+      }
+      
+      // Generate comparison table data
+      generateComparisonTable() {
+        const rows = [
+          {
+            label: 'Product',
+            values: this.products.map(p => ({
+              title: p.title,
+              brand: p.brand,
+              image: p.primaryImage
+            }))
+          },
+          {
+            label: 'Price',
+            values: this.products.map(p => 
+              `$${p.price} ${p.currency}`
+            )
+          },
+          {
+            label: 'Price Range',
+            values: this.products.map(p => {
+              if (p.minPrice === p.maxPrice) {
+                return `$${p.minPrice}`;
+              }
+              return `$${p.minPrice} - $${p.maxPrice}`;
+            })
+          },
+          {
+            label: 'Availability',
+            values: this.products.map(p => 
+              p.available ? 
+                `In Stock (${p.availableVariants}/${p.totalVariants} variants)` : 
+                'Out of Stock'
+            )
+          },
+          {
+            label: 'Color',
+            values: this.products.map(p => p.color)
+          },
+          {
+            label: 'Material',
+            values: this.products.map(p => p.material)
+          },
+          {
+            label: 'Style',
+            values: this.products.map(p => p.style.join(', ') || 'N/A')
+          }
+        ];
+        
+        return rows;
+      }
+      
+      // Find best value (lowest price among available products)
+      findBestValue() {
+        const available = this.products.filter(p => p.available);
+        if (available.length === 0) return null;
+        
+        return available.reduce((best, current) => 
+          current.price < best.price ? current : best
+        );
+      }
+      
+      // Get comparison summary
+      getSummary() {
+        const bestValue = this.findBestValue();
+        const allAvailable = this.products.every(p => p.available);
+        const priceRange = {
+          min: Math.min(...this.products.map(p => p.minPrice)),
+          max: Math.max(...this.products.map(p => p.maxPrice))
+        };
+        
+        return {
+          totalProducts: this.products.length,
+          allAvailable,
+          bestValue: bestValue ? {
+            title: bestValue.title,
+            price: bestValue.price,
+            currency: bestValue.currency
+          } : null,
+          priceRange
+        };
+      }
+    }
+
+    // Usage
+    const comparison = new ProductComparison(products);
+    const table = comparison.generateComparisonTable();
+    const summary = comparison.getSummary();
+
+    console.log('Comparison Summary:', summary);
+    console.log('Comparison Table:', table);
+    ```
+
+    ### Step 4: Error Handling
+
+    Handle cases where some products fail to retrieve:
+
+    ```javascript
+    async function retrieveProductsWithErrors(urls) {
+      const executionId = await startProductRetrieval(urls);
+      const results = await pollForResults(executionId);
+      
+      const successful = [];
+      const failed = [];
+      
+      results.forEach(result => {
+        if (result.success && result.product) {
+          successful.push(result.product);
+        } else {
+          failed.push({
+            url: result.url,
+            reason: result.outcome || 'Unknown error'
+          });
+        }
+      });
+      
+      return {
+        products: successful,
+        errors: failed,
+        successRate: (successful.length / urls.length) * 100
+      };
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## Best Practices
+
+### Enable Enrichment
+
+<Tip>
+Always enable `enable_enrichment: true` when retrieving products for comparison. This provides richer, normalized attributes that make comparisons more meaningful.
+</Tip>
+
+Enrichment provides:
+- Better attribute extraction
+- Normalized color and material information
+- Enhanced style and feature descriptions
+- Consistent data structure across vendors
+
+### Handle Missing Data
+
+Not all products will have all attributes. Handle missing data gracefully:
+
+```javascript
+function safeGetAttribute(product, path, defaultValue = 'N/A') {
+  const keys = path.split('.');
+  let value = product;
+  
+  for (const key of keys) {
+    if (value && typeof value === 'object' && key in value) {
+      value = value[key];
+    } else {
+      return defaultValue;
+    }
+  }
+  
+  return value || defaultValue;
+}
+```
+
+```python
+def safe_get_attribute(product, path, default='N/A'):
+    """Safely get nested attribute with default value"""
+    keys = path.split('.')
+    value = product
+    
+    for key in keys:
+        if isinstance(value, dict) and key in value:
+            value = value[key]
+        else:
+            return default
+    
+    return value or default
+```
+
+### Batch Requests
+
+Retrieve all products in a single batch (up to 1000 URLs) for better performance and consistency.
+
+## Related Endpoints
+
+<CardGroup cols={2}>
+  <Card title="/products" icon="box" href="/v1/api-reference/endpoints/extract/retrieve-products">
+    Extract high-quality, real-time product data
+  </Card>
+  <Card title="/products/{execution_id}" icon="clock" href="/v1/api-reference/endpoints/extract/get-products-execution-status">
+    Check extraction status and access results when ready
+  </Card>
+  <Card title="/agentic-search" icon="magnifying-glass" href="/v1/api-reference/endpoints/search/agentic-search">
+    AI-powered semantic search tailored to customer profiles
+  </Card>
+</CardGroup>
+
