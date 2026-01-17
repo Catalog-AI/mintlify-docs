@@ -6,7 +6,7 @@ description: "How to build and maintain your own product index using the Catalog
 Build and maintain your own product index using Catalog's browse, crawl, and product endpoints. Choose the approach that best fits your needs: browse existing vendors that Catalog has already discovered, or crawl new vendors to ensure you have the latest data.
 
 <Note>
-This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v1/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Crawl](/v1/api-reference/endpoints/discover/crawl), and adding missing products via [Get Products](/v1/api-reference/endpoints/extract/retrieve-products).
+This guide covers multiple approaches: browsing existing vendors via [`GET /v1/vendors`](/v1/api-reference/endpoints/discover/get-vendors), discovering new product listings via [`POST /v1/crawl`](/v1/api-reference/endpoints/discover/crawl), and adding missing products via [`POST /v1/products`](/v1/api-reference/endpoints/extract/retrieve-products).
 </Note>
 
 ## Option 1: Browse Existing Vendors
@@ -15,7 +15,7 @@ If the vendors you want to index are already available in Catalog's system, you 
 
 ### Step 1: Discover vendors
 
-Use the **Get Vendors** endpoint (`GET /v1/vendors`) to discover which vendors are available and how many products they have.
+Use [`GET /v1/vendors`](/v1/api-reference/endpoints/discover/get-vendors) to discover which vendors are available and how many products they have.
 
 You can use this to:
 - Select a subset of vendors to index (e.g., only fashion brands)
@@ -26,7 +26,7 @@ You can use this to:
 
 ### Step 2: Enumerate collections (optional)
 
-If your chosen vendors support collections, you can use the **Get Collections** endpoint (`POST /v1/collections`) to:
+If your chosen vendors support collections, you can use [`POST /v1/collections`](/v1/api-reference/endpoints/discover/get-collections) to:
 - Retrieve collections (e.g., "New In", "Sale", "Shoes")
 - Decide which collections to index (e.g., only "New Arrivals" or "Top Sellers")
 
@@ -34,20 +34,20 @@ This helps you build a more structured index (vendor → collection → products
 
 ### Step 3: List products per vendor or collection
 
-Use the **Get Product Listings** endpoint (`POST /v1/listings`) to page through all products for a vendor or collection. As you page through:
+Use [`POST /v1/listings`](/v1/api-reference/endpoints/discover/get-listings) to page through all products for a vendor or collection. As you page through:
 - Extract the **canonical product URLs** from each listing
 - Store product URLs in your own database or search index
 - Record lightweight metadata (vendor, handle/slug, collection, timestamps) for faster lookups
 
 ### Step 4: Hydrate full product data
 
-Once you have a list of product URLs, use the **Get Products** endpoint (`POST /v1/products`) to hydrate many URLs in a single request (up to 1000 URLs per request).
+Once you have a list of product URLs, use [`POST /v1/products`](/v1/api-reference/endpoints/extract/retrieve-products) to hydrate many URLs in a single request (up to 1000 URLs per request).
 
 **Typical flow:**
 
 1. Pull a batch of URLs from your queue or database
 2. Call `POST /v1/products` with up to 1000 URLs per request
-3. Receive an `execution_id` and poll the [Get Execution Status](/v1/api-reference/endpoints/extract/get-products-execution-status) endpoint
+3. Receive an `execution_id` and poll [`GET /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status)
 4. For each result in the completed execution:
    - If `success === true`: Upsert the product into your index (search engine, DB, vector store, etc.)
    - If `success === false`: Optionally log the `outcome`/reason and decide whether to retry later
@@ -60,7 +60,7 @@ If your vendor is not yet available in Catalog, or you want to ensure you have t
 
 ### Step 1: Start with Crawl
 
-Use the **Crawl** endpoint (`POST /v1/crawl`) to discover all product listings from a vendor website. This endpoint:
+Use [`POST /v1/crawl`](/v1/api-reference/endpoints/discover/crawl) to discover all product listings from a vendor website. This endpoint:
 - Discovers collections from the vendor
 - Extracts product listings from each collection
 
@@ -75,7 +75,7 @@ Use the **Crawl** endpoint (`POST /v1/crawl`) to discover all product listings f
 
 2. Receive an `execution_id` immediately (format: `crawl-{hostname}-{uuid}`)
 
-3. Poll the [Get Crawl Execution Status](/v1/api-reference/endpoints/discover/get-crawl-status) endpoint to check progress:
+3. Poll [`GET /v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/get-crawl-status) to check progress:
    - Status will be `"pending"`, `"running"`, `"completed"`, or `"failed"`
    - When `status === "completed"`, you'll see `total_listings_found` indicating how many products were discovered
 
@@ -87,7 +87,7 @@ Use the **Crawl** endpoint (`POST /v1/crawl`) to discover all product listings f
 
 ### Step 2: Add Missing Products
 
-Use the **Get Products** endpoint (`POST /v1/products`) to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
+Use [`POST /v1/products`](/v1/api-reference/endpoints/extract/retrieve-products) to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
 
 **Use cases:**
 - Products from your internal catalog
@@ -113,7 +113,7 @@ Use the **Get Products** endpoint (`POST /v1/products`) to add any products whos
 
 3. Receive an `execution_id` immediately (format: `products-batch-{uuid}`)
 
-4. Poll the [Get Execution Status](/v1/api-reference/endpoints/extract/get-products-execution-status) endpoint to check progress
+4. Poll [`GET /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status) to check progress
 
 5. When `status === "completed"`, retrieve paginated results and upsert successful products into your index
 

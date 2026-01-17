@@ -43,7 +43,7 @@ description: "List all extracts with status. Shows all extract jobs, their curre
   
   <Expandable title="Execution Summary">
     <ResponseField name="execution_id" type="string">
-      Unique execution identifier. Use this ID with the [Get Execution Status](/v1/api-reference/endpoints/extract/get-products-execution-status) endpoint to check detailed status and results.
+      Unique execution identifier. Use this ID with [`GET /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status) to check detailed status and results.
       
       **Format:** `products-batch-{uuid}`
     </ResponseField>

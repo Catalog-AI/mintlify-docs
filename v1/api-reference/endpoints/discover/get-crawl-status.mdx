@@ -14,7 +14,7 @@ description: "Get crawl status and results for an asynchronous crawl job."
 <Note>
 **Authentication Required:** This endpoint requires a valid API key. The API key is verified, but execution IDs are not restricted to specific API keys. Keep your execution IDs secure.
 
-**Cancel Running Executions:** If you need to stop a crawl that is currently running, use the [Cancel Crawl Execution](/v1/api-reference/endpoints/discover/cancel-crawl-execution) endpoint to stop the execution.
+**Cancel Running Executions:** If you need to stop a crawl that is currently running, use [`DELETE /v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/cancel-crawl-execution) to stop the execution.
 </Note>
 
 ## Request
@@ -24,7 +24,7 @@ description: "Get crawl status and results for an asynchronous crawl job."
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID returned from the [Crawl](/v1/api-reference/endpoints/discover/crawl) POST endpoint
+  The execution ID returned from [`POST /v1/crawl`](/v1/api-reference/endpoints/discover/crawl)
   
   **Format:** `crawl-{hostname}-{uuid}`
   
@@ -144,4 +144,4 @@ For best results when waiting for completion:
 2. **Polling Interval:** Wait 10-30 seconds between polls for running executions (crawls can take longer than product processing)
 3. **Exponential Backoff:** Consider increasing wait time for long-running crawls
 4. **Timeout:** Set a maximum wait time based on the size of the vendor website
-5. **Cancellation:** If a crawl is taking too long or you need to stop it, use the [Cancel Crawl Execution](/v1/api-reference/endpoints/discover/cancel-crawl-execution) endpoint to stop running executions
+5. **Cancellation:** If a crawl is taking too long or you need to stop it, use [`DELETE /v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/cancel-crawl-execution) to stop running executions

@@ -9,18 +9,18 @@ description: "Async discovery of collections and product listings for a vendor. 
 1. Discover collections from the vendor
 2. Extract product listings from each collection
 
-This is ideal for initial discovery of a new vendor. Use the [Get Products](/v1/api-reference/endpoints/extract/retrieve-products) endpoint to get full product details from discovered listings.
+This is ideal for initial discovery of a new vendor. Use [`POST /v1/products`](/v1/api-reference/endpoints/extract/retrieve-products) to get full product details from discovered listings.
 </Tip>
 
 <Note>
-**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Crawl Execution Status](/v1/api-reference/endpoints/discover/get-crawl-status) endpoint to check progress and retrieve results when processing completes.
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use [`GET /v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/get-crawl-status) to check progress and retrieve results when processing completes.
 
 **Billing Requirement:** Crawl requests require auto top-up to be enabled in your billing settings. This ensures you have sufficient credits to complete the crawl operation.
 
 
-**View All Executions:** You can view all your crawl executions using the [List Crawl Executions](/v1/api-reference/endpoints/discover/list-crawl-executions) endpoint to see all crawl jobs, their statuses, and when they were created.
+**View All Executions:** You can view all your crawl executions using [`GET /v1/crawl`](/v1/api-reference/endpoints/discover/list-crawl-executions) to see all crawl jobs, their statuses, and when they were created.
 
-**Cancel Execution:** You can cancel a running crawl execution using the [Cancel Crawl Execution](/v1/api-reference/endpoints/discover/cancel-crawl-execution) endpoint if you need to stop a crawl that is currently processing.
+**Cancel Execution:** You can cancel a running crawl execution using [`DELETE /v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/cancel-crawl-execution) if you need to stop a crawl that is currently processing.
 </Note>
 
 ## Request
@@ -45,7 +45,7 @@ This is ideal for initial discovery of a new vendor. Use the [Get Products](/v1/
 </ResponseField>
 
 <ResponseField name="execution_id" type="string">
-  Unique execution identifier for this crawl job. Use this ID with the [Get Crawl Execution Status](/v1/api-reference/endpoints/discover/get-crawl-status) endpoint to check progress.
+  Unique execution identifier for this crawl job. Use this ID with [`GET /v1/crawl/{execution_id}`](/v1/api-reference/endpoints/discover/get-crawl-status) to check progress.
   
   **Format:** `crawl-{hostname}-{uuid}`
   

@@ -6,7 +6,7 @@ description: "How to build and maintain your own product index using the Catalog
 Build and maintain your own product index using Catalog's browse, crawl, and extract endpoints. Choose the approach that best fits your needs: browse existing vendors that Catalog has already discovered, or crawl and extract new vendors to ensure you have the latest data.
 
 <Note>
-This guide covers multiple approaches: browsing existing vendors via [Get Vendors](/v2/api-reference/endpoints/discover/get-vendors), discovering new product listings via [Crawl](/v2/api-reference/endpoints/discover/crawl), and extracting products via [Extract](/v2/api-reference/endpoints/extract/extract) using either URLs or a vendor.
+This guide covers multiple approaches: browsing existing vendors via [`GET /v2/vendors`](/v2/api-reference/endpoints/discover/get-vendors), discovering new product listings via [`POST /v2/crawl`](/v2/api-reference/endpoints/discover/crawl), and extracting products via [`POST /v2/extract`](/v2/api-reference/endpoints/extract/extract) using either URLs or a vendor.
 </Note>
 
 ## Option 1: Browse Existing Vendors
@@ -15,7 +15,7 @@ If the vendors you want to index are already available in Catalog's system, you 
 
 ### Step 1: Discover vendors
 
-Use the **Get Vendors** endpoint (`GET /v2/vendors`) to discover which vendors are available and how many products they have.
+Use [`GET /v2/vendors`](/v2/api-reference/endpoints/discover/get-vendors) to discover which vendors are available and how many products they have.
 
 You can use this to:
 - Select a subset of vendors to index (e.g., only fashion brands)
@@ -26,7 +26,7 @@ You can use this to:
 
 ### Step 2: Enumerate collections (optional)
 
-If your chosen vendors support collections, you can use the **Get Collections** endpoint (`POST /v2/collections`) to:
+If your chosen vendors support collections, you can use [`POST /v2/collections`](/v2/api-reference/endpoints/discover/get-collections) to:
 - Retrieve collections (e.g., "New In", "Sale", "Shoes")
 - Decide which collections to index (e.g., only "New Arrivals" or "Top Sellers")
 
@@ -34,14 +34,14 @@ This helps you build a more structured index (vendor → collection → products
 
 ### Step 3: List products per vendor or collection
 
-Use the **Get Product Listings** endpoint (`POST /v2/listings`) to page through all products for a vendor or collection. As you page through:
+Use [`POST /v2/listings`](/v2/api-reference/endpoints/discover/get-listings) to page through all products for a vendor or collection. As you page through:
 - Extract the **canonical product URLs** from each listing
 - Store product URLs in your own database or search index
 - Record lightweight metadata (vendor, handle/slug, collection, timestamps) for faster lookups
 
 ### Step 4: Hydrate full product data
 
-Once you have a list of product URLs, use the **Extract** endpoint (`POST /v2/extract`) to hydrate many URLs in a single request (up to 1000 URLs per request).
+Once you have a list of product URLs, use [`POST /v2/extract`](/v2/api-reference/endpoints/extract/extract) to hydrate many URLs in a single request (up to 1000 URLs per request).
 
 **Typical flow:**
 
@@ -57,7 +57,7 @@ Once you have a list of product URLs, use the **Extract** endpoint (`POST /v2/ex
      "country_code": "us"
    }
    ```
-3. Receive an `execution_id` (format: `extract-urls-{uuid}`) and poll the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-extract-status) endpoint
+3. Receive an `execution_id` (format: `extract-urls-{uuid}`) and poll [`GET /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status)
 4. For each result in the completed execution:
    - If `success === true`: Upsert the product into your index (search engine, DB, vector store, etc.)
    - If `success === false`: Optionally log the `outcome`/reason and decide whether to retry later
@@ -70,7 +70,7 @@ If your vendor is not yet available in Catalog, or you want to ensure you have t
 
 ### Step 1: Start with Crawl
 
-Use the **Crawl** endpoint (`POST /v2/crawl`) to discover all product listings from a vendor website. This endpoint:
+Use [`POST /v2/crawl`](/v2/api-reference/endpoints/discover/crawl) to discover all product listings from a vendor website. This endpoint:
 - Discovers collections from the vendor
 - Extracts product listings from each collection
 
@@ -85,7 +85,7 @@ Use the **Crawl** endpoint (`POST /v2/crawl`) to discover all product listings f
 
 2. Receive an `execution_id` immediately (format: `crawl-{hostname}-{uuid}`)
 
-3. Poll the [Get Crawl Execution Status](/v2/api-reference/endpoints/discover/get-crawl-status) endpoint to check progress:
+3. Poll [`GET /v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/get-crawl-status) to check progress:
    - Status will be `"pending"`, `"running"`, `"completed"`, or `"failed"`
    - When `status === "completed"`, you'll see `total_listings_found` indicating how many products were discovered
 
@@ -97,7 +97,7 @@ Use the **Crawl** endpoint (`POST /v2/crawl`) to discover all product listings f
 
 ### Step 2: Extract Products from Vendor
 
-After crawling (or while a crawl is running), use the **Extract** endpoint (`POST /v2/extract`) with a vendor to enhance products with full details, AI enrichment, reviews, and image tags from all discovered listings.
+After crawling (or while a crawl is running), use [`POST /v2/extract`](/v2/api-reference/endpoints/extract/extract) with a vendor to enhance products with full details, AI enrichment, reviews, and image tags from all discovered listings.
 
 **Typical flow:**
 
@@ -125,7 +125,7 @@ After crawling (or while a crawl is running), use the **Extract** endpoint (`POS
 
 3. Receive an `execution_id` immediately (format: `extract-{vendor}-{uuid}`)
 
-4. Poll the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-extract-status) endpoint:
+4. Poll [`GET /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status):
    - Check `status` and `meta.progress` for real-time progress
    - When `status === "completed"`, results are available with pagination
    - Use `page` and `page_size` query parameters to retrieve results in chunks
@@ -140,7 +140,7 @@ After crawling (or while a crawl is running), use the **Extract** endpoint (`POS
 
 ### Step 3: Add Missing Products with URLs
 
-Use the **Extract** endpoint (`POST /v2/extract`) with URLs to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
+Use [`POST /v2/extract`](/v2/api-reference/endpoints/extract/extract) with URLs to add any products whose listings weren't discovered during crawl, or to refresh specific products from your own URL list.
 
 **Use cases:**
 - Products from your internal catalog
@@ -166,7 +166,7 @@ Use the **Extract** endpoint (`POST /v2/extract`) with URLs to add any products 
 
 3. Receive an `execution_id` immediately (format: `extract-urls-{uuid}`)
 
-4. Poll the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-extract-status) endpoint to check progress
+4. Poll [`GET /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status) to check progress
 
 5. When `status === "completed"`, retrieve paginated results and upsert successful products into your index
 

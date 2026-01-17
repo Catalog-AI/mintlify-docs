@@ -5,13 +5,13 @@ description: "Async extract from product URLs (up to 1000). Returns immediately 
 ---
 
 <Note>
-**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Execution Status](/v1/api-reference/endpoints/extract/get-products-execution-status) endpoint to check progress and retrieve results when processing completes.
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use [`GET /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status) to check progress and retrieve results when processing completes.
 </Note>
 
 <Tip>
 **Managing Executions:** 
-- **View All Executions:** You can view all your product processing executions using the [List Product Executions](/v1/api-reference/endpoints/extract/list-products-executions) endpoint to see all processing jobs, their statuses, and when they were created.
-- **Cancel Running Executions:** If you need to stop a running execution, use the [Cancel Product Execution](/v1/api-reference/endpoints/extract/cancel-products-execution) endpoint.
+- **View All Executions:** You can view all your product processing executions using [`GET /v1/products`](/v1/api-reference/endpoints/extract/list-products-executions) to see all processing jobs, their statuses, and when they were created.
+- **Cancel Running Executions:** If you need to stop a running execution, use [`DELETE /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/cancel-products-execution).
 </Tip>
 
 ## Request
@@ -68,14 +68,14 @@ description: "Async extract from product URLs (up to 1000). Returns immediately 
 </ResponseField>
 
 <ResponseField name="execution_id" type="string">
-  Unique execution identifier for this batch processing job. Use this ID with the [Get Execution Status](/v1/api-reference/endpoints/extract/get-products-execution-status) endpoint to check progress and retrieve results.
+  Unique execution identifier for this batch processing job. Use this ID with [`GET /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status) to check progress and retrieve results.
   
   **Format:** `products-batch-{uuid}`
 </ResponseField>
 
 <Note>
 **Getting Results:** The POST endpoint returns immediately with an `execution_id`. Processing happens asynchronously. To get your results:
-1. Use the `execution_id` to poll the [Get Execution Status](/v1/api-reference/endpoints/extract/get-products-execution-status) endpoint
+1. Use the `execution_id` to poll [`GET /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status)
 2. Check the `status` field - when it's `"completed"`, results are available
 3. Use pagination parameters (`page`, `limit`) to retrieve results in chunks
 </Note>
@@ -177,5 +177,5 @@ execution_id = data['execution_id']
 
 1. **Start Processing:** Send a POST request with your URLs to start async batch processing
 2. **Get Execution ID:** Receive an `execution_id` immediately in the response
-3. **Check Status:** Poll the [Get Execution Status](/v1/api-reference/endpoints/extract/get-products-execution-status) endpoint using the `execution_id`
+3. **Check Status:** Poll [`GET /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status) using the `execution_id`
 4. **Retrieve Results:** When `status` is `"completed"`, results are available with pagination support

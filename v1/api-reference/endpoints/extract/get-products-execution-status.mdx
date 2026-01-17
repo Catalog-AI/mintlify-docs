@@ -13,8 +13,8 @@ description: "Get extract status and results for an asynchronous extract job."
 
 <Tip>
 **Managing Executions:** 
-- **View All Executions:** Use the [List Product Executions](/v1/api-reference/endpoints/extract/list-products-executions) endpoint to see all your processing jobs
-- **Cancel Running Executions:** If you need to stop a running execution, use the [Cancel Product Execution](/v1/api-reference/endpoints/extract/cancel-products-execution) endpoint
+- **View All Executions:** Use [`GET /v1/products`](/v1/api-reference/endpoints/extract/list-products-executions) to see all your processing jobs
+- **Cancel Running Executions:** If you need to stop a running execution, use [`DELETE /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/cancel-products-execution)
 </Tip>
 
 <Note>
@@ -28,7 +28,7 @@ description: "Get extract status and results for an asynchronous extract job."
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID returned from the [Get Products by URLs](/v1/api-reference/endpoints/extract/retrieve-products) POST endpoint
+  The execution ID returned from [`POST /v1/products`](/v1/api-reference/endpoints/extract/retrieve-products)
   
   **Format:** `products-batch-{uuid}`
   

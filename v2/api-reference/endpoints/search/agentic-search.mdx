@@ -9,11 +9,11 @@ description: "Async AI-powered search with customer profile personalization. Ret
 </Tip>
 
 <Note>
-**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Agentic Search Execution Status](/v2/api-reference/endpoints/search/get-agentic-search-status) endpoint to check progress and retrieve results when processing completes.
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use [`GET /v2/agentic-search/{execution_id}`](/v2/api-reference/endpoints/search/get-agentic-search-status) to check progress and retrieve results when processing completes.
 
-**View All Executions:** You can view all your agentic search executions using the [List Agentic Search Executions](/v2/api-reference/endpoints/search/list-agentic-search-executions) endpoint to see all search jobs, their statuses, and when they were created.
+**View All Executions:** You can view all your agentic search executions using [`GET /v2/agentic-search`](/v2/api-reference/endpoints/search/list-agentic-search-executions) to see all search jobs, their statuses, and when they were created.
 
-**Cancel Execution:** You can cancel a running agentic search execution using the [Cancel Agentic Search Execution](/v2/api-reference/endpoints/search/cancel-agentic-search-execution) endpoint if you need to stop a search that is currently processing.
+**Cancel Execution:** You can cancel a running agentic search execution using [`DELETE /v2/agentic-search/{execution_id}`](/v2/api-reference/endpoints/search/cancel-agentic-search-execution) if you need to stop a search that is currently processing.
 </Note>
 
 ## Request
@@ -67,7 +67,7 @@ description: "Async AI-powered search with customer profile personalization. Ret
 ## Response
 
 <ResponseField name="execution_id" type="string">
-  Unique execution identifier for this search job. Use this ID with the [Get Agentic Search Execution Status](/v2/api-reference/endpoints/search/get-agentic-search-status) endpoint to check progress and retrieve results.
+  Unique execution identifier for this search job. Use this ID with [`GET /v2/agentic-search/{execution_id}`](/v2/api-reference/endpoints/search/get-agentic-search-status) to check progress and retrieve results.
   
   **Format:** `agentic-{uuid}-{timestamp}`
 </ResponseField>

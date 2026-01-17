@@ -13,7 +13,7 @@ description: "Get crawl status and results for an asynchronous crawl job."
 </Tip>
 
 <Note>
-**Cancel Running Executions:** If you need to stop a crawl that is currently running, use the [Cancel Crawl Execution](/v2/api-reference/endpoints/discover/cancel-crawl-execution) endpoint to stop the execution.
+**Cancel Running Executions:** If you need to stop a crawl that is currently running, use [`DELETE /v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/cancel-crawl-execution) to stop the execution.
 </Note>
 
 ## Request
@@ -23,7 +23,7 @@ description: "Get crawl status and results for an asynchronous crawl job."
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID returned from the [Crawl](/v2/api-reference/endpoints/discover/crawl) POST endpoint
+  The execution ID returned from [`POST /v2/crawl`](/v2/api-reference/endpoints/discover/crawl)
   
   **Format:** `crawl-{hostname}-{uuid}`
   
@@ -327,4 +327,4 @@ For best results when waiting for completion:
 4. **Timeout:** Set a maximum wait time based on the size of the vendor website
 5. **Step Monitoring:** Use the `steps` array in the response to see which phase of the crawl is currently executing
 6. **Progress Tracking:** Monitor `meta.progress` to see real-time counts of collections and listings discovered
-7. **Cancellation:** If a crawl is taking too long or you need to stop it, use the [Cancel Crawl Execution](/v2/api-reference/endpoints/discover/cancel-crawl-execution) endpoint to stop running executions
+7. **Cancellation:** If a crawl is taking too long or you need to stop it, use [`DELETE /v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/cancel-crawl-execution) to stop running executions

@@ -9,13 +9,13 @@ You can extract products using one of two input sources:
 - **Vendor:** Provide a vendor to extract products from previously discovered listings
 
 <Note>
-**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-extract-status) endpoint to check progress and retrieve results when processing completes.
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use [`GET /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status) to check progress and retrieve results when processing completes.
 </Note>
 
 <Tip>
 **Managing Executions:** 
-- **View All Executions:** You can view all your extraction executions using the [List Extract Executions](/v2/api-reference/endpoints/extract/list-extract-executions) endpoint to see all processing jobs, their statuses, and when they were created.
-- **Cancel Running Executions:** If you need to stop a running execution, use the [Cancel Extract Execution](/v2/api-reference/endpoints/extract/cancel-extract-execution) endpoint.
+- **View All Executions:** You can view all your extraction executions using [`GET /v2/extract`](/v2/api-reference/endpoints/extract/list-extract-executions) to see all processing jobs, their statuses, and when they were created.
+- **Cancel Running Executions:** If you need to stop a running execution, use [`DELETE /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/cancel-extract-execution).
 </Tip>
 
 ## Request
@@ -64,7 +64,7 @@ Choose one of the following input sources:
   
   **Note:** The domain will be normalized automatically. You can include or omit the protocol and www prefix.
   
-  **Important:** This vendor must have been crawled previously using the [Crawl](/v2/api-reference/endpoints/discover/crawl) endpoint, or you must provide a `crawl_id` to wait for an active crawl to complete. Extraction requires product listings to have been discovered via crawl.
+  **Important:** This vendor must have been crawled previously using [`POST /v2/crawl`](/v2/api-reference/endpoints/discover/crawl), or you must provide a `crawl_id` to wait for an active crawl to complete. Extraction requires product listings to have been discovered via crawl.
 </ParamField>
 
 #### Vendor-Specific Parameters
@@ -84,7 +84,7 @@ These parameters only apply when using the `vendor` input source:
   
   **Format:** `crawl-{vendor}-{uuid}`
   
-  **Note:** If you haven't started a crawl yet, use the [Crawl](/v2/api-reference/endpoints/discover/crawl) endpoint first, then use the returned `execution_id` as the `crawl_id` parameter here.
+  **Note:** If you haven't started a crawl yet, use [`POST /v2/crawl`](/v2/api-reference/endpoints/discover/crawl) first, then use the returned `execution_id` as the `crawl_id` parameter here.
 </ParamField>
 
 #### Shared Parameters
@@ -125,7 +125,7 @@ These parameters apply to both input sources:
 ## Response
 
 <ResponseField name="execution_id" type="string">
-  Unique execution identifier for this extraction job. Use this ID with the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-extract-status) endpoint to check progress and retrieve results.
+  Unique execution identifier for this extraction job. Use this ID with [`GET /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status) to check progress and retrieve results.
   
   **Format:**
   - When using `urls`: `extract-urls-{uuid}`
@@ -374,13 +374,13 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
 
 1. **Start Extraction:** Send a POST request with your `urls` array
 2. **Get Execution ID:** Receive an `execution_id` immediately in the response (HTTP 202)
-3. **Check Status:** Poll the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-extract-status) endpoint using the `execution_id`
+3. **Check Status:** Poll [`GET /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status) using the `execution_id`
 4. **Retrieve Results:** When `status` is `"completed"`, results are available with pagination support
 
 ### Using Vendor
 
-1. **Crawl the Domain (if not already done):** First, use the [Crawl](/v2/api-reference/endpoints/discover/crawl) endpoint to discover product listings from the domain. Wait for the crawl to complete or use the `crawl_id` parameter in step 2.
+1. **Crawl the Domain (if not already done):** First, use [`POST /v2/crawl`](/v2/api-reference/endpoints/discover/crawl) to discover product listings from the domain. Wait for the crawl to complete or use the `crawl_id` parameter in step 2.
 2. **Start Extraction:** Send a POST request with your `vendor` domain. If the domain hasn't been crawled yet, provide the `crawl_id` from step 1 to wait for crawl completion.
 3. **Get Execution ID:** Receive an `execution_id` immediately in the response
-4. **Check Status:** Poll the [Get Extract Execution Status](/v2/api-reference/endpoints/extract/get-extract-status) endpoint. If waiting for a crawl, the status will show `pending` with `waiting_for` in the meta.
+4. **Check Status:** Poll [`GET /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status). If waiting for a crawl, the status will show `pending` with `waiting_for` in the meta.
 5. **Retrieve Results:** When `status` is `"completed"`, results are available with pagination support

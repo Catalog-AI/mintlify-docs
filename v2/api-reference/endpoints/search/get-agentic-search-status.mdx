@@ -16,7 +16,7 @@ description: "Get agentic search status and results for an asynchronous search j
 <Note>
 **Authentication Required:** This endpoint requires a valid API key. Execution IDs are scoped to your organization - you can only access executions that belong to your organization.
 
-**Cancel Running Executions:** If you need to stop a search that is currently running, use the [Cancel Agentic Search Execution](/v2/api-reference/endpoints/search/cancel-agentic-search-execution) endpoint to stop the execution.
+**Cancel Running Executions:** If you need to stop a search that is currently running, use [`DELETE /v2/agentic-search/{execution_id}`](/v2/api-reference/endpoints/search/cancel-agentic-search-execution) to stop the execution.
 </Note>
 
 ## Request
@@ -26,7 +26,7 @@ description: "Get agentic search status and results for an asynchronous search j
 </ParamField>
 
 <ParamField path="execution_id" type="string" required>
-  The execution ID returned from the [Agentic Search](/v2/api-reference/endpoints/search/agentic-search) POST endpoint
+  The execution ID returned from [`POST /v2/agentic-search`](/v2/api-reference/endpoints/search/agentic-search)
   
   **Format:** `agentic-{uuid}-{timestamp}`
   
@@ -613,4 +613,4 @@ For best results when waiting for completion:
 3. **Exponential Backoff:** Consider increasing wait time for long-running searches
 4. **Timeout:** Set a maximum wait time based on your application's requirements
 5. **Progress Tracking:** Monitor `meta.progress` to see real-time progress
-6. **Cancellation:** If a search is taking too long or you need to stop it, use the [Cancel Agentic Search Execution](/v2/api-reference/endpoints/search/cancel-agentic-search-execution) endpoint to stop running executions
+6. **Cancellation:** If a search is taking too long or you need to stop it, use [`DELETE /v2/agentic-search/{execution_id}`](/v2/api-reference/endpoints/search/cancel-agentic-search-execution) to stop running executions
