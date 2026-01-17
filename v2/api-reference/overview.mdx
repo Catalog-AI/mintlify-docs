@@ -16,17 +16,22 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 
 ## Endpoints
 
-### Discover
+### Crawl
 
 | Endpoint | Method | Description |
 |:---------|:-------|:------------|
-| [`/v2/crawl`](/v2/api-reference/endpoints/discover/crawl) | POST | Async discovery of collections and product listings for a vendor |
-| [`/v2/crawl`](/v2/api-reference/endpoints/discover/list-crawl-executions) | GET | List all crawls with status |
-| [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/get-crawl-status) | GET | Get crawl status and results |
-| [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/cancel-crawl-execution) | DELETE | Cancel a running crawl |
-| [`/v2/vendors`](/v2/api-reference/endpoints/discover/get-vendors) | GET | List all indexed vendors |
-| [`/v2/collections`](/v2/api-reference/endpoints/discover/get-collections) | POST | Get all collections for a vendor |
-| [`/v2/listings`](/v2/api-reference/endpoints/discover/get-listings) | POST | Get product listings |
+| [`/v2/crawl`](/v2/api-reference/endpoints/crawl/crawl) | POST | Async discovery of collections and product listings for a vendor |
+| [`/v2/crawl`](/v2/api-reference/endpoints/crawl/list-crawl-executions) | GET | List all crawls with status |
+| [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/crawl/get-crawl-status) | GET | Get crawl status and results |
+| [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/crawl/cancel-crawl-execution) | DELETE | Cancel a running crawl |
+
+### Catalog
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v2/vendors`](/v2/api-reference/endpoints/get-vendors) | GET | List your crawled vendors |
+| [`/v2/collections`](/v2/api-reference/endpoints/get-collections) | POST | Get collections for a vendor |
+| [`/v2/listings`](/v2/api-reference/endpoints/get-listings) | POST | Get product listings |
 
 ### Extract
 

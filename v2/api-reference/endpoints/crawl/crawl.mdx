@@ -13,14 +13,14 @@ This is ideal for initial discovery of a new vendor. Use [`POST /v2/extract`](/v
 </Tip>
 
 <Note>
-**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use [`GET /v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/get-crawl-status) to check progress and retrieve results when processing completes.
+**Async Processing:** This endpoint starts processing asynchronously and returns an `execution_id` immediately. Use [`GET /v2/crawl/{execution_id}`](/v2/api-reference/endpoints/crawl/get-crawl-status) to check progress and retrieve results when processing completes.
 
 **Billing Requirement:** Crawl requests require auto top-up to be enabled in your billing settings. This ensures you have sufficient credits to complete the crawl operation.
 
 
-**View All Executions:** You can view all your crawl executions using [`GET /v2/crawl`](/v2/api-reference/endpoints/discover/list-crawl-executions) to see all crawl jobs, their statuses, and when they were created.
+**View All Executions:** You can view all your crawl executions using [`GET /v2/crawl`](/v2/api-reference/endpoints/crawl/list-crawl-executions) to see all crawl jobs, their statuses, and when they were created.
 
-**Cancel Execution:** You can cancel a running crawl execution using [`DELETE /v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/cancel-crawl-execution) if you need to stop a crawl that is currently processing.
+**Cancel Execution:** You can cancel a running crawl execution using [`DELETE /v2/crawl/{execution_id}`](/v2/api-reference/endpoints/crawl/cancel-crawl-execution) if you need to stop a crawl that is currently processing.
 </Note>
 
 ## Request
@@ -41,7 +41,7 @@ This is ideal for initial discovery of a new vendor. Use [`POST /v2/extract`](/v
 ## Response
 
 <ResponseField name="execution_id" type="string">
-  Unique execution identifier for this crawl job. Use this ID with [`GET /v2/crawl/{execution_id}`](/v2/api-reference/endpoints/discover/get-crawl-status) to check progress.
+  Unique execution identifier for this crawl job. Use this ID with [`GET /v2/crawl/{execution_id}`](/v2/api-reference/endpoints/crawl/get-crawl-status) to check progress.
   
   **Format:** `crawl-{hostname}-{uuid}`
   

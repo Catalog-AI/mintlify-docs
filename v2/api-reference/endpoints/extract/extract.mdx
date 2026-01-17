@@ -62,7 +62,7 @@ Choose one of the following input sources:
   
   **Note:** The domain will be normalized automatically. You can include or omit the protocol and www prefix.
   
-  **Important:** This vendor must have been crawled previously using [`POST /v2/crawl`](/v2/api-reference/endpoints/discover/crawl), or you must provide a `crawl_id` to wait for an active crawl to complete. Extraction requires product listings to have been discovered via crawl.
+  **Important:** This vendor must have been crawled previously using [`POST /v2/crawl`](/v2/api-reference/endpoints/crawl/crawl), or you must provide a `crawl_id` to wait for an active crawl to complete. Extraction requires product listings to have been discovered via crawl.
 </ParamField>
 
 #### Vendor-Specific Parameters
@@ -82,7 +82,7 @@ These parameters only apply when using the `vendor` input source:
   
   **Format:** `crawl-{vendor}-{uuid}`
   
-  **Note:** If you haven't started a crawl yet, use [`POST /v2/crawl`](/v2/api-reference/endpoints/discover/crawl) first, then use the returned `execution_id` as the `crawl_id` parameter here.
+  **Note:** If you haven't started a crawl yet, use [`POST /v2/crawl`](/v2/api-reference/endpoints/crawl/crawl) first, then use the returned `execution_id` as the `crawl_id` parameter here.
 </ParamField>
 
 #### Shared Parameters
@@ -377,7 +377,7 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
 
 ### Using Vendor
 
-1. **Crawl the Domain (if not already done):** First, use [`POST /v2/crawl`](/v2/api-reference/endpoints/discover/crawl) to discover product listings from the domain. Wait for the crawl to complete or use the `crawl_id` parameter in step 2.
+1. **Crawl the Domain (if not already done):** First, use [`POST /v2/crawl`](/v2/api-reference/endpoints/crawl/crawl) to discover product listings from the domain. Wait for the crawl to complete or use the `crawl_id` parameter in step 2.
 2. **Start Extraction:** Send a POST request with your `vendor` domain. If the domain hasn't been crawled yet, provide the `crawl_id` from step 1 to wait for crawl completion.
 3. **Get Execution ID:** Receive an `execution_id` immediately in the response
 4. **Check Status:** Poll [`GET /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status). If waiting for a crawl, the status will show `pending` with `waiting_for` in the meta.
