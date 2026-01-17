@@ -33,7 +33,7 @@ description: "Async extract from product URLs (up to 1000). Returns immediately 
   **Example:**
   ```json
   [
-    "https://skims.com/products/cotton-jersey-long-sleeve-t-shirt-soot",
+    "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
     "https://www.adidas.com/us/gazelle-shoes/BB5476.html",
     "https://www.example-store.com/product/123"
   ]
@@ -100,7 +100,7 @@ curl -X POST https://api.getcatalog.ai/v1/products \
   -H "x-api-key: $CATALOG_API_KEY" \
   -d '{
     "urls": [
-      "https://skims.com/products/cotton-jersey-long-sleeve-t-shirt-soot",
+      "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
       "https://www.adidas.com/us/gazelle-shoes/BB5476.html"
     ],
     "enable_enrichment": true,
@@ -118,7 +118,7 @@ const response = await fetch('https://api.getcatalog.ai/v1/products', {
   },
   body: JSON.stringify({
     urls: [
-      'https://skims.com/products/cotton-jersey-long-sleeve-t-shirt-soot',
+      'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
       'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
     ],
     enable_enrichment: true,
@@ -145,7 +145,7 @@ response = requests.post(
     },
     json={
         'urls': [
-            'https://skims.com/products/cotton-jersey-long-sleeve-t-shirt-soot',
+            'https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111',
             'https://www.adidas.com/us/gazelle-shoes/BB5476.html'
         ],
         'enable_enrichment': True,
