@@ -69,10 +69,8 @@ Choose one of the following input sources:
 
 These parameters only apply when using the `vendor` input source:
 
-<ParamField body="max_products" type="number" default="0">
-  Maximum number of products to process. Set to `0` for no limit (process all available products).
-  
-  **Note:** When set to `0`, all products found in the vendor's listings will be processed. This is useful for full catalog extraction.
+<ParamField body="max_products" type="number">
+  Maximum number of products to process. If not provided, all available products will be processed.
 </ParamField>
 
 <ParamField body="crawl_id" type="string">

@@ -87,9 +87,7 @@ Once you have curated your list of product URLs, use [`POST /v1/products`](/v1/a
    }
    ```
 3. Receive an `execution_id` (format: `products-batch-{uuid}`) and poll [`GET /v1/products/{execution_id}`](/v1/api-reference/endpoints/extract/get-products-execution-status)
-4. For each result in the completed execution:
-   - If `success === true`: Upsert the product into your index (search engine, DB, vector store, etc.)
-   - If `success === false`: Optionally log the `outcome`/reason and decide whether to retry later
+4. Upsert the extracted products into your index (search engine, DB, vector store, etc.)
 
 ## Extracting from Any URL Source
 

@@ -87,9 +87,7 @@ Once you have curated your list of product URLs, use [`POST /v2/extract`](/v2/ap
    }
    ```
 3. Receive an `execution_id` (format: `extract-urls-{uuid}`) and poll [`GET /v2/extract/{execution_id}`](/v2/api-reference/endpoints/extract/get-extract-status)
-4. For each result in the completed execution:
-   - If `success === true`: Upsert the product into your index (search engine, DB, vector store, etc.)
-   - If `success === false`: Optionally log the `outcome`/reason and decide whether to retry later
+4. Upsert the extracted products into your index (search engine, DB, vector store, etc.)
 
 ## Shortcut: Extract All Products from a Vendor
 
@@ -104,8 +102,7 @@ If you want to extract **all** products from a vendor without browsing and curat
      "enable_enrichment": true,
      "enable_reviews": true,
      "enable_image_tags": true,
-     "country_code": "us",
-     "max_products": 0
+     "country_code": "us"
    }
    ```
 
@@ -126,9 +123,7 @@ If you want to extract **all** products from a vendor without browsing and curat
    - When `status === "completed"`, results are available with pagination
    - Use `page` and `page_size` query parameters to retrieve results in chunks
 
-5. For each result in the completed execution:
-   - If `success === true`: Upsert the enhanced product into your index
-   - If `success === false`: Log the `outcome`/reason and decide whether to retry later
+5. Upsert the extracted products into your index (search engine, DB, vector store, etc.)
 
 <Note>
 **When to use vendor-based extraction:** This shortcut is ideal when you want a complete catalog from a vendor. If you only need specific collections or a curated subset of products, use the browse + URL extraction flow instead.

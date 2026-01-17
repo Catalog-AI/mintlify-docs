@@ -398,7 +398,7 @@ v2 unifies both v1 extraction endpoints (`/v1/products` and `/v1/extract`) into 
 ```json
 {
   "vendor": "nike.com",  // Changed from "domain" in v1
-  "max_products": 100,  // 0 for no limit
+  "max_products": 100,  // Optional: omit for no limit
   "crawl_id": "crawl-nike-com-7f42-402f",  // Optional: wait for crawl
   "enable_enrichment": false,  // Default changed from true to false
   "country_code": "us",
