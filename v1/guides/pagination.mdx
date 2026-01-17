@@ -23,10 +23,6 @@ Most paginated endpoints return a pagination object with the following structure
 }
 ```
 
-<Warning>
-  The `total_items` value may be capped for performance optimization, depending on the endpoint.
-</Warning>
-
 <Note>
   Some endpoints use `meta` instead of `pagination`, and `current_page` instead of `page`. Always check the endpoint documentation for the exact response structure.
 </Note>

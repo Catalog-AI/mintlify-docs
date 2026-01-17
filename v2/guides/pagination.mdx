@@ -23,12 +23,8 @@ Paginated endpoints return a consistent structure:
 }
 ```
 
-<Warning>
-  The `total_items` value may be capped for performance optimization, depending on the endpoint.
-</Warning>
-
 <Note>
-  In v2, all endpoints consistently return data in a `data` array and use `page_size` for pagination parameters. The pagination object structure is consistent across all endpoints.
+  All endpoints consistently return data in a `data` array and use `page_size` for pagination parameters. The pagination object structure is consistent across all endpoints.
 </Note>
 
 ## Pagination Patterns
@@ -268,13 +264,3 @@ The `has_next` and `has_prev` boolean fields make it easy to implement navigatio
   - **Desktop**: 12-24 items per page
   - **Maximum**: 100 items per page (varies by endpoint)
 </Tip>
-
-## Important Notes
-
-<Note>
-  **Consistent Structure in v2:**
-  - All endpoints return data in a `data` array
-  - All endpoints use `pagination` object (not `meta`)
-  - All endpoints use `page` in response (not `current_page`)
-  - All endpoints use `page_size` consistently
-</Note>
