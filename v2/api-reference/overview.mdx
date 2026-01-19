@@ -25,14 +25,6 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 | [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/crawl/get-crawl-status) | GET | Get crawl status and results |
 | [`/v2/crawl/{execution_id}`](/v2/api-reference/endpoints/crawl/cancel-crawl-execution) | DELETE | Cancel a running crawl |
 
-### Catalog
-
-| Endpoint | Method | Description |
-|:---------|:-------|:------------|
-| [`/v2/vendors`](/v2/api-reference/endpoints/get-vendors) | GET | List your crawled vendors |
-| [`/v2/collections`](/v2/api-reference/endpoints/get-collections) | POST | Get collections for a vendor |
-| [`/v2/listings`](/v2/api-reference/endpoints/get-listings) | POST | Get product listings |
-
 ### Extract
 
 | Endpoint | Method | Description |
@@ -51,6 +43,24 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 | [`/v2/agentic-search`](/v2/api-reference/endpoints/search/list-agentic-search-executions) | GET | List all agentic searches with status |
 | [`/v2/agentic-search/{execution_id}`](/v2/api-reference/endpoints/search/get-agentic-search-status) | GET | Get agentic search status and results |
 | [`/v2/agentic-search/{execution_id}`](/v2/api-reference/endpoints/search/cancel-agentic-search-execution) | DELETE | Cancel a running agentic search |
+
+### Vendors
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v2/vendors`](/v2/api-reference/endpoints/get-vendors) | GET | List your crawled vendors |
+
+### Collections
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v2/collections`](/v2/api-reference/endpoints/get-collections) | POST | Get collections for a vendor |
+
+### Listings
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v2/listings`](/v2/api-reference/endpoints/get-listings) | POST | Get product listings |
 
 ### Affiliate
 

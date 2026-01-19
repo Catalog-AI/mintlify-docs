@@ -25,14 +25,6 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 | [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/crawl/get-crawl-status) | GET | Get crawl status and results |
 | [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/crawl/cancel-crawl-execution) | DELETE | Cancel a running crawl |
 
-### Catalog
-
-| Endpoint | Method | Description |
-|:---------|:-------|:------------|
-| [`/v1/vendors`](/v1/api-reference/endpoints/get-vendors) | GET | List your crawled vendors |
-| [`/v1/collections`](/v1/api-reference/endpoints/get-collections) | POST | Get collections for a vendor |
-| [`/v1/listings`](/v1/api-reference/endpoints/get-listings) | POST | Get product listings |
-
 ### Extract
 
 | Endpoint | Method | Description |
@@ -48,6 +40,24 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 |:---------|:-------|:------------|
 | [`/v1/agentic-search`](/v1/api-reference/endpoints/search/agentic-search) | POST | AI-powered natural language search with customer profile personalization |
 | [`/v1/agentic-search-mini`](/v1/api-reference/endpoints/search/agentic-search-mini) | POST | Fast synchronous search returning up to 10 products |
+
+### Vendors
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/vendors`](/v1/api-reference/endpoints/get-vendors) | GET | List your crawled vendors |
+
+### Collections
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/collections`](/v1/api-reference/endpoints/get-collections) | POST | Get collections for a vendor |
+
+### Listings
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/listings`](/v1/api-reference/endpoints/get-listings) | POST | Get product listings |
 
 ### Affiliate
 
