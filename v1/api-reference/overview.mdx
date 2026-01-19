@@ -16,15 +16,6 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 
 ## Endpoints
 
-### Crawl
-
-| Endpoint | Method | Description |
-|:---------|:-------|:------------|
-| [`/v1/crawl`](/v1/api-reference/endpoints/crawl/crawl) | POST | Async discovery of collections and product listings for a vendor |
-| [`/v1/crawl`](/v1/api-reference/endpoints/crawl/list-crawl-executions) | GET | List all crawls with status |
-| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/crawl/get-crawl-status) | GET | Get crawl status and results |
-| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/crawl/cancel-crawl-execution) | DELETE | Cancel a running crawl |
-
 ### Extract
 
 | Endpoint | Method | Description |
@@ -40,6 +31,15 @@ All requests require an API key in the `x-api-key` header. See [Authentication](
 |:---------|:-------|:------------|
 | [`/v1/agentic-search`](/v1/api-reference/endpoints/search/agentic-search) | POST | AI-powered natural language search with customer profile personalization |
 | [`/v1/agentic-search-mini`](/v1/api-reference/endpoints/search/agentic-search-mini) | POST | Fast synchronous search returning up to 10 products |
+
+### Crawl
+
+| Endpoint | Method | Description |
+|:---------|:-------|:------------|
+| [`/v1/crawl`](/v1/api-reference/endpoints/crawl/crawl) | POST | Async discovery of collections and product listings for a vendor |
+| [`/v1/crawl`](/v1/api-reference/endpoints/crawl/list-crawl-executions) | GET | List all crawls with status |
+| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/crawl/get-crawl-status) | GET | Get crawl status and results |
+| [`/v1/crawl/{execution_id}`](/v1/api-reference/endpoints/crawl/cancel-crawl-execution) | DELETE | Cancel a running crawl |
 
 ### Vendors
 

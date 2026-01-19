@@ -34,15 +34,6 @@
                 "pages": [
                   "v2/api-reference/overview",
                   {
-                    "group": "Crawl",
-                    "pages": [
-                      "v2/api-reference/endpoints/crawl/crawl",
-                      "v2/api-reference/endpoints/crawl/list-crawl-executions",
-                      "v2/api-reference/endpoints/crawl/get-crawl-status",
-                      "v2/api-reference/endpoints/crawl/cancel-crawl-execution"
-                    ]
-                  },
-                  {
                     "group": "Extract",
                     "pages": [
                       "v2/api-reference/endpoints/extract/extract",
@@ -59,6 +50,15 @@
                       "v2/api-reference/endpoints/search/list-agentic-search-executions",
                       "v2/api-reference/endpoints/search/get-agentic-search-status",
                       "v2/api-reference/endpoints/search/cancel-agentic-search-execution"
+                    ]
+                  },
+                  {
+                    "group": "Crawl",
+                    "pages": [
+                      "v2/api-reference/endpoints/crawl/crawl",
+                      "v2/api-reference/endpoints/crawl/list-crawl-executions",
+                      "v2/api-reference/endpoints/crawl/get-crawl-status",
+                      "v2/api-reference/endpoints/crawl/cancel-crawl-execution"
                     ]
                   },
                   "v2/api-reference/endpoints/get-vendors",
@@ -130,15 +130,6 @@
                 "pages": [
                   "v1/api-reference/overview",
                   {
-                    "group": "Crawl",
-                    "pages": [
-                      "v1/api-reference/endpoints/crawl/crawl",
-                      "v1/api-reference/endpoints/crawl/list-crawl-executions",
-                      "v1/api-reference/endpoints/crawl/get-crawl-status",
-                      "v1/api-reference/endpoints/crawl/cancel-crawl-execution"
-                    ]
-                  },
-                  {
                     "group": "Extract",
                     "pages": [
                       "v1/api-reference/endpoints/extract/retrieve-products",
@@ -152,6 +143,15 @@
                     "pages": [
                       "v1/api-reference/endpoints/search/agentic-search",
                       "v1/api-reference/endpoints/search/agentic-search-mini"
+                    ]
+                  },
+                  {
+                    "group": "Crawl",
+                    "pages": [
+                      "v1/api-reference/endpoints/crawl/crawl",
+                      "v1/api-reference/endpoints/crawl/list-crawl-executions",
+                      "v1/api-reference/endpoints/crawl/get-crawl-status",
+                      "v1/api-reference/endpoints/crawl/cancel-crawl-execution"
                     ]
                   },
                   "v1/api-reference/endpoints/get-vendors",
