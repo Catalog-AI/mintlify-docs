@@ -1,7 +1,7 @@
 ---
 title: "Get Vendors"
 api: "GET https://api.getcatalog.ai/v1/vendors"
-description: "List all indexed vendors with product counts and latest update timestamps."
+description: "List all indexed vendors with listing counts, collection counts, and latest update timestamps."
 ---
 
 <Tip>
@@ -32,12 +32,16 @@ description: "List all indexed vendors with product counts and latest update tim
       The vendor/brand name
     </ResponseField>
     
-    <ResponseField name="product_count" type="number">
-      Total number of products from this vendor
+    <ResponseField name="listings_count" type="number">
+      Total number of listings from this vendor
     </ResponseField>
     
-    <ResponseField name="latest_product_update_by_catalog" type="string">
-      ISO 8601 timestamp of the most recently updated product from this vendor
+    <ResponseField name="collections_count" type="number">
+      Total number of collections from this vendor
+    </ResponseField>
+    
+    <ResponseField name="last_updated_by_catalog" type="string">
+      ISO 8601 timestamp of the most recently updated listing from this vendor
     </ResponseField>
     
     <ResponseField name="in_affiliate_network" type="boolean">
@@ -122,32 +126,37 @@ print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}
   "data": [
     {
       "vendor": "12thtribe.com",
-      "latest_product_update_by_catalog": "2025-11-16T00:21:21.414453+00:00",
-      "product_count": 1253,
+      "last_updated_by_catalog": "2025-11-16T00:21:21.414453+00:00",
+      "listings_count": 1253,
+      "collections_count": 42,
       "in_affiliate_network": false
     },
     {
       "vendor": "18east.co",
-      "latest_product_update_by_catalog": "2026-01-04T18:48:00.329426+00:00",
-      "product_count": 387,
+      "last_updated_by_catalog": "2026-01-04T18:48:00.329426+00:00",
+      "listings_count": 387,
+      "collections_count": 15,
       "in_affiliate_network": false
     },
     {
       "vendor": "1stclass-vintage.com",
-      "latest_product_update_by_catalog": "2025-11-23T23:02:28.336691+00:00",
-      "product_count": 1484,
+      "last_updated_by_catalog": "2025-11-23T23:02:28.336691+00:00",
+      "listings_count": 1484,
+      "collections_count": 28,
       "in_affiliate_network": false
     },
     {
       "vendor": "2cuteclothing.com",
-      "latest_product_update_by_catalog": "2025-12-19T17:47:02.397774+00:00",
-      "product_count": 254,
+      "last_updated_by_catalog": "2025-12-19T17:47:02.397774+00:00",
+      "listings_count": 254,
+      "collections_count": 8,
       "in_affiliate_network": false
     },
     {
       "vendor": "31philliplim.com",
-      "latest_product_update_by_catalog": "2025-11-23T23:25:40.15897+00:00",
-      "product_count": 2644,
+      "last_updated_by_catalog": "2025-11-23T23:25:40.15897+00:00",
+      "listings_count": 2644,
+      "collections_count": 56,
       "in_affiliate_network": true
     }
   ],
