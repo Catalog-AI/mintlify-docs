@@ -68,231 +68,231 @@ description: "Get agentic search status and results for an asynchronous search j
 </ResponseField>
 
 <ResponseField name="data" type="array" optional>
-  Array of products matching the search query with comprehensive product information (only present when status is "completed", up to 8 products). Fewer products may be returned if some cannot be processed or don't meet quality requirements.
+  Array of products matching the search query (only present when status is "completed", up to 8 products).
   
-  <Expandable title="Product Properties">
-    <ResponseField name="id" type="string">
-      Unique product identifier
-    </ResponseField>
-    
-    <ResponseField name="title" type="string">
-      Product title
-    </ResponseField>
-    
-    <ResponseField name="description" type="string">
-      Product description
-    </ResponseField>
-    
-    <ResponseField name="description_html" type="string">
-      Product description with HTML formatting
-    </ResponseField>
-    
+  <Expandable title="Product Object">
     <ResponseField name="url" type="string">
       Product URL
     </ResponseField>
     
-    <ResponseField name="brand" type="string">
-      Product brand name
-    </ResponseField>
-    
-    <ResponseField name="vendor" type="string">
-      Product vendor/retailer
-    </ResponseField>
-    
-    <ResponseField name="handle" type="string">
-      URL-friendly product identifier
-    </ResponseField>
-    
-    <ResponseField name="tags" type="array">
-      Product category tags
-    </ResponseField>
-    
-    <ResponseField name="product_type" type="string">
-      Main product category
-    </ResponseField>
-    
-    <ResponseField name="price_amount" type="number">
-      Base price amount in decimal format
-    </ResponseField>
-    
-    <ResponseField name="price_currency" type="string">
-      Currency code (e.g., "USD", "EUR")
-    </ResponseField>
-    
-    <ResponseField name="min_price" type="number">
-      Minimum price across all variants
-    </ResponseField>
-    
-    <ResponseField name="max_price" type="number">
-      Maximum price across all variants
-    </ResponseField>
-    
-    <ResponseField name="is_available" type="boolean">
-      Product availability status
-    </ResponseField>
-    
-    <ResponseField name="platform_id" type="string">
-      Platform-specific product ID
-    </ResponseField>
-    
-    <ResponseField name="store_domain" type="string">
-      Domain of the retailer
-    </ResponseField>
-    
-    <ResponseField name="store_canonical_url" type="string">
-      Canonical URL of the store
-    </ResponseField>
-    
-    <ResponseField name="google_product_category_id" type="string">
-      Google product category identifier
-    </ResponseField>
-    
-    <ResponseField name="google_product_category_path" type="string">
-      Full Google product category path
-    </ResponseField>
-    
-    <ResponseField name="updated_at" type="string">
-      Last update timestamp (ISO 8601 format)
-    </ResponseField>
-    
-    <ResponseField name="images" type="array">
-      Product images with metadata including URL, dimensions, alt text, and variant associations
+    <ResponseField name="product" type="object">
+      Product details
       
-      <Expandable title="Image Properties">
+      <Expandable title="Product Properties">
         <ResponseField name="id" type="string">
-          Unique image identifier
-        </ResponseField>
-        
-        <ResponseField name="url" type="string">
-          Image URL
-        </ResponseField>
-        
-        <ResponseField name="width" type="number">
-          Image width in pixels
-        </ResponseField>
-        
-        <ResponseField name="height" type="number">
-          Image height in pixels
-        </ResponseField>
-        
-        <ResponseField name="altText" type="string">
-          Alt text for the image
-        </ResponseField>
-        
-        <ResponseField name="position" type="number">
-          Display position/order of the image
-        </ResponseField>
-        
-        <ResponseField name="variantIDs" type="array">
-          Array of variant IDs that use this image
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
-    
-    <ResponseField name="variants" type="array">
-      Product variants with pricing, availability, and sizing information
-      
-      <Expandable title="Variant Properties">
-        <ResponseField name="id" type="string">
-          Unique variant identifier
-        </ResponseField>
-        
-        <ResponseField name="SKU" type="string">
-          Stock Keeping Unit identifier
-        </ResponseField>
-        
-        <ResponseField name="price" type="string">
-          Variant price as string
+          Unique product identifier
         </ResponseField>
         
         <ResponseField name="title" type="string">
-          Full variant title including options
+          Product title
         </ResponseField>
         
-        <ResponseField name="option1" type="string">
-          First option value (e.g., size)
+        <ResponseField name="description" type="string">
+          Product description
         </ResponseField>
         
-        <ResponseField name="isAvailable" type="boolean">
-          Variant availability status
+        <ResponseField name="description_html" type="string">
+          Product description with HTML formatting
         </ResponseField>
         
-        <ResponseField name="compareAtPrice" type="string">
-          Compare at price (original/MSRP price)
+        <ResponseField name="brand" type="string">
+          Product brand name
+        </ResponseField>
+        
+        <ResponseField name="vendor" type="string">
+          Product vendor/retailer
+        </ResponseField>
+        
+        <ResponseField name="handle" type="string">
+          URL-friendly product identifier
+        </ResponseField>
+        
+        <ResponseField name="tags" type="array">
+          Product category tags
+        </ResponseField>
+        
+        <ResponseField name="product_type" type="string">
+          Main product category
+        </ResponseField>
+        
+        <ResponseField name="price" type="object">
+          Price information
+          
+          <Expandable title="Price Properties">
+            <ResponseField name="current_value" type="number">
+              Current product price as a number
+            </ResponseField>
+            
+            <ResponseField name="compare_at_value" type="number | null">
+              Original/compare-at price if on sale, otherwise `null`
+            </ResponseField>
+            
+            <ResponseField name="currency" type="string">
+              Currency code (e.g., "USD")
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="min_price" type="number">
+          Minimum price across all variants
+        </ResponseField>
+        
+        <ResponseField name="max_price" type="number">
+          Maximum price across all variants
+        </ResponseField>
+        
+        <ResponseField name="is_available" type="boolean">
+          Product availability status
+        </ResponseField>
+        
+        <ResponseField name="platform_id" type="string">
+          Platform-specific product ID
+        </ResponseField>
+        
+        <ResponseField name="store_domain" type="string">
+          Domain of the retailer
+        </ResponseField>
+        
+        <ResponseField name="store_canonical_url" type="string">
+          Canonical URL of the store
+        </ResponseField>
+        
+        <ResponseField name="google_product_category_id" type="string">
+          Google product category identifier
+        </ResponseField>
+        
+        <ResponseField name="google_product_category_path" type="string">
+          Full Google product category path
+        </ResponseField>
+        
+        <ResponseField name="updated_at" type="string">
+          Last update timestamp (ISO 8601 format)
+        </ResponseField>
+        
+        <ResponseField name="images" type="array">
+          Product images with metadata
+          
+          <Expandable title="Image Properties">
+            <ResponseField name="id" type="string">
+              Unique image identifier
+            </ResponseField>
+            
+            <ResponseField name="url" type="string">
+              Image URL
+            </ResponseField>
+            
+            <ResponseField name="width" type="number">
+              Image width in pixels
+            </ResponseField>
+            
+            <ResponseField name="height" type="number">
+              Image height in pixels
+            </ResponseField>
+            
+            <ResponseField name="altText" type="string">
+              Alt text for the image
+            </ResponseField>
+            
+            <ResponseField name="position" type="number">
+              Display position/order of the image
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="variants" type="array">
+          Product variants with pricing and availability
+          
+          <Expandable title="Variant Properties">
+            <ResponseField name="id" type="string">
+              Unique variant identifier
+            </ResponseField>
+            
+            <ResponseField name="SKU" type="string">
+              Stock Keeping Unit identifier
+            </ResponseField>
+            
+            <ResponseField name="price" type="string">
+              Variant price as string
+            </ResponseField>
+            
+            <ResponseField name="title" type="string">
+              Full variant title including options
+            </ResponseField>
+            
+            <ResponseField name="option1" type="string">
+              First option value (e.g., size)
+            </ResponseField>
+            
+            <ResponseField name="isAvailable" type="boolean">
+              Variant availability status
+            </ResponseField>
+            
+            <ResponseField name="compareAtPrice" type="string">
+              Compare at price (original/MSRP price)
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="options" type="array">
+          Available product options (size, color, etc.)
+          
+          <Expandable title="Option Properties">
+            <ResponseField name="name" type="string">
+              Option name (e.g., "Size", "Color")
+            </ResponseField>
+            
+            <ResponseField name="values" type="array">
+              Array of available values for this option
+            </ResponseField>
+            
+            <ResponseField name="position" type="number">
+              Display position of the option
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="attributes" type="object">
+          Rich product attributes including style, mood, color, material, season, occasion, and care instructions.
+          
+          <Expandable title="Common Attributes">
+            <ResponseField name="color" type="object">
+              Color information with merchant label and ISCC classification (when available)
+            </ResponseField>
+            
+            <ResponseField name="material" type="object">
+              Material information with primary material and merchant label (when available)
+            </ResponseField>
+            
+            <ResponseField name="style" type="array">
+              Style descriptors (e.g., ["casual", "relaxed-fit"])
+            </ResponseField>
+            
+            <ResponseField name="mood" type="array">
+              Mood descriptors (e.g., ["playful", "cheerful"])
+            </ResponseField>
+            
+            <ResponseField name="season" type="array">
+              Suitable seasons (e.g., ["spring", "summer", "fall"])
+            </ResponseField>
+            
+            <ResponseField name="occasion" type="array">
+              Suitable occasions (e.g., ["everyday", "casual", "weekend"])
+            </ResponseField>
+            
+            <ResponseField name="gender" type="string">
+              Gender classification (when available)
+            </ResponseField>
+            
+            <ResponseField name="summary" type="string">
+              Product summary
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="video_url" type="string | null">
+          Product video URL (if available)
         </ResponseField>
       </Expandable>
-    </ResponseField>
-    
-    <ResponseField name="options" type="array">
-      Available product options (size, color, etc.)
-      
-      <Expandable title="Option Properties">
-        <ResponseField name="name" type="string">
-          Option name (e.g., "Size", "Color")
-        </ResponseField>
-        
-        <ResponseField name="values" type="array">
-          Array of available values for this option
-        </ResponseField>
-        
-        <ResponseField name="position" type="number">
-          Display position of the option
-        </ResponseField>
-      </Expandable>
-    </ResponseField>
-    
-    <ResponseField name="attributes" type="object">
-      Rich product attributes including style, mood, color, material, season, occasion, and care instructions. Attributes are dynamically extracted and vary by product based on available information.
-      
-      <Expandable title="Common Attributes">
-        <ResponseField name="color" type="object">
-          Color information with merchant label and ISCC classification (when available)
-        </ResponseField>
-        
-        <ResponseField name="material" type="object">
-          Material information with primary material and merchant label (when available)
-        </ResponseField>
-        
-        <ResponseField name="style" type="array">
-          Style descriptors (e.g., ["casual", "relaxed-fit"])
-        </ResponseField>
-        
-        <ResponseField name="mood" type="array">
-          Mood descriptors (e.g., ["playful", "cheerful"])
-        </ResponseField>
-        
-        <ResponseField name="season" type="array">
-          Suitable seasons (e.g., ["spring", "summer", "fall"])
-        </ResponseField>
-        
-        <ResponseField name="occasion" type="array">
-          Suitable occasions (e.g., ["everyday", "casual", "weekend"])
-        </ResponseField>
-        
-        <ResponseField name="gender" type="string">
-          Gender classification (when available)
-        </ResponseField>
-        
-        <ResponseField name="features" type="string">
-          Key product features
-        </ResponseField>
-        
-        <ResponseField name="care_instructions" type="string">
-          Care and washing instructions (when available)
-        </ResponseField>
-        
-        <ResponseField name="summary" type="string">
-          Product summary
-        </ResponseField>
-      </Expandable>
-      
-      <Note>
-        **Dynamic Attributes:** The attributes object contains dynamic keys and values that vary by product. The exact structure depends on the product and available data sources.
-      </Note>
-    </ResponseField>
-    
-    <ResponseField name="video_url" type="string | null">
-      Product video URL (if available)
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -366,19 +366,11 @@ description: "Get agentic search status and results for an asynchronous search j
     </ResponseField>
     
     <ResponseField name="result" type="object" optional>
-      Final result statistics (only available when status is "completed")
+      Result statistics (only available when status is "completed")
       
       <Expandable title="Result Object">
-        <ResponseField name="products_requested" type="number">
-          Total number of products requested
-        </ResponseField>
-        
-        <ResponseField name="products_successful" type="number">
-          Number of products successfully processed
-        </ResponseField>
-        
-        <ResponseField name="products_failed" type="number">
-          Number of products that failed to process
+        <ResponseField name="products_returned" type="number">
+          Number of products returned in the response
         </ResponseField>
       </Expandable>
     </ResponseField>
@@ -410,7 +402,7 @@ const data = await response.json();
 
 if (data.status === 'completed') {
   console.log(`Search completed!`);
-  console.log(`Products found: ${data.meta.result?.products_successful || 0}`);
+  console.log(`Products found: ${data.meta.result?.products_returned || 0}`);
   console.log(`Duration: ${data.meta.duration_ms}ms`);
   console.log(`Products:`, data.data);
 } else if (data.status === 'running') {
@@ -441,7 +433,7 @@ while True:
     
     if data['status'] == 'completed':
         print(f"Search completed!")
-        print(f"Products found: {data['meta'].get('result', {}).get('products_successful', 0)}")
+        print(f"Products found: {data['meta'].get('result', {}).get('products_returned', 0)}")
         print(f"Duration: {data['meta']['duration_ms']}ms")
         print(f"Products: {data.get('data', [])}")
         break
@@ -487,72 +479,77 @@ while True:
   "error": null,
   "data": [
     {
-      "id": "c9d57a2c-2017-4b67-94f0-65744d029e84",
       "url": "https://www.barbour.com/us/safari-relaxed-long-sleeved-shirt-LSH1357MI5214.html",
-      "tags": ["SHIRTS"],
-      "brand": "Barbour",
-      "title": "Safari Relaxed Long-Sleeved Shirt",
-      "handle": "safari-relaxed-long-sleeved-shirt-lsh1357mi5214",
-      "vendor": "barbour",
-      "platform_id": "LSH1357MI5214",
-      "is_available": true,
-      "price_amount": 115,
-      "product_type": "SHIRTS",
-      "store_domain": "www.barbour.com",
-      "price_currency": "USD",
-      "min_price": 115,
-      "max_price": 115,
-      "description": "Meet the Safari shirt with its 100% cotton construction and relaxed fit.",
-      "description_html": "Meet the Safari shirt with its 100% cotton construction and relaxed fit. <p class=\"pt-3\">SKU: LSH1357MI5214</p>",
-      "store_canonical_url": "https://www.barbour.com/",
-      "google_product_category_id": "212",
-      "google_product_category_path": "Apparel & Accessories > Clothing > Shirts & Tops",
-      "updated_at": "2025-08-05T12:27:51.896Z",
-      "video_url": null,
-      "images": [
-        {
-          "id": "img-1754396866999-0",
-          "url": "https://images.salsify.com/image/upload/s--qi5RyAOF--/a37a100905bd45f9069b666bf211c4b066532e33.jpg",
-          "width": 1500,
-          "height": 1836,
-          "altText": "Safari Relaxed Long-Sleeved Shirt product image (primary)",
-          "position": 1
-        }
-      ],
-      "variants": [
-        {
-          "id": "variant-1754396867009-0",
-          "SKU": "LSH1357MI5214",
-          "price": "115",
-          "title": "Safari Relaxed Long-Sleeved Shirt - Us 4",
-          "option1": "US 4",
-          "isAvailable": true,
-          "compareAtPrice": "115"
-        }
-      ],
-      "options": [
-        {
-          "name": "Size",
-          "values": ["US 4", "US 6", "US 8", "US 10", "US 12", "US 14"],
-          "position": 1
-        }
-      ],
-      "attributes": {
-        "mood": ["playful", "cheerful", "relaxed"],
-        "color": {
-          "iscc_shade": "null",
-          "iscc_family": "white",
-          "merchant_label": "all-over pattern"
+      "product": {
+        "id": "c9d57a2c-2017-4b67-94f0-65744d029e84",
+        "tags": ["SHIRTS"],
+        "brand": "Barbour",
+        "title": "Safari Relaxed Long-Sleeved Shirt",
+        "handle": "safari-relaxed-long-sleeved-shirt-lsh1357mi5214",
+        "vendor": "barbour",
+        "platform_id": "LSH1357MI5214",
+        "is_available": true,
+        "price": {
+          "current_value": 115,
+          "compare_at_value": null,
+          "currency": "USD"
         },
-        "style": ["casual", "relaxed-fit"],
-        "gender": "female",
-        "season": ["spring", "summer", "fall", "year-round"],
-        "summary": "Feminine relaxed long-sleeved shirt made from 100% cotton.",
-        "material": {
-          "primary": "cotton",
-          "merchant_label": "100% cotton"
-        },
-        "occasion": ["everyday", "casual", "weekend"]
+        "product_type": "SHIRTS",
+        "store_domain": "www.barbour.com",
+        "min_price": 115,
+        "max_price": 115,
+        "description": "Meet the Safari shirt with its 100% cotton construction and relaxed fit.",
+        "description_html": "Meet the Safari shirt with its 100% cotton construction and relaxed fit.",
+        "store_canonical_url": "https://www.barbour.com/",
+        "google_product_category_id": "212",
+        "google_product_category_path": "Apparel & Accessories > Clothing > Shirts & Tops",
+        "updated_at": "2025-08-05T12:27:51.896Z",
+        "video_url": null,
+        "images": [
+          {
+            "id": "img-1754396866999-0",
+            "url": "https://images.salsify.com/image/upload/s--qi5RyAOF--/a37a100905bd45f9069b666bf211c4b066532e33.jpg",
+            "width": 1500,
+            "height": 1836,
+            "altText": "Safari Relaxed Long-Sleeved Shirt product image (primary)",
+            "position": 1
+          }
+        ],
+        "variants": [
+          {
+            "id": "variant-1754396867009-0",
+            "SKU": "LSH1357MI5214",
+            "price": "115",
+            "title": "Safari Relaxed Long-Sleeved Shirt - Us 4",
+            "option1": "US 4",
+            "isAvailable": true,
+            "compareAtPrice": "115"
+          }
+        ],
+        "options": [
+          {
+            "name": "Size",
+            "values": ["US 4", "US 6", "US 8", "US 10", "US 12", "US 14"],
+            "position": 1
+          }
+        ],
+        "attributes": {
+          "mood": ["playful", "cheerful", "relaxed"],
+          "color": {
+            "iscc_shade": "null",
+            "iscc_family": "white",
+            "merchant_label": "all-over pattern"
+          },
+          "style": ["casual", "relaxed-fit"],
+          "gender": "female",
+          "season": ["spring", "summer", "fall", "year-round"],
+          "summary": "Feminine relaxed long-sleeved shirt made from 100% cotton.",
+          "material": {
+            "primary": "cotton",
+            "merchant_label": "100% cotton"
+          },
+          "occasion": ["everyday", "casual", "weekend"]
+        }
       }
     }
   ],
@@ -575,9 +572,7 @@ while True:
     "stop_date": "2025-01-15T10:32:30.000Z",
     "duration_ms": 150000,
     "result": {
-      "products_requested": 8,
-      "products_successful": 1,
-      "products_failed": 0
+      "products_returned": 1
     }
   }
 }
