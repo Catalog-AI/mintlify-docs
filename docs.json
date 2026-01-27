@@ -94,11 +94,6 @@
             ]
           },
           {
-            "anchor": "Dashboard",
-            "href": "https://dashboard.getcatalog.ai",
-            "icon": "gauge"
-          },
-          {
             "anchor": "Website",
             "href": "https://www.getcatalog.ai",
             "icon": "globe"
@@ -180,11 +175,6 @@
             ]
           },
           {
-            "anchor": "Dashboard",
-            "href": "https://dashboard.getcatalog.ai",
-            "icon": "gauge"
-          },
-          {
             "anchor": "Website",
             "href": "https://www.getcatalog.ai",
             "icon": "globe"
@@ -206,7 +196,7 @@
     "primary": {
       "type": "button",
       "label": "Get API Key",
-      "href": "https://dashboard.getcatalog.ai"
+      "href": "mailto:founders@getcatalog.ai"
     }
   },
   "contextual": {
