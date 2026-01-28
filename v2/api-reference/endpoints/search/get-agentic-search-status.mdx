@@ -461,25 +461,6 @@ while True:
 
 <ResponseExample>
 
-```json Status: Running
-{
-  "execution_id": "agentic-a1b2c3d4-1735123456789",
-  "status": "running",
-  "error": null,
-  "meta": {
-    "query": "A Barbour jacket suitable for the office",
-    "progress": {
-      "products_processed": 0,
-      "products_total": 8,
-      "percent_complete": 0
-    },
-    "start_date": "2025-01-15T10:30:00.000Z",
-    "stop_date": null,
-    "duration_ms": 15000
-  }
-}
-```
-
 ```json Status: Completed
 {
   "execution_id": "agentic-a1b2c3d4-1735123456789",
@@ -579,6 +560,25 @@ while True:
       "products_successful": 1,
       "products_failed": 0
     }
+  }
+}
+```
+
+```json Status: Running
+{
+  "execution_id": "agentic-a1b2c3d4-1735123456789",
+  "status": "running",
+  "error": null,
+  "meta": {
+    "query": "A Barbour jacket suitable for the office",
+    "progress": {
+      "products_processed": 0,
+      "products_total": 8,
+      "percent_complete": 0
+    },
+    "start_date": "2025-01-15T10:30:00.000Z",
+    "stop_date": null,
+    "duration_ms": 15000
   }
 }
 ```

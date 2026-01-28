@@ -175,7 +175,7 @@ The `/v2/extract` endpoint maintains a consistent response schema regardless of 
 
 <RequestExample>
 
-```bash cURL (URLs)
+```bash cURL
 curl -X POST https://api.getcatalog.ai/v2/extract \
   -H "Content-Type: application/json" \
   -H "x-api-key: $CATALOG_API_KEY" \
@@ -191,19 +191,8 @@ curl -X POST https://api.getcatalog.ai/v2/extract \
   }'
 ```
 
-```bash cURL (Vendor)
-curl -X POST https://api.getcatalog.ai/v2/extract \
-  -H "Content-Type: application/json" \
-  -H "x-api-key: $CATALOG_API_KEY" \
-  -d '{
-    "vendor": "nike.com",
-    "enable_enrichment": false,
-    "country_code": "us",
-    "max_products": 100
-  }'
-```
 
-```javascript JavaScript (URLs)
+```javascript JavaScript
 // Start async extraction with URLs
 const response = await fetch('https://api.getcatalog.ai/v2/extract', {
   method: 'POST',
@@ -230,31 +219,8 @@ console.log(`URLs to process: ${meta.urls_to_process}`);
 // Poll for results: GET /v2/extract/{execution_id}
 ```
 
-```javascript JavaScript (Vendor)
-// Start async extraction from vendor
-const response = await fetch('https://api.getcatalog.ai/v2/extract', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'x-api-key': 'YOUR_API_KEY'
-  },
-  body: JSON.stringify({
-    vendor: 'nike.com',
-    enable_enrichment: false,
-    country_code: 'us',
-    max_products: 100
-  })
-});
 
-const { execution_id, status, meta } = await response.json();
-console.log(`Execution started: ${execution_id}`);
-console.log(`URLs found: ${meta.url_count}`);
-console.log(`URLs to process: ${meta.urls_to_process}`);
-
-// Poll for results: GET /v2/extract/{execution_id}
-```
-
-```python Python (URLs)
+```python Python
 import requests
 
 # Start async extraction with URLs
@@ -283,39 +249,11 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
 
 # Poll for results: GET /v2/extract/{execution_id}
 ```
-
-```python Python (Vendor)
-import requests
-
-# Start async extraction from vendor
-response = requests.post(
-    'https://api.getcatalog.ai/v2/extract',
-    headers={
-        'Content-Type': 'application/json',
-        'x-api-key': 'YOUR_API_KEY'
-    },
-    json={
-        'vendor': 'nike.com',
-        'enable_enrichment': False,
-        'country_code': 'us',
-        'max_products': 100
-    }
-)
-
-data = response.json()
-execution_id = data['execution_id']
-print(f"Execution started: {execution_id}")
-print(f"URLs found: {data['meta']['url_count']}")
-print(f"URLs to process: {data['meta']['urls_to_process']}")
-
-# Poll for results: GET /v2/extract/{execution_id}
-```
-
 </RequestExample>
 
 <ResponseExample>
 
-```json Response (URLs)
+```json Response
 {
   "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
   "status": "pending",
@@ -323,41 +261,6 @@ print(f"URLs to process: {data['meta']['urls_to_process']}")
     "credits_used": 10,
     "url_count": 2,
     "urls_to_process": 2
-  }
-}
-```
-
-```json Response (Vendor)
-{
-  "execution_id": "extract-nike-com-51d87084",
-  "status": "pending",
-  "meta": {
-    "credits_used": 100,
-    "url_count": 100,
-    "urls_to_process": 100
-  }
-}
-```
-
-```json Response (Vendor with crawl_id)
-{
-  "execution_id": "extract-nike-com-51d87084",
-  "status": "pending",
-  "meta": {
-    "credits_used": 100,
-    "url_count": 100,
-    "urls_to_process": 100,
-    "waiting_for": "crawl-nike-com-7f42-402f"
-  }
-}
-```
-
-```json Error Response (No Listings Found)
-{
-  "error": {
-    "message": "No listings found for this domain. Use /v2/crawl first to discover product listings.",
-    "code": "VALIDATION_ERROR",
-    "request_id": "req-12345678-1234-1234-1234-123456789abc"
   }
 }
 ```

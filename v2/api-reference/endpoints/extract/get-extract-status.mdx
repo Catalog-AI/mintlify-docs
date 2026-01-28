@@ -62,7 +62,7 @@ description: "Get extract status and results for an asynchronous extract job."
 <ResponseField name="data" type="array" optional>
   Array of product results (only present when status is "completed" and results are available)
   
-  <Expandable title="Product Result">
+  <Expandable title="Product Result" defaultOpen>
     <ResponseField name="url" type="string">
       Original URL that was processed
     </ResponseField>
@@ -286,9 +286,6 @@ description: "Get extract status and results for an asynchronous extract job."
 curl -X GET "https://api.getcatalog.ai/v2/extract/extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7" \
   -H "x-api-key: $CATALOG_API_KEY"
 
-# Check execution status (vendor input)
-curl -X GET "https://api.getcatalog.ai/v2/extract/extract-nike-com-51d87084" \
-  -H "x-api-key: $CATALOG_API_KEY"
 
 # Get results with pagination
 curl -X GET "https://api.getcatalog.ai/v2/extract/extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7?page=1&page_size=50" \
@@ -331,60 +328,151 @@ if (data.status === 'completed') {
 
 ```python Python
 import requests
-import time
 
-execution_id = 'extract-nike-com-51d87084'
+execution_id = 'extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7'
 
-# Poll for completion
-while True:
-    response = requests.get(
-        f'https://api.getcatalog.ai/v2/extract/{execution_id}',
-        headers={'x-api-key': 'YOUR_API_KEY'},
-        params={'page': 1, 'page_size': 50}
+# Check execution status
+response = requests.get(
+    f'https://api.getcatalog.ai/v2/extract/{execution_id}',
+    headers={'x-api-key': 'YOUR_API_KEY'},
+    params={'page': 1, 'page_size': 50},
+)
+
+data = response.json()
+
+if data['status'] == 'completed':
+    print('Results:', data['data'])
+    print('Total successful:', data['meta']['result']['products_successful'])
+    print('Duration:', data['meta']['duration_ms'], 'ms')
+elif data['status'] == 'running':
+    progress = data['meta']['progress']
+    print(
+        f"Progress: {progress['percent_complete']}% "
+        f"({progress['products_processed']}/{progress['products_total']})"
     )
-    
-    data = response.json()
-    
-    if data['status'] == 'completed':
-        print('Results:', data['data'])
-        print('Total successful:', data['meta']['result']['products_successful'])
-        print('Duration:', data['meta']['duration_ms'], 'ms')
-        break
-    elif data['status'] == 'running':
-        progress = data.get('meta', {}).get('progress', {})
-        print(f"Progress: {progress.get('percent_complete', 0)}% ({progress.get('products_processed', 0)}/{progress.get('products_total', 0)})")
-        print(f"Started: {data['meta'].get('start_date')}")
-        time.sleep(5)  # Wait 5 seconds before next poll
-    elif data['status'] == 'pending':
-        if data.get('meta', {}).get('waiting_for'):
-            print(f"Waiting for crawl: {data['meta']['waiting_for']}")
-            time.sleep(10)  # Wait longer when waiting for crawl
-        else:
-            print('Execution is pending')
-            time.sleep(5)
-    elif data['status'] == 'failed':
-        print('Error:', data.get('error'))
-        break
+    print(f"Started: {data['meta']['start_date']}")
+elif data['status'] == 'pending':
+    if data['meta'].get('waiting_for'):
+        print(f"Waiting for crawl to complete: {data['meta']['waiting_for']}")
+    else:
+        print('Execution is pending')
+elif data['status'] == 'failed':
+    print('Error:', data['error'])
 ```
 
 </RequestExample>
 
 <ResponseExample>
 
-```json Status: Pending (Waiting for Crawl)
+```json Status: Completed
 {
-  "execution_id": "extract-nike-com-51d87084",
-  "status": "pending",
+  "execution_id": "extract-urls-b45c2d8c-46b7-46c2-8fed-fa3788c75e2a",
+  "status": "completed",
   "error": null,
   "meta": {
-    "progress": null,
-    "start_date": null,
-    "stop_date": null,
-    "duration_ms": null,
-    "waiting_for": "crawl-nike-com-7f42-402f"
+    "progress": {
+      "products_processed": 1,
+      "products_total": 1,
+      "percent_complete": 100
+    },
+    "start_date": "2026-01-28T22:30:05.823Z",
+    "stop_date": "2026-01-28T22:35:31.082Z",
+    "duration_ms": 325259,
+    "result": {
+      "products_requested": 1,
+      "products_successful": 1,
+      "products_failed": 0
+    },
+    "credits_used": 5
+  },
+  "data": [
+    {
+      "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+      "product": {
+        "id": "6e6bd7bd-bfb5-4e05-85ee-4969628e741a",
+        "title": "Nike Air Force 1 '07",
+        "description": "Comfortable, durable and timeless—it’s number one for a reason. ...",
+        "vendor": "nike.com",
+        "brand": "Nike",
+        "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+        "handle": "cw2288-111",
+        "is_available": true,
+        "attributes": null,
+        "price": { "current_value": 115, "compare_at_value": 115, "currency": "USD" },
+        "images": [
+          {
+            "url": "https://static.nike.com/a/images/t_default/.../AIR+FORCE+1+%2707.png",
+            "alt_text": "Nike Air Force 1 '07 product image (primary)",
+            "position": 1,
+            "width": 400,
+            "height": 400,
+            "id": "img-1769639694151-0",
+            "variant_ids": ["variant-1769639694153-0", "..."],
+            "attributes": null
+          },
+          "..."
+        ],
+        "options": [
+          { "name": "Color", "position": 1, "values": ["White/White"] },
+          { "name": "Size", "position": 2, "values": ["6", "6.5", "7", "...", "18"] }
+        ],
+        "variants": [
+          {
+            "id": "variant-1769639694153-0",
+            "title": "Nike Air Force 1 '07 - White/white - 6",
+            "is_available": true,
+            "price": { "current_value": 115, "compare_at_value": null, "currency": "USD" },
+            "sku": "CW2288-111",
+            "option1": "White/White",
+            "option2": "6",
+            "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-jBrhbr/CW2288-111#size-6",
+            "image": {
+              "url": "https://static.nike.com/a/images/t_default/.../AIR+FORCE+1+%2707.png",
+              "alt_text": "Nike Air Force 1 '07 - White/White - 6 variant image",
+              "position": 1,
+              "width": 400,
+              "height": 400,
+              "id": "img-variant-variant-1769639694153-0",
+              "variant_ids": ["variant-1769639694153-0"]
+            }
+          },
+          "..."
+        ],
+        "store_canonical_url": "https://www.nike.com/",
+        "store_domain": "www.nike.com",
+        "platform": null,
+        "platform_id": "CW2288-111",
+        "description_html": "<html>...</html>",
+        "product_type": null,
+        "google_product_category_id": null,
+        "google_product_category_path": null,
+        "tags": ["FOOTWEAR"],
+        "video_url": null,
+        "review_count": null,
+        "average_rating": null,
+        "rating_scale": null,
+        "faqs": null,
+        "reviews": null,
+        "updated_at": "2026-01-28T22:34:54.186Z",
+        "brand_pdp": null,
+        "similar_products": null,
+        "reddit_insights": null,
+        "affiliate_link": "https://wild.link/e?...”
+      },
+      "success": true
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 50,
+    "total_items": 1,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
   }
 }
 ```
+
 
 ```json Status: Running
 {
@@ -404,72 +492,6 @@ while True:
 }
 ```
 
-```json Status: Completed
-{
-  "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
-  "status": "completed",
-  "error": null,
-  "data": [
-    {
-      "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
-      "success": true,
-      "product": {
-        "id": "fec26b49-66f8-480e-8cbb-cfc823af1d33",
-        "title": "Air Force 1 '07 Men's Shoes",
-        "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
-        "brand": "Nike",
-        "vendor": "nike",
-        "price_amount": 90,
-        "price_currency": "USD",
-        "is_available": true
-      }
-    },
-    {
-      "url": "https://www.example-store.com/invalid-product",
-      "success": false,
-      "product": null,
-      "outcome": "unsupported_vendor"
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "page_size": 50,
-    "total_items": 100,
-    "total_pages": 2,
-    "has_next": true,
-    "has_prev": false
-  },
-  "meta": {
-    "progress": {
-      "products_processed": 98,
-      "products_total": 100,
-      "percent_complete": 100
-    },
-    "start_date": "2025-01-15T10:30:00.000Z",
-    "stop_date": "2025-01-15T10:35:22.000Z",
-    "duration_ms": 322000,
-    "result": {
-      "products_requested": 100,
-      "products_successful": 98,
-      "products_failed": 2
-    }
-  }
-}
-```
-
-```json Status: Failed (Blocking Crawl Failed)
-{
-  "execution_id": "extract-nike-com-51d87084",
-  "status": "failed",
-  "error": "The crawl this extraction was waiting for failed or was canceled",
-  "meta": {
-    "progress": null,
-    "start_date": null,
-    "stop_date": null,
-    "duration_ms": null
-  }
-}
-```
 
 ```json Status: Failed (Execution Failed)
 {
