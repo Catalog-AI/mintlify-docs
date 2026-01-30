@@ -4,8 +4,6 @@ api: "POST https://api.getcatalog.ai/v2/agentic-search-mini"
 description: "Fast synchronous search returning up to 10 products with AI-powered attribute enrichment."
 ---
 
-import ProductProperties from "/snippets/v2-product-object.mdx";
-
 <Tip>
 **When to use:** Ideal for autocomplete, quick previews, or when you need fast AI-enriched results with a small result set. For larger result sets with customer profile personalization, use [`POST /v2/agentic-search`](/v2/api-reference/endpoints/search/agentic-search).
 </Tip>
@@ -44,25 +42,77 @@ import ProductProperties from "/snippets/v2-product-object.mdx";
 ## Response
 
 <ResponseField name="data" type="array">
-  Array of product results (up to 10 items). Fewer items may be returned if some cannot be processed or lack detailed product data.
+  Array of discovered products with enriched data (up to 10 results).
   
-  <Expandable title="Product Result" defaultOpen>
+  <Expandable title="Product Object">
     <ResponseField name="url" type="string">
-      Original URL that was processed
+      Product URL (normalized and cleaned)
     </ResponseField>
     
-    <ResponseField name="success" type="boolean">
-      Whether the product was successfully processed
-    </ResponseField>
-    
-    <ResponseField name="product" type="object | null">
-      Product data (null if processing failed)
+    <ResponseField name="product" type="object">
+      Product details
       
-      <ProductProperties />
-    </ResponseField>
-    
-    <ResponseField name="outcome" type="string" optional>
-      Machine-readable reason for failure (only present when success is false and a specific reason is available)
+      <Expandable title="Product Properties">
+        <ResponseField name="title" type="string">
+          Product title
+        </ResponseField>
+        
+        <ResponseField name="price" type="object">
+          Price information
+          
+          <Expandable title="Price Properties">
+            <ResponseField name="current_value" type="number">
+              Current product price as a number (e.g., 99.99)
+            </ResponseField>
+            
+            <ResponseField name="compare_at_value" type="number | null">
+              Original/compare-at price if on sale, otherwise `null`
+            </ResponseField>
+            
+            <ResponseField name="currency" type="string">
+              Currency code (e.g., `"USD"`)
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="description" type="string">
+          Product description
+        </ResponseField>
+        
+        <ResponseField name="images" type="array">
+          Array of product image URLs
+        </ResponseField>
+        
+        <ResponseField name="attributes" type="object">
+          Comprehensive product attributes extracted through AI analysis and Google Shopping data. Attribute keys and values are dynamic and vary by product based on available information.
+          
+          <Expandable title="Common Attributes">
+            <ResponseField name="color" type="string">
+              Primary product color (when available)
+            </ResponseField>
+            
+            <ResponseField name="material" type="string">
+              Primary material composition (when available)
+            </ResponseField>
+            
+            <ResponseField name="category" type="string">
+              Product category classification (when available)
+            </ResponseField>
+            
+            <ResponseField name="brand" type="string">
+              Brand information (when available)
+            </ResponseField>
+            
+            <ResponseField name="features" type="string">
+              Key product features (when available)
+            </ResponseField>
+          </Expandable>
+          
+          <Note>
+            **Dynamic Attributes:** The attributes object contains dynamic keys and values that vary by product. Common attributes like `color`, `material`, `category`, `brand`, and `features` may be present, but the exact structure depends on the product and available data sources (Google Shopping features and AI enrichment when enabled).
+          </Note>
+        </ResponseField>
+      </Expandable>
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -109,7 +159,7 @@ import ProductProperties from "/snippets/v2-product-object.mdx";
 
 ## Response Schema and Enable Flags
 
-The `/v2/agentic-search-mini` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present in the `product` object of each item in the `data` array, but will be `null` when the corresponding flag is `false`.
+The `/v2/agentic-search-mini` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present in product objects returned in the `data` array, but will be `null` when the corresponding flag is `false`.
 
 **Field Mappings:**
 
@@ -174,305 +224,124 @@ print(f"Found {len(data['data'])} products")
   "data": [
     {
       "url": "https://bysonqo.com/products/floral-crochet-organic-cotton-dress-sustainable-party-top",
-      "title": "Organic Cotton Floral Crochet Dress",
-      "price_amount": 723.03,
-      "price_currency": "USD",
-      "description": "",
-      "images": [
-        [
+      "product": {
+        "title": "Organic Cotton Floral Crochet Dress",
+        "price": {
+          "current_value": 723.03,
+          "compare_at_value": null,
+          "currency": "USD"
+        },
+        "description": "",
+        "images": [
           "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQPlPfCKoRew2h3A9Xi54Wm1xfod5UhOVbLvgHtCW7m02kRkqYKg_IgyVrZ_-AZyT-AFivJYE3I0fMKhzQ3zDZCExx1K1UVxJ68QLeIqljZ"
-        ]
-      ],
-      "attributes": {
-        "product_name": "Floral Crochet Organic Cotton Dress",
-        "material": "100% Peruvian Organic Cotton (GOTS - USDA certified)",
-        "construction": "Handmade in Peru",
-        "design": "Crochet midi dress",
-        "measurements": "Hips: 36.22 inches (92 cm), Length: 40.55 inches (103 cm)",
-        "available_sizes": "S, M",
-        "available_colors": "Ivory, Black, Pink, Red, Orange, Gray, Light Blue, Light Green, Light Violet",
-        "care_instructions": "Hand wash with shampoo",
-        "production_time": "4-6 days for item to be made before shipping"
+        ],
+        "attributes": {
+          "product_name": "Floral Crochet Organic Cotton Dress",
+          "material": "100% Peruvian Organic Cotton (GOTS - USDA certified)",
+          "construction": "Handmade in Peru",
+          "design": "Crochet midi dress",
+          "measurements": "Hips: 36.22 inches (92 cm), Length: 40.55 inches (103 cm)",
+          "available_sizes": "S, M",
+          "available_colors": "Ivory, Black, Pink, Red, Orange, Gray, Light Blue, Light Green, Light Violet",
+          "care_instructions": "Hand wash with shampoo",
+          "production_time": "4-6 days for item to be made before shipping"
+        }
       }
     },
     {
       "url": "https://agaati.com/products/maremma-nautical-stripe-off-shoulder-top-in-cotton-poplin?country=US&currency=USD",
-      "title": "Filoli Cut-Out Cotton Midi Dress",
-      "price_amount": 595,
-      "price_currency": "USD",
-      "description": "Fashioned in sustainable cotton, the Filoli Midi Dress has an A-line silhouette with an asymmetrical neck and a cutout waist.This stunning midi dress features a diagonal neckline framed by playful short puff sleeves. Offset by a skin-baring cutout detail, its gathered pleats lead to a full, A-line skirt for more volume. A row of hand-embroidered buttons along the side embody its careful construction and attention to craft. Committed to responsible design, the Filoli is made with Better Cotton Initiative (BCI) cotton—an ethically sourced alternative to regular cotton—and hand-block printed by highly skilled Indian artisans. Exquisite hand-embroidered flowers outline its boldly striped pattern adding dimension and supple texture.A stunning option for summer dressing, wear yours with nude sandals and statement earrings for a sophisticated twist. Made on-demand in our Atelier.",
-      "images": [
-        [
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRGQCXaNahFk4IBTOOgU3d2Qs2_dCcmr-lW7K8DyN5alchuGV18srNSLqVd9Yr5wXm2WmbHT92g7cjfyMASwWj82X2k5O2QB23vmVHpfTMDv-YDq_h27YeB",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT-uCDemTU7kk-Q2BCo2oQxWAhPELMBzo5rVKntOnnIGx1NBWEPTrtIFrE49QDDUFa-zj5SOO8PxFJ9KkxMciQdFJZPkAtadjBTXp878pjsh4r0I7MfJ0Zi",
-          "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcToTf6_8MNFLdRMkEDcG2LASgTbQdQKBQ9MFLCzS3GZ0YPc_t8MT2YcmGgOL9B5VLGGUAtfRwByq1VOazFkBU4dcDzrAIWN",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcStOMk4yAAUhG_smGPGzYQKOoVwrDBrSocuTHjrIY1uj2_8KGzpWoxSQztdmPog5r-QuYMFMc01xFARYbLnIvvuTTcy0yMbQrkkYvfaQ9kttv3ttRt60TKglA"
-        ]
-      ],
-      "attributes": {
-        "product_name": "Maremma Nautical Stripe Off Shoulder Top",
-        "material": "Cotton Poplin",
-        "design": "Nautical Stripe",
-        "neckline": "Off Shoulder",
-        "sleeve_style": "Short Sleeves",
-        "fit": "Relaxed",
-        "length": "Cropped",
-        "closure": "Side Zipper",
-        "care_instructions": "Dry Clean Only",
-        "origin": "Made in India",
-        "artisan_technique": "Hand-Block Printed",
-        "embellishments": "Hand-Embroidered Buttons",
-        "collection": "Humming Gardens",
-        "production_time": "1 Week",
-        "delivery_time": "5-7 Business Days"
+      "product": {
+        "title": "Filoli Cut-Out Cotton Midi Dress",
+        "price": {
+          "current_value": 595,
+          "compare_at_value": null,
+          "currency": "USD"
+        },
+        "description": "Fashioned in sustainable cotton, the Filoli Midi Dress has an A-line silhouette with an asymmetrical neck and a cutout waist.",
+        "images": [
+          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRGQCXaNahFk4IBTOOgU3d2Qs2_dCcmr-lW7K8DyN5alchuGV18srNSLqVd9Yr5wXm2WmbHT92g7cjfyMASwWj82X2k5O2QB23vmVHpfTMDv-YDq_h27YeB"
+        ],
+        "attributes": {
+          "product_name": "Maremma Nautical Stripe Off Shoulder Top",
+          "material": "Cotton Poplin",
+          "design": "Nautical Stripe",
+          "neckline": "Off Shoulder",
+          "sleeve_style": "Short Sleeves",
+          "fit": "Relaxed",
+          "care_instructions": "Dry Clean Only",
+          "origin": "Made in India"
+        }
       }
     },
     {
       "url": "https://www.lafayette148ny.com/organic-cotton-poplin-gathered-midi-dress",
-      "title": "Lafayette 148 New York Women's Ruched Organic Cotton Poplin Midi Dress",
-      "price_amount": 539,
-      "price_currency": "USD",
-      "description": "This midi dress from Lafayette 148 New York is crafted from organic cotton poplin. The a-line silhouette features a high neckline, cap sleeves, and ruching on the shoulder and waist. It has a side zipper and hem that falls below the knee. Approximate length from shoulders to hem: 46.5\".",
-      "images": [
-        [
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSfrfQThwOKnhxscqlm09aboUOZuAahac4X1WH2VCXn1gU2NAzIVrlx9rI9DLWtXxZemPtMrNpAsED9evfj2WWwSc6jQL-iNbRAbhuqUlqdjluqpmq6GomE",
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQIkk7vHHNClMSUhazC7Jw-ViQvNzf1kpKKtkVhfjfUKyMK7JQJgZ7rPFNy0ZuBQtpKf8J0GDvAuhbK4_bN2m8yeWmoWKgk3Z2FDKHsC0Obis1alb7HLDmF",
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcRoBdQ3H8pAcB7WAbLtZM_JNSzWIDRBVx13W4UjjPJ_VoY_Tvfto-pF9ewU5TJMI4cbg_S3tgRDhpAEY_P3wVouKSAzV0molePTh_f-xwwjPQBK_rPJbWzL",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSn1IakvtMeTpvE-gim1AIAQuL5kkZcZjZP3RZEnpEEuxiisJlrhiiZlsDE5J7bg7e53k-MksanTQwgwI61Mfg8bEtcnTMnJxDr0Rj6jgdZ",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ578w-e5X2AR7f6yux-A9esErhhJ0ua1VYcV5GoYBMjbGXKei9j8exfWISR-vEs0s-2PCaW2jkOdiySZSVcARtjVRUWlgU_9V9hN4oS_w",
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQAVPCP7i-v2imYJsXU6PZig7JfSQepqTxG8E3Nzgkn6uZ4XUCg004NqpfEtVzt4464ueMjDEOyMC7JHmk2OgGsaMZZ_i3OIIxJhjqqA26UqeuGKNbt96Vs-g",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRuBlhLdnnMXscb9M2P8maGCOH33DEiZ52yL8RJWKEEY9cx6NmthrSAIEIVsluvZddVr_pRiIdvuhFzJV8UY706E9q1vVoxRQ"
-        ]
-      ],
-      "attributes": {
-        "fit": "A-line",
-        "sleeve_length": "Cap sleeve",
-        "closure": "Side zip",
-        "design_elements": "Gathered drawstring ties at shoulder and side waist",
-        "material": "100% organic cotton poplin",
-        "care_instructions": "Machine wash cold or dry clean",
-        "style_number": "MDFA6R-1R48",
-        "collection": "Pre-Fall 2025",
-        "garment_measurements": "Size 4: 38.5\" bust / 31.5\" waist / 40.5\" low hip / 45.5\" long; Size 8: 41\" bust / 34\" waist / 43\" low hip / 45.5\" long; Size 12: 44\" bust / 37\" waist / 46\" low hip / 46\" long; Size 16: 47.5\" bust / 40.5\" waist / 49.5\" low hip / 46.5\" long"
+      "product": {
+        "title": "Lafayette 148 New York Women's Ruched Organic Cotton Poplin Midi Dress",
+        "price": {
+          "current_value": 539,
+          "compare_at_value": null,
+          "currency": "USD"
+        },
+        "description": "This midi dress from Lafayette 148 New York is crafted from organic cotton poplin.",
+        "images": [
+          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSfrfQThwOKnhxscqlm09aboUOZuAahac4X1WH2VCXn1gU2NAzIVrlx9rI9DLWtXxZemPtMrNpAsED9evfj2WWwSc6jQL-iNbRAbhuqUlqdjluqpmq6GomE"
+        ],
+        "attributes": {
+          "fit": "A-line",
+          "sleeve_length": "Cap sleeve",
+          "closure": "Side zip",
+          "material": "100% organic cotton poplin",
+          "care_instructions": "Machine wash cold or dry clean"
+        }
       }
     },
     {
       "url": "https://www.harrods.com/en-us/p/doen-organic-cotton-leanne-midi-dress-000000000007912152",
-      "title": "Dôen Organic Cotton Leanne Midi Dress - Navy - S",
-      "price_amount": 500,
-      "price_currency": "USD",
+      "product": {
+        "title": "Dôen Organic Cotton Leanne Midi Dress - Navy - S",
+        "price": {
+          "current_value": 500,
+          "compare_at_value": null,
+          "currency": "USD"
+        },
       "description": "",
-      "images": [
-        [
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQgJA5k3E8prr6bSBRT3HQfa8ImbsxVM_6Dal2kK5U9D2rvk_fsGiPlzF2QoSH1Q9omLWnodYZyvC932CO6MUTrZ62yXum-VP3javqC38X3O3MAKiwqnyDpjg",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTQt9vJM7Z3w_5BvipRVxqTIvJ3d7vUlabyoAjgvH8DoR3D64AjBAk2t0TJaoBP9qWiyVzhyxdqhgC3klrS-GuEM0yR7YDU",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRPVmFOr-Qj6SIiEPfLjY6BC6BXBoF1PvDO5ipUO8fGoWrgEPgexv19NINKSq0kqqR4inMlVVNYhgdjTDc0T_RednAGbgaP3J0ekmbXn9jIxJRWBdJ3Xa49Bg",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRCZX23bcbqYvomgoiol32b9TMey3_3UEgfUPbrOy2G3Bd5FGg2fMjteUIkxnDoxMdCm6taQ8o5UQzJS40PJiaa7cVdKwEPBPH37W1u4umJXEcAroKg7Wyi",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQnwm8IK65bDSOLA5-MwQ3zhDGhLAFlHXNeUaIMrG3BIJNPn-B1As5Fv0balCj2-h-aokuHdPUR_tadXIDDR_Q4NMNndiQW",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcQkqu-w-uvTIh8jNWtI_cIwsczCnEGV6WdslSEOvGoLeu6aKxmCmeSnBsTc_nDi3LfL97e8H0nqcDJKKAdk1mlRFZ-tQPrceA"
-        ]
-      ],
-      "attributes": {
-        "brand": "DÔEN",
-        "product_name": "Organic Cotton Leanne Midi Dress",
-        "color": "Adriatic (Navy)",
-        "material": "100% Organic Cotton Poplin",
-        "sleeve_style": "Puff Sleeves",
-        "waist_detail": "Shirred Waistband",
-        "design_elements": "Ruffles",
-        "silhouette": "Fitted Bodice with Full Skirt",
-        "style_inspiration": "Romantic, Vintage-Inspired"
+        "images": [
+          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQgJA5k3E8prr6bSBRT3HQfa8ImbsxVM_6Dal2kK5U9D2rvk_fsGiPlzF2QoSH1Q9omLWnodYZyvC932CO6MUTrZ62yXum-VP3javqC38X3O3MAKiwqnyDpjg"
+        ],
+        "attributes": {
+          "brand": "DÔEN",
+          "product_name": "Organic Cotton Leanne Midi Dress",
+          "color": "Adriatic (Navy)",
+          "material": "100% Organic Cotton Poplin"
+        }
       }
     },
     {
       "url": "https://cunningtonandsanderson.com/products/copy-of-knotted-dress-1?country=US&currency=USD",
-      "title": "Zero-Waste Luxury Knotted Cotton Midi Dress",
-      "price_amount": 494,
-      "price_currency": "USD",
-      "description": "Sculptural white knotted midi dress with zero-waste design. Elegant avant-garde dress with good luck knot detail. Sustainable luxury fashion.",
-      "images": [
-        [
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSljyjGXGses1UGGx-JpOzf2Ox-PRiMZT5lWF44-TXHy5ofQ_gRP7FWHkT7E1cXgw6F9br7sG8wIPan5l5oOGVSg6yN57FbmlaYtmA9JrBuXwXDRpMZduqkPA",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcR6teFh88YRY4YDFL42G0Vy_Aw4yRU0ZUv0QNM53-_h2pgxbZ2h2eCu8YDahb4yMp_voG_lJLZ5_xlQ92hE5UYlEFpc_VQjtOJ4_8yyO8_vvtwv9hnn41noWpc",
-          "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQcMSc_YG_2PhF-wbCcvRbuCdqyLQvVzGCDywmwljIdCy65GuoXk4fzUZYWYWrT8KjqkwF0vOyCPqxmIhDE4FurQNhbFzYIscFA6PwD07R7zWDS-VB3KwtMbg"
-        ]
-      ],
-      "attributes": {
-        "product_name": "Knotted Dress White",
-        "brand": "Cunnington & Sanderson",
-        "gender": "Women's",
-        "material": "Cotton",
-        "color": "White",
-        "sizes_available": "XXS, XS, S, M, L",
-        "design": "Zero-waste design with large good luck knot structure on the front",
-        "neckline": "V-neckline",
-        "seam_lines": "Unique seam lines",
-        "back_fit": "Tailored fitted back",
-        "armholes": "Cut-away armholes",
-        "length": "Midi",
-        "belt": "Includes self-fabric belt for a more fitted look",
-        "care_instructions": "Wash at 30 degrees, iron on low 1 on reverse",
-        "production_time": "Made to order in 5 to 10 working days",
-        "origin": "Made in United Kingdom"
-      }
-    },
-    {
-      "url": "https://www.studioverandah.com/products/high-low-lily-shirt-dress?country=US&currency=USD",
-      "title": "Verandah Women's Sustainable Midi Dress",
-      "price_amount": 475,
-      "price_currency": "USD",
-      "description": "",
-      "images": [
-        [
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSRMTXIZEDwowGjLD5sdg-vDomN4ifgrdO9W8gf37vk2XLzGmgD5RLG4T12ZkBNiOtfBd-6ijMWXa_e4LgCuo5VXNoFJvg7F5lU7R01m_0",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSyw3J1WxxhDEj3ejDYYtRSmkRXZbC72XW2R75MSPQj3J1AwMgWkvGWnIW8fOs2vgstQ4WFdXLQpraoowfaGMrrIlODtjS4chMFgddIWVw",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQX1de0eintVa2EGMjNZq95MTnYIQoRoW522vEs__N7AipJZHgok-eUjnJsp_ahbsuIN2JyHou19egtZ7oR01p2HvpmyAvP3zK3qyX__Dt_"
-        ]
-      ],
-      "attributes": {
-        "product_name": "High-Low Lily Shirt Dress",
-        "color": "Blue Water Lily",
-        "material": "100% Cotton Poplin",
-        "fit": "Standard",
-        "garment_length": "37 inches",
-        "model_height": "5 feet 9.5 inches",
-        "model_size": "S",
-        "sustainability": "Responsibly sourced cotton from certified textile mills in India",
-        "wash_care": "Gentle cold hand wash after first dry clean; do not machine wash; do not bleach; iron on low heat"
-      }
-    },
-    {
-      "url": "https://www.harrods.com/en-us/p/doen-organic-cotton-voile-delfina-midi-dress-000000000007893098",
-      "title": "DÔEN Women's Delfina Floral Fitted Organic Cotton Midi Dress",
-      "price_amount": 435,
-      "price_currency": "USD",
-      "description": "Crafted from soft, 100% organic cotton voile in our Delphinium Floral print, the ‘70s-inspired Delfina Dress features three-quarter-length raglan sleeves, hand-crocheted scallop trim at the neckline and sleeve cuffs, and delicate self-ties at the neck that finish in petite baubles. Intricate hand-smocking textures the yoke and bodice, while a fitted waist gives way to a full, ankle-grazing skirt.",
-      "images": [
-        [
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcSC2KPMrbCfwaY2hcwlEdIVZAqKzNDab4oqEw1QcDyoVH8WXjW2eTok86chXS8LhmdD7uCTS-EcaQ-wqwbphU0O3yKOanPHPli6R1bJC8nUZuK8NtjkDJeJmzQ",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSp-_pDEKZplDTpRBthOZwiwtWfUI8vFqojv3UlGTEFEE1rkmzhOv700j-kN7zE40ubHJWpsjeRJfzoercAPBKXRMO4DW7ceRqittwGTQrWzgtpG9KYIQwuNg",
-          "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcR3WGUL1QaSwIrlbhJke2YxYDMNY3xDvS0wDLJuITkyRKAiAByUSGGK1hegCOfcTIF3VJgub_kGpGa7ph2FT6xYOIFd7UG0h_tLQUpvMp23BZLT_zInDUu68w",
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTEAUx8kGg3VZL4r2e3h69lRQT94rGihh_uQIIuA909SS5dOtjnZ4DLgq1dIcbninytdCIer_NFQUjQus-vfcoBAIWOCBnBo8FTmMt82ZCfgDVjAa8w_1pU",
-          "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcR5OFTi58h7NLyHENB7FdPR8hJfZC_dgRri2Xw3u5fZ1OOWmbaIgjZweXX7W8nkcd2eumWaWNFJ4ewrXVnn0NcSacI0CKQbbw",
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQ6SVD2ZHTiwK6LadZRKRV-kTrh9s5KExLUGWvcay_iwlrflnzUSbjJRHe83VriiBcgbnzJTvUovZslWpXczjzaJCaW-AcFkTuaEGEvlB9OYD_IRzomSPVnXPc",
-          "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRtueZ1r4_veest4vVOQuepJGGq03iH22hefhLLE0xUgbchOgIHipTgk1XArR-2f4qk8k-7NsMU49qD0FW6p3r6SWz66YnhZfAflyPhX28wEsfi6PhRaova8dw",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcT2UvLvDOkEDWK2VSHsoy6Zva1RCkVCZ29VbI1xxeP8e5Ckr_5raV7w6IyZAkwZLKlH_BXtT25FcL3lt4XM6QF34pyMQP8VhUG2De3xse_mViBxr7RdbIb-Yg",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcT4w3BsNreMjaMdPh_u33S7x8HGaMEWFTf9sawn-DMWTNis9U61NjVOt6if_V2PnagpSrp8Q6yT2jNXt8wn9xBbSrNbYruyOVuc7ZvyyEQutl7YDTJNec5I",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSw4I20nV_UU8u4TPAKb4BP8QWzOd19OeFxGhk3AUeErKsAXldkPrVIQ8miY6QAdEfqGZYxdXV9jE4-sE2NMWxrKjW4EWh0Iw",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTP5pdNrks8kv97YJ2f2fOjRbe_zbjVJof4ikpvbII9cGFAba69eSyKB5QFlWEIuKuy797yVlgXtkfSxV0ysYukY9SJLPQTQg",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ1L3LTL6Am1sGgrNPMqm3MU2E5OOIoWsfKVmjDXj6lk4pq-4VlzdmTJNbuDXMwyjqpWrN_ncsedACRXlzZXVDDzFkwSeS7pw",
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTPZ_pzgdDVeXEIkoDfenwerBvlS78uxKxlUkG5r8klnVhw-ia0CUzELZ047nGqjcVgNNNoIPnNsPAwBGjliP5H4j-tcsqzNQ",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQ0zGBQmbmYhY2bnbfIiLUCW1MX-O73SQtyp5WxSu8cpgRyle-ISYfo5A-HNkogtGyr07eoXq8lii9O4F7azQKpv7zztvo2",
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcS2rOOdqdfbonAxboDWb-fIzE81xoxSyiFDILIcBSsfWW-BLUeWYcceG4jVVjVcXW21WmzPxxPTKuv5PnWAfG-kCBEKra1PGw"
-        ]
-      ],
-      "attributes": {
-        "brand": "DÔEN",
-        "product_name": "Delfina Midi Dress",
-        "material": "100% Organic Cotton Voile",
-        "color": "Delphinium Floral",
-        "design_elements": "Floral print, scalloped trims, gathered waistline",
-        "style": "Midi dress",
-        "origin": "California-inspired design"
-      }
-    },
-    {
-      "url": "https://www.net-a-porter.com/en-us/shop/product/doen/clothing/midi-dresses/bijou-shirred-floral-print-organic-cotton-voile-midi-dress/46376663162909273",
-      "title": "DÔEN Bijou Shirred Floral-print Organic Cotton-voile Midi Dress - Women Dresses - XL",
-      "price_amount": 400,
-      "price_currency": "USD",
-      "description": "",
-      "images": [
-        [
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTbojkdwMu4Gl1xBEY8RYu7E4KSF7PwvzquXAR9kfQj9N4V59kGl-F1gYCQ87D7-Vm2SItwPkgt17H7bZtkCQKoerO4vs3tL_oDvb12-UL2vh1OL0sgp5lQ7A",
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcTKLPBJwHmUlsh7B9OtT3abqD_6t-eP0dUsFLC82G0lSx4N-tDVs8I-66zJ1Gk9VKy9_UjesAFJrvBuY2Gaaqp86I49zfJs",
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRsdj64nD6nZq7HcAMNHKF_Q9VJWNMPHaVfGYqHOkAmtVrJZkeHXE7T3QtB4nRJvS4s_c1Sf9ktAOBFoaOwuKkQerTkONubcw"
-        ]
-      ],
-      "attributes": {
-        "brand": "DÔEN",
-        "product_name": "Bijou Shirred Floral-Print Organic Cotton-Voile Midi Dress",
-        "material": "100% organic cotton-voile",
-        "color": "Multicolored (Designer color: Noir Prairie de Montagne)",
-        "pattern": "Floral print",
-        "design_elements": "Smocked bodice, puffed-up shoulders, elastic-trimmed shoulders",
-        "sleeve_length": "Elbow-length sleeves",
-        "neckline": "Elastic-trimmed, can be worn on or off the shoulders",
-        "fit": "Fitted at the bust and waist, loose at the hip",
-        "length": "Midi-length",
-        "fabric_weight": "Lightweight",
-        "stretch": "Stretchy fabric with non-stretchy skirt",
-        "closure": "Slips on",
-        "lining": "Unlined",
-        "care_instructions": "Hand wash",
-        "model_height": "177 cm (5'10\")",
-        "model_size": "Small",
-        "model_measurements": "Bust: 86 cm (34\"), Waist: 65 cm (25.5\"), Hip: 90 cm (35.5\")",
-        "product_code": "46376663162909273",
-        "bust": "86cm/ 34\"",
-        "waist": "65cm/ 25.5\"",
-        "hip": "90cm/ 35.5\"",
-        "designer_color": "Noir Prairie de Montagne"
-      }
-    },
-    {
-      "url": "https://www.smallable.com/en/product/terina-oeko-tex(r)-linen-midi-dress-yellow-faithfull-the-brand-257670",
-      "title": "Terina OEKO-TEX Linen Midi Dress | Yellow",
-      "price_amount": 383.67,
-      "price_currency": "USD",
-      "description": "",
-      "images": [
-        [
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcRqEhHwYWDTFVWtvOq0Bk3P_V73NRpp_ChXVJujvzo3DX4ZMKme-n9r9Z2rpGYcIO_Aoc3ao0Lr5yV01hJRPSaAghI_cupNj9FA_6AF0h_6IxUHtf28XVZKOG8"
-        ]
-      ],
-      "attributes": {
-        "brand": "Faithfull The Brand",
-        "product_name": "Terina Oeko-Tex® Linen Midi Dress",
-        "color": "Yellow",
-        "material": "100% Linen",
-        "certification": "Oeko-Tex® Standard 100",
-        "length": "Midi",
-        "neckline": "Square",
-        "sleeve_style": "Sleeveless",
-        "waist_style": "Elasticated",
-        "closure": "Back zipper",
-        "pattern": "Plain",
-        "manufacturing_process": "Hand-dyed",
-        "origin": "Made in Indonesia"
-      }
-    },
-    {
-      "url": "https://www.smallable.com/en/product/terina-oeko-tex(r)-linen-midi-dress-black-faithfull-the-brand-257672",
-      "title": "Terina OEKO-TEX Linen Midi Dress | Black",
-      "price_amount": 383.67,
-      "price_currency": "USD",
-      "description": "",
-      "images": [
-        [
-          "https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcRjKsToqyc5KFtvQjnqjTiZ0yupLdpD_mNL5uLyYCK0kHqw_7AUcQQD6zP81NcGxu1ELwR98i5ceYPxa2nBh6IAUihR9ZwYMlKBEVOYeZIvfuVAdAHGhGWfDw"
-        ]
-      ],
-      "attributes": {
-        "brand": "Faithfull the Brand",
-        "product_name": "Terina Oeko-Tex® Linen Midi Dress",
-        "color": "Black",
-        "gender": "Women's",
-        "material": "100% Linen",
-        "certification": "OEKO-TEX® Standard 100",
-        "neckline": "Square",
-        "sleeve_length": "Short sleeves",
-        "fit": "Flared cut",
-        "length": "Midi",
-        "design_details": "Elasticated neckline, Smocked bodice",
-        "origin": "Made in Indonesia"
+      "product": {
+        "title": "Zero-Waste Luxury Knotted Cotton Midi Dress",
+        "price": {
+          "current_value": 494,
+          "compare_at_value": null,
+          "currency": "USD"
+        },
+        "description": "Sculptural white knotted midi dress with zero-waste design.",
+        "images": [
+          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSljyjGXGses1UGGx-JpOzf2Ox-PRiMZT5lWF44-TXHy5ofQ_gRP7FWHkT7E1cXgw6F9br7sG8wIPan5l5oOGVSg6yN57FbmlaYtmA9JrBuXwXDRpMZduqkPA"
+        ],
+        "attributes": {
+          "product_name": "Knotted Dress White",
+          "brand": "Cunnington & Sanderson",
+          "material": "Cotton",
+          "color": "White"
+        }
       }
     }
   ],
   "pagination": {
     "page": 1,
-    "page_size": 10,
-    "total_items": 10,
+    "page_size": 5,
+    "total_items": 5,
     "total_pages": 1,
     "has_next": false,
     "has_prev": false
@@ -482,4 +351,3 @@ print(f"Found {len(data['data'])} products")
 ```
 
 </ResponseExample>
-

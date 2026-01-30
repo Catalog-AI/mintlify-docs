@@ -82,7 +82,7 @@ import ProductProperties from "/snippets/v2-product-object.mdx";
     </ResponseField>
     
     <ResponseField name="product" type="object | null">
-      Product data (null if processing failed)
+      Product object
       
       <ProductProperties />
     </ResponseField>
@@ -162,19 +162,11 @@ import ProductProperties from "/snippets/v2-product-object.mdx";
     </ResponseField>
     
     <ResponseField name="result" type="object" optional>
-      Final result statistics (only available when status is "completed")
+      Result statistics (only available when status is "completed")
       
       <Expandable title="Result Object">
-        <ResponseField name="products_requested" type="number">
-          Total number of products requested
-        </ResponseField>
-        
-        <ResponseField name="products_successful" type="number">
-          Number of products successfully processed
-        </ResponseField>
-        
-        <ResponseField name="products_failed" type="number">
-          Number of products that failed to process
+        <ResponseField name="products_returned" type="number">
+          Number of products returned in the response
         </ResponseField>
       </Expandable>
     </ResponseField>
@@ -206,7 +198,7 @@ const data = await response.json();
 
 if (data.status === 'completed') {
   console.log(`Search completed!`);
-  console.log(`Products found: ${data.meta.result?.products_successful || 0}`);
+  console.log(`Products found: ${data.meta.result?.products_returned || 0}`);
   console.log(`Duration: ${data.meta.duration_ms}ms`);
   console.log(`Products:`, data.data);
 } else if (data.status === 'running') {
@@ -237,7 +229,7 @@ while True:
     
     if data['status'] == 'completed':
         print(f"Search completed!")
-        print(f"Products found: {data['meta'].get('result', {}).get('products_successful', 0)}")
+        print(f"Products found: {data['meta'].get('result', {}).get('products_returned', 0)}")
         print(f"Duration: {data['meta']['duration_ms']}ms")
         print(f"Products: {data.get('data', [])}")
         break
@@ -265,10 +257,8 @@ while True:
   "data": [
     {
       "url": "https://www.barbour.com/us/safari-relaxed-long-sleeved-shirt-LSH1357MI5214.html",
-      "success": true,
       "product": {
         "id": "c9d57a2c-2017-4b67-94f0-65744d029e84",
-        "url": "https://www.barbour.com/us/safari-relaxed-long-sleeved-shirt-LSH1357MI5214.html",
         "tags": ["SHIRTS"],
         "brand": "Barbour",
         "title": "Safari Relaxed Long-Sleeved Shirt",
@@ -278,13 +268,15 @@ while True:
         "is_available": true,
         "price": {
           "current_value": 115,
-          "compare_at_value": 115,
+          "compare_at_value": null,
           "currency": "USD"
         },
         "product_type": "SHIRTS",
         "store_domain": "www.barbour.com",
+        "min_price": 115,
+        "max_price": 115,
         "description": "Meet the Safari shirt with its 100% cotton construction and relaxed fit.",
-        "description_html": "Meet the Safari shirt with its 100% cotton construction and relaxed fit. <p class=\"pt-3\">SKU: LSH1357MI5214</p>",
+        "description_html": "Meet the Safari shirt with its 100% cotton construction and relaxed fit.",
         "store_canonical_url": "https://www.barbour.com/",
         "google_product_category_id": "212",
         "google_product_category_path": "Apparel & Accessories > Clothing > Shirts & Tops",
@@ -296,22 +288,19 @@ while True:
             "url": "https://images.salsify.com/image/upload/s--qi5RyAOF--/a37a100905bd45f9069b666bf211c4b066532e33.jpg",
             "width": 1500,
             "height": 1836,
-            "alt_text": "Safari Relaxed Long-Sleeved Shirt product image (primary)",
+            "altText": "Safari Relaxed Long-Sleeved Shirt product image (primary)",
             "position": 1
           }
         ],
         "variants": [
           {
             "id": "variant-1754396867009-0",
-            "sku": "LSH1357MI5214",
-            "price": {
-              "current_value": 115,
-              "compare_at_value": 115,
-              "currency": "USD"
-            },
+            "SKU": "LSH1357MI5214",
+            "price": "115",
             "title": "Safari Relaxed Long-Sleeved Shirt - Us 4",
             "option1": "US 4",
-            "is_available": true
+            "isAvailable": true,
+            "compareAtPrice": "115"
           }
         ],
         "options": [
@@ -360,9 +349,7 @@ while True:
     "stop_date": "2025-01-15T10:32:30.000Z",
     "duration_ms": 150000,
     "result": {
-      "products_requested": 8,
-      "products_successful": 1,
-      "products_failed": 0
+      "products_returned": 1
     }
   }
 }
