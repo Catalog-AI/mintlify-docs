@@ -1,0 +1,284 @@
+<Expandable title="Product object (when success is true)" defaultOpen>
+  <ResponseField name="id" type="string">
+    Unique product identifier
+  </ResponseField>
+  <ResponseField name="title" type="string">
+    Product title
+  </ResponseField>
+  <ResponseField name="description" type="string">
+    Detailed product description
+  </ResponseField>
+  <ResponseField name="vendor" type="string">
+    Store/retailer (e.g. hostname such as "nike.com")
+  </ResponseField>
+  <ResponseField name="brand" type="string | null">
+    Product brand name
+  </ResponseField>
+  <ResponseField name="url" type="string">
+    Product URL
+  </ResponseField>
+  <ResponseField name="handle" type="string | null">
+    Product handle/slug
+  </ResponseField>
+  <ResponseField name="is_available" type="boolean">
+    Product availability status
+  </ResponseField>
+  <ResponseField name="price" type="object | null">
+    Object with price information.
+  </ResponseField>
+  <Expandable title="Price object">
+    Used for product.price and for each variant.price.
+    <ResponseField name="current_value" type="number | null">
+      Price value
+    </ResponseField>
+    <ResponseField name="compare_at_value" type="number | null">
+      Compare-at / MSRP value
+    </ResponseField>
+    <ResponseField name="currency" type="string">
+      Currency code (e.g. "USD")
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="images" type="array">
+    Array of image objects.
+  </ResponseField>
+  <Expandable title="Image object (elements of product.images)">
+    <ResponseField name="url" type="string">
+      Image URL
+    </ResponseField>
+    <ResponseField name="alt_text" type="string | null">
+      Alt text
+    </ResponseField>
+    <ResponseField name="attributes" type="object | null">
+      Optional AI/image analysis: labels (string[]), text (string | null), colors (array of { color, context }), description (string), confidence ("low" | "medium" | "high"), flat_lay (boolean)
+    </ResponseField>
+    <ResponseField name="position" type="number">
+      Display order (Shopify-style images only)
+    </ResponseField>
+    <ResponseField name="width" type="number">
+      Width in pixels (Shopify-style images only)
+    </ResponseField>
+    <ResponseField name="height" type="number">
+      Height in pixels (Shopify-style images only)
+    </ResponseField>
+    <ResponseField name="id" type="string">
+      Image ID (Shopify-style images only)
+    </ResponseField>
+    <ResponseField name="variant_ids" type="array">
+      Variant IDs linked to this image (Shopify-style images only)
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="options" type="array">
+    Array of option objects.
+  </ResponseField>
+  <Expandable title="Option object (elements of product.options)">
+    <ResponseField name="name" type="string">
+      Option name (e.g. "Size", "Color")
+    </ResponseField>
+    <ResponseField name="position" type="number">
+      Display order
+    </ResponseField>
+    <ResponseField name="values" type="array">
+      Option values (e.g. ["S", "M", "L"])
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="variants" type="array">
+    Array of variant objects.
+  </ResponseField>
+  <Expandable title="Variant object (elements of product.variants)">
+    <ResponseField name="id" type="string">
+      Variant ID
+    </ResponseField>
+    <ResponseField name="title" type="string">
+      Variant title
+    </ResponseField>
+    <ResponseField name="image" type="object | null">
+      Optional image; same shape as Image object above
+    </ResponseField>
+    <ResponseField name="is_available" type="boolean | null">
+      Availability
+    </ResponseField>
+    <ResponseField name="price" type="object">
+      Price object (current_value, compare_at_value, currency)
+    </ResponseField>
+    <ResponseField name="is_shipping_required" type="boolean | null">
+      Whether shipping is required
+    </ResponseField>
+    <ResponseField name="sku" type="string">
+      SKU
+    </ResponseField>
+    <ResponseField name="is_taxable" type="boolean | null">
+      Whether variant is taxable
+    </ResponseField>
+    <ResponseField name="weight" type="number | null">
+      Weight
+    </ResponseField>
+    <ResponseField name="option1" type="string | null">
+      First option value (e.g. size)
+    </ResponseField>
+    <ResponseField name="option2" type="string | null">
+      Second option value (e.g. color)
+    </ResponseField>
+    <ResponseField name="option3" type="string | null">
+      Third option value
+    </ResponseField>
+    <ResponseField name="url" type="string | null">
+      Variant URL
+    </ResponseField>
+    <ResponseField name="affiliate_link" type="string | null">
+      Affiliate link URL
+    </ResponseField>
+    <ResponseField name="quantity_available" type="number | null">
+      Quantity available (Shopify-style variants only)
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="store_canonical_url" type="string | null">
+    Canonical store URL
+  </ResponseField>
+  <ResponseField name="store_domain" type="string">
+    Store domain
+  </ResponseField>
+  <ResponseField name="platform" type="string | null">
+    E-commerce platform (null if not identified)
+  </ResponseField>
+  <ResponseField name="platform_id" type="string | null">
+    Platform-specific ID
+  </ResponseField>
+  <ResponseField name="description_html" type="string | null">
+    HTML-formatted description
+  </ResponseField>
+  <ResponseField name="product_type" type="string | null">
+    Product type/category
+  </ResponseField>
+  <ResponseField name="google_product_category_id" type="string | null">
+    Google product category identifier
+  </ResponseField>
+  <ResponseField name="google_product_category_path" type="string | null">
+    Full Google product category path
+  </ResponseField>
+  <ResponseField name="tags" type="array">
+    Array of product tags (strings)
+  </ResponseField>
+  <ResponseField name="video_url" type="string | null">
+    Product video URL (if available)
+  </ResponseField>
+  <ResponseField name="updated_at" type="string">
+    Last update timestamp (ISO 8601)
+  </ResponseField>
+  <ResponseField name="attributes" type="object">
+    Product attributes when AI enrichment is enabled.
+  </ResponseField>
+  <Expandable title="Attributes object (product.attributes)">
+    Key-value object from AI enrichment. Structure is product-dependent; no fixed schema. May include semantic attributes (e.g. style, material, occasion) and other enriched fields.
+  </Expandable>
+  <ResponseField name="review_count" type="number | null">
+    Review count (when reviews enabled)
+  </ResponseField>
+  <ResponseField name="average_rating" type="number | null">
+    Average rating (when reviews enabled)
+  </ResponseField>
+  <ResponseField name="rating_scale" type="number | null">
+    Rating scale (e.g. 5)
+  </ResponseField>
+  <ResponseField name="faqs" type="array | null">
+    Array of FAQ objects.
+  </ResponseField>
+  <Expandable title="FAQ object (elements of product.faqs)">
+    <ResponseField name="question" type="string">
+      Question
+    </ResponseField>
+    <ResponseField name="answer" type="string">
+      Answer
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="reviews" type="array | null">
+    Array of review objects.
+  </ResponseField>
+  <Expandable title="Review object (elements of product.reviews)">
+    <ResponseField name="date" type="string | null">
+      Review date
+    </ResponseField>
+    <ResponseField name="title" type="string | null">
+      Review title
+    </ResponseField>
+    <ResponseField name="rating" type="number | string | null">
+      Rating
+    </ResponseField>
+    <ResponseField name="content" type="string | null">
+      Review body
+    </ResponseField>
+    <ResponseField name="image_url" type="string | null">
+      Review image URL
+    </ResponseField>
+    <ResponseField name="reviewer_name" type="string | null">
+      Reviewer name
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="brand_pdp" type="object | null">
+    Brand PDP data when brand PDP discovery is enabled.
+  </ResponseField>
+  <Expandable title="Brand PDP object (product.brand_pdp)">
+    Present when brand PDP discovery is enabled.
+    <ResponseField name="success" type="boolean">
+      Whether brand PDP was found
+    </ResponseField>
+    <ResponseField name="brand_pdp_url" type="string | null">
+      Brand PDP URL
+    </ResponseField>
+    <ResponseField name="brand_domain" type="string | null">
+      Brand domain
+    </ResponseField>
+    <ResponseField name="brand_name" type="string | null">
+      Brand name
+    </ResponseField>
+    <ResponseField name="product_title" type="string | null">
+      Product title used for matching
+    </ResponseField>
+    <ResponseField name="confidence" type="string | null">
+      "high" | "medium" | "low"
+    </ResponseField>
+    <ResponseField name="error" type="string | null">
+      Error message if success is false
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="similar_products" type="array | null">
+    Similar products when similar products discovery is enabled.
+  </ResponseField>
+  <Expandable title="Similar product object (elements of product.similar_products)">
+    <ResponseField name="title" type="string">
+      Product title
+    </ResponseField>
+    <ResponseField name="url" type="string">
+      Product URL
+    </ResponseField>
+    <ResponseField name="brand" type="string | null">
+      Brand name
+    </ResponseField>
+    <ResponseField name="similarity" type="string">
+      "high" | "medium" | "low"
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="reddit_insights" type="object | null">
+    Reddit consumer voice when Reddit insights are enabled.
+  </ResponseField>
+  <Expandable title="Reddit insights object (product.reddit_insights)">
+    Present when Reddit insights are enabled. Nested structure from Reddit consumer voice.
+    <ResponseField name="status" type="string">
+      "ok" | "error" | "no_results"
+    </ResponseField>
+    <ResponseField name="generated_at" type="string">
+      ISO timestamp
+    </ResponseField>
+    <ResponseField name="match" type="object">
+      confidence (number 0–1), matched_terms (string[]), notes (string)
+    </ResponseField>
+    <ResponseField name="coverage" type="object">
+      threads_used (number), subreddits (string[])
+    </ResponseField>
+    <ResponseField name="conversation_summary" type="object">
+      one_liner (string), sentiment (object), top_themes (array), use_cases (array), comparisons (array), common_questions (array), gotchas (array)
+    </ResponseField>
+    <ResponseField name="evidence" type="object">
+      items (array of evidence items: ref_id, type, title, excerpt, author, subreddit, thread { title, subreddit, url })
+    </ResponseField>
+  </Expandable>
+</Expandable>

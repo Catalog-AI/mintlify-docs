@@ -4,6 +4,8 @@ api: "GET https://api.getcatalog.ai/v2/extract/{execution_id}"
 description: "Get extract status and results for an asynchronous extract job."
 ---
 
+import ProductProperties from "/snippets/v2-product-object.mdx";
+
 <Tip>
 **When to use:** After starting an extraction job with the POST endpoint, use this endpoint to:
 - Check if processing is complete
@@ -74,115 +76,7 @@ description: "Get extract status and results for an asynchronous extract job."
     <ResponseField name="product" type="object | null">
       Product data (null if processing failed)
       
-      <Expandable title="Product Properties">
-        <ResponseField name="id" type="string">
-          Unique product identifier
-        </ResponseField>
-        
-        <ResponseField name="title" type="string">
-          Product title
-        </ResponseField>
-        
-        <ResponseField name="description" type="string">
-          Detailed product description
-        </ResponseField>
-        
-        <ResponseField name="vendor" type="string">
-          Store/retailer name (e.g., "net-a-porter", "Nike")
-        </ResponseField>
-        
-        <ResponseField name="brand" type="string | null">
-          Product brand name (e.g., "LOEFFLER RANDALL", "Nike")
-        </ResponseField>
-        
-        <ResponseField name="url" type="string">
-          Product URL
-        </ResponseField>
-        
-        <ResponseField name="handle" type="string">
-          Product handle/slug
-        </ResponseField>
-        
-        <ResponseField name="is_available" type="boolean">
-          Product availability status
-        </ResponseField>
-        
-        <ResponseField name="price_amount" type="number | null">
-          Price in dollars
-        </ResponseField>
-        
-        <ResponseField name="price_currency" type="string | null">
-          Currency code (e.g., "USD")
-        </ResponseField>
-        
-        <ResponseField name="min_price" type="number | null">
-          Minimum price for variants
-        </ResponseField>
-        
-        <ResponseField name="max_price" type="number | null">
-          Maximum price for variants
-        </ResponseField>
-        
-        <ResponseField name="images" type="array">
-          Array of product images
-        </ResponseField>
-        
-        <ResponseField name="options" type="array">
-          Array of product options (size, color, etc.)
-        </ResponseField>
-        
-        <ResponseField name="variants" type="array">
-          Array of product variants with detailed information
-        </ResponseField>
-        
-        <ResponseField name="store_canonical_url" type="string | null">
-          Canonical store URL
-        </ResponseField>
-        
-        <ResponseField name="store_domain" type="string">
-          Store domain
-        </ResponseField>
-        
-        <ResponseField name="platform" type="string | null">
-          E-commerce platform (null if not identified)
-        </ResponseField>
-        
-        <ResponseField name="platform_id" type="string | null">
-          Platform-specific ID
-        </ResponseField>
-        
-        <ResponseField name="description_html" type="string | null">
-          HTML-formatted description
-        </ResponseField>
-        
-        <ResponseField name="product_type" type="string | null">
-          Product type/category
-        </ResponseField>
-        
-        <ResponseField name="google_product_category_id" type="string | null">
-          Google product category identifier
-        </ResponseField>
-        
-        <ResponseField name="google_product_category_path" type="string | null">
-          Full Google product category path
-        </ResponseField>
-        
-        <ResponseField name="tags" type="array">
-          Array of product tags/categories
-        </ResponseField>
-        
-        <ResponseField name="video_url" type="string | null">
-          Product video URL (if available)
-        </ResponseField>
-        
-        <ResponseField name="updated_at" type="string">
-          Last update timestamp (ISO 8601)
-        </ResponseField>
-        
-        <ResponseField name="attributes" type="object">
-          Comprehensive product attributes (when AI enrichment is enabled)
-        </ResponseField>
-      </Expandable>
+      <ProductProperties />
     </ResponseField>
     
     <ResponseField name="outcome" type="string" optional>

@@ -4,6 +4,8 @@ api: "POST https://api.getcatalog.ai/v2/agentic-search-mini"
 description: "Fast synchronous search returning up to 10 products with AI-powered attribute enrichment."
 ---
 
+import ProductProperties from "/snippets/v2-product-object.mdx";
+
 <Tip>
 **When to use:** Ideal for autocomplete, quick previews, or when you need fast AI-enriched results with a small result set. For larger result sets with customer profile personalization, use [`POST /v2/agentic-search`](/v2/api-reference/endpoints/search/agentic-search).
 </Tip>
@@ -42,61 +44,25 @@ description: "Fast synchronous search returning up to 10 products with AI-powere
 ## Response
 
 <ResponseField name="data" type="array">
-  Array of discovered products with enriched data (up to 10 results). Fewer products may be returned if some cannot be processed or lack detailed product data.
+  Array of product results (up to 10 items). Fewer items may be returned if some cannot be processed or lack detailed product data.
   
-  <Expandable title="Product Properties">
+  <Expandable title="Product Result" defaultOpen>
     <ResponseField name="url" type="string">
-      Product URL (normalized and cleaned)
+      Original URL that was processed
     </ResponseField>
     
-    <ResponseField name="title" type="string">
-      Product title
+    <ResponseField name="success" type="boolean">
+      Whether the product was successfully processed
     </ResponseField>
     
-    <ResponseField name="price_amount" type="number">
-      Product price as a number (e.g., 99.99)
-    </ResponseField>
-    
-    <ResponseField name="price_currency" type="string">
-      Currency code. Currently always `"USD"`.
-    </ResponseField>
-    
-    <ResponseField name="description" type="string">
-      Product description
-    </ResponseField>
-    
-    <ResponseField name="images" type="array">
-      Array of product image URLs
-    </ResponseField>
-    
-    <ResponseField name="attributes" type="object">
-      Comprehensive product attributes extracted through AI analysis and Google Shopping data. Attribute keys and values are dynamic and vary by product based on available information.
+    <ResponseField name="product" type="object | null">
+      Product data (null if processing failed)
       
-      <Expandable title="Common Attributes">
-        <ResponseField name="color" type="string">
-          Primary product color (when available)
-        </ResponseField>
-        
-        <ResponseField name="material" type="string">
-          Primary material composition (when available)
-        </ResponseField>
-        
-        <ResponseField name="category" type="string">
-          Product category classification (when available)
-        </ResponseField>
-        
-        <ResponseField name="brand" type="string">
-          Brand information (when available)
-        </ResponseField>
-        
-        <ResponseField name="features" type="string">
-          Key product features (when available)
-        </ResponseField>
-      </Expandable>
-      
-      <Note>
-        **Dynamic Attributes:** The attributes object contains dynamic keys and values that vary by product. Common attributes like `color`, `material`, `category`, `brand`, and `features` may be present, but the exact structure depends on the product and available data sources (Google Shopping features and AI enrichment when enabled).
-      </Note>
+      <ProductProperties />
+    </ResponseField>
+    
+    <ResponseField name="outcome" type="string" optional>
+      Machine-readable reason for failure (only present when success is false and a specific reason is available)
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -143,7 +109,7 @@ description: "Fast synchronous search returning up to 10 products with AI-powere
 
 ## Response Schema and Enable Flags
 
-The `/v2/agentic-search-mini` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present in product objects returned in the `data` array, but will be `null` when the corresponding flag is `false`.
+The `/v2/agentic-search-mini` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present in the `product` object of each item in the `data` array, but will be `null` when the corresponding flag is `false`.
 
 **Field Mappings:**
 
