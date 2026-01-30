@@ -82,7 +82,7 @@ import ProductProperties from "/snippets/v2-product-object.mdx";
     </ResponseField>
     
     <ResponseField name="product" type="object | null">
-      Product data
+      Product data (null if processing failed)
       
       <ProductProperties />
     </ResponseField>
@@ -181,9 +181,9 @@ import ProductProperties from "/snippets/v2-product-object.mdx";
   </Expandable>
 </ResponseField>
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 # Check execution status
 curl -X GET "https://api.getcatalog.ai/v2/agentic-search/agentic-a1b2c3d4-1735123456789" \
   -H "x-api-key: $CATALOG_API_KEY"

@@ -70,9 +70,9 @@ This is ideal for initial discovery of a new vendor. Use [`POST /v2/extract`](/v
 **HTTP Status Code:** This endpoint returns `202 Accepted` to indicate the request has been accepted for processing. The response body contains the execution details you need to track the crawl progress.
 </Note>
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 curl -X POST https://api.getcatalog.ai/v2/crawl \
   -H "Content-Type: application/json" \
   -H "x-api-key: $CATALOG_API_KEY" \
