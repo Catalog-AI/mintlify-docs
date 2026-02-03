@@ -27,7 +27,6 @@
     Object with price information.
   </ResponseField>
   <Expandable title="Price object">
-    Used for product.price and for each variant.price.
     <ResponseField name="current_value" type="number | null">
       Price value
     </ResponseField>
@@ -41,7 +40,7 @@
   <ResponseField name="images" type="array">
     Array of image objects.
   </ResponseField>
-  <Expandable title="Image object (elements of product.images)">
+  <Expandable title="Image object">
     <ResponseField name="url" type="string">
       Image URL
     </ResponseField>
@@ -70,7 +69,7 @@
   <ResponseField name="options" type="array">
     Array of option objects.
   </ResponseField>
-  <Expandable title="Option object (elements of product.options)">
+  <Expandable title="Option object">
     <ResponseField name="name" type="string">
       Option name (e.g. "Size", "Color")
     </ResponseField>
@@ -84,7 +83,7 @@
   <ResponseField name="variants" type="array">
     Array of variant objects.
   </ResponseField>
-  <Expandable title="Variant object (elements of product.variants)">
+  <Expandable title="Variant object">
     <ResponseField name="id" type="string">
       Variant ID
     </ResponseField>
@@ -167,7 +166,7 @@
   <ResponseField name="attributes" type="object">
     Product attributes when AI enrichment is enabled.
   </ResponseField>
-  <Expandable title="Attributes object (product.attributes)">
+  <Expandable title="Attributes object">
     Key-value object from AI enrichment. Structure is product-dependent; no fixed schema. May include semantic attributes (e.g. style, material, occasion) and other enriched fields.
   </Expandable>
   <ResponseField name="review_count" type="number | null">
@@ -182,7 +181,7 @@
   <ResponseField name="faqs" type="array | null">
     Array of FAQ objects.
   </ResponseField>
-  <Expandable title="FAQ object (elements of product.faqs)">
+  <Expandable title="FAQ object">
     <ResponseField name="question" type="string">
       Question
     </ResponseField>
@@ -193,7 +192,7 @@
   <ResponseField name="reviews" type="array | null">
     Array of review objects.
   </ResponseField>
-  <Expandable title="Review object (elements of product.reviews)">
+  <Expandable title="Review object">
     <ResponseField name="date" type="string | null">
       Review date
     </ResponseField>
@@ -216,7 +215,7 @@
   <ResponseField name="brand_pdp" type="object | null">
     Brand PDP data when brand PDP discovery is enabled.
   </ResponseField>
-  <Expandable title="Brand PDP object (product.brand_pdp)">
+  <Expandable title="Brand PDP object">
     Present when brand PDP discovery is enabled.
     <ResponseField name="success" type="boolean">
       Whether brand PDP was found
@@ -243,7 +242,7 @@
   <ResponseField name="similar_products" type="array | null">
     Similar products when similar products discovery is enabled.
   </ResponseField>
-  <Expandable title="Similar product object (elements of product.similar_products)">
+  <Expandable title="Similar product object">
     <ResponseField name="title" type="string">
       Product title
     </ResponseField>
@@ -260,7 +259,7 @@
   <ResponseField name="reddit_insights" type="object | null">
     Reddit consumer voice when Reddit insights are enabled.
   </ResponseField>
-  <Expandable title="Reddit insights object (product.reddit_insights)">
+  <Expandable title="Reddit insights object">
     Present when Reddit insights are enabled. Nested structure from Reddit consumer voice.
     <ResponseField name="status" type="string">
       "ok" | "error" | "no_results"

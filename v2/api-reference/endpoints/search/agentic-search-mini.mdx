@@ -44,7 +44,7 @@ description: "Fast synchronous search returning up to 10 products with AI-powere
 <ResponseField name="data" type="array">
   Array of discovered products with enriched data (up to 10 results).
   
-  <Expandable title="Product Object">
+  <Expandable title="Product Object" defaultOpen>
     <ResponseField name="url" type="string">
       Product URL (normalized and cleaned)
     </ResponseField>
@@ -52,7 +52,7 @@ description: "Fast synchronous search returning up to 10 products with AI-powere
     <ResponseField name="product" type="object">
       Product details
       
-      <Expandable title="Product Properties">
+      <Expandable title="Product Properties" defaultOpen>
         <ResponseField name="title" type="string">
           Product title
         </ResponseField>
@@ -227,121 +227,36 @@ print(f"Found {len(data['data'])} products")
       "product": {
         "title": "Organic Cotton Floral Crochet Dress",
         "price": {
-          "current_value": 723.03,
+          "current_value": 733.6,
           "compare_at_value": null,
           "currency": "USD"
         },
         "description": "",
         "images": [
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQPlPfCKoRew2h3A9Xi54Wm1xfod5UhOVbLvgHtCW7m02kRkqYKg_IgyVrZ_-AZyT-AFivJYE3I0fMKhzQ3zDZCExx1K1UVxJ68QLeIqljZ"
+          [
+            "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQPlPfCKoRew2h3A9Xi54Wm1xfod5UhOVbLvgHtCW7m02kRkqYKg_IgyVrZ_-AZyT-AFivJYE3I0fMKhzQ3zDZCExx1K1UVxJ68QLeIqljZ"
+          ]
         ],
         "attributes": {
           "product_name": "Floral Crochet Organic Cotton Dress",
-          "material": "100% Peruvian Organic Cotton (GOTS - USDA certified)",
-          "construction": "Handmade in Peru",
+          "material": "100% Peruvian Organic Cotton",
+          "certifications": "GOTS, USDA",
+          "origin": "Handmade in Peru",
           "design": "Crochet midi dress",
           "measurements": "Hips: 36.22 inches (92 cm), Length: 40.55 inches (103 cm)",
           "available_sizes": "S, M",
           "available_colors": "Ivory, Black, Pink, Red, Orange, Gray, Light Blue, Light Green, Light Violet",
           "care_instructions": "Hand wash with shampoo",
-          "production_time": "4-6 days for item to be made before shipping"
+          "production_time": "4-6 days"
         }
       }
     },
-    {
-      "url": "https://agaati.com/products/maremma-nautical-stripe-off-shoulder-top-in-cotton-poplin?country=US&currency=USD",
-      "product": {
-        "title": "Filoli Cut-Out Cotton Midi Dress",
-        "price": {
-          "current_value": 595,
-          "compare_at_value": null,
-          "currency": "USD"
-        },
-        "description": "Fashioned in sustainable cotton, the Filoli Midi Dress has an A-line silhouette with an asymmetrical neck and a cutout waist.",
-        "images": [
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcRGQCXaNahFk4IBTOOgU3d2Qs2_dCcmr-lW7K8DyN5alchuGV18srNSLqVd9Yr5wXm2WmbHT92g7cjfyMASwWj82X2k5O2QB23vmVHpfTMDv-YDq_h27YeB"
-        ],
-        "attributes": {
-          "product_name": "Maremma Nautical Stripe Off Shoulder Top",
-          "material": "Cotton Poplin",
-          "design": "Nautical Stripe",
-          "neckline": "Off Shoulder",
-          "sleeve_style": "Short Sleeves",
-          "fit": "Relaxed",
-          "care_instructions": "Dry Clean Only",
-          "origin": "Made in India"
-        }
-      }
-    },
-    {
-      "url": "https://www.lafayette148ny.com/organic-cotton-poplin-gathered-midi-dress",
-      "product": {
-        "title": "Lafayette 148 New York Women's Ruched Organic Cotton Poplin Midi Dress",
-        "price": {
-          "current_value": 539,
-          "compare_at_value": null,
-          "currency": "USD"
-        },
-        "description": "This midi dress from Lafayette 148 New York is crafted from organic cotton poplin.",
-        "images": [
-          "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcSfrfQThwOKnhxscqlm09aboUOZuAahac4X1WH2VCXn1gU2NAzIVrlx9rI9DLWtXxZemPtMrNpAsED9evfj2WWwSc6jQL-iNbRAbhuqUlqdjluqpmq6GomE"
-        ],
-        "attributes": {
-          "fit": "A-line",
-          "sleeve_length": "Cap sleeve",
-          "closure": "Side zip",
-          "material": "100% organic cotton poplin",
-          "care_instructions": "Machine wash cold or dry clean"
-        }
-      }
-    },
-    {
-      "url": "https://www.harrods.com/en-us/p/doen-organic-cotton-leanne-midi-dress-000000000007912152",
-      "product": {
-        "title": "Dôen Organic Cotton Leanne Midi Dress - Navy - S",
-        "price": {
-          "current_value": 500,
-          "compare_at_value": null,
-          "currency": "USD"
-        },
-      "description": "",
-        "images": [
-          "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQgJA5k3E8prr6bSBRT3HQfa8ImbsxVM_6Dal2kK5U9D2rvk_fsGiPlzF2QoSH1Q9omLWnodYZyvC932CO6MUTrZ62yXum-VP3javqC38X3O3MAKiwqnyDpjg"
-        ],
-        "attributes": {
-          "brand": "DÔEN",
-          "product_name": "Organic Cotton Leanne Midi Dress",
-          "color": "Adriatic (Navy)",
-          "material": "100% Organic Cotton Poplin"
-        }
-      }
-    },
-    {
-      "url": "https://cunningtonandsanderson.com/products/copy-of-knotted-dress-1?country=US&currency=USD",
-      "product": {
-        "title": "Zero-Waste Luxury Knotted Cotton Midi Dress",
-        "price": {
-          "current_value": 494,
-          "compare_at_value": null,
-          "currency": "USD"
-        },
-        "description": "Sculptural white knotted midi dress with zero-waste design.",
-        "images": [
-          "https://encrypted-tbn0.gstatic.com/shopping?q=tbn:ANd9GcSljyjGXGses1UGGx-JpOzf2Ox-PRiMZT5lWF44-TXHy5ofQ_gRP7FWHkT7E1cXgw6F9br7sG8wIPan5l5oOGVSg6yN57FbmlaYtmA9JrBuXwXDRpMZduqkPA"
-        ],
-        "attributes": {
-          "product_name": "Knotted Dress White",
-          "brand": "Cunnington & Sanderson",
-          "material": "Cotton",
-          "color": "White"
-        }
-      }
-    }
+    ...
   ],
   "pagination": {
     "page": 1,
-    "page_size": 5,
-    "total_items": 5,
+    "page_size": 10,
+    "total_items": 10,
     "total_pages": 1,
     "has_next": false,
     "has_prev": false
