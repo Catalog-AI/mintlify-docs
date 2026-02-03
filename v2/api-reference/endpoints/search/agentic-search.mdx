@@ -91,9 +91,9 @@ description: "Async AI-powered search with customer profile personalization. Ret
 </ResponseField>
 
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 curl -X POST https://api.getcatalog.ai/v2/agentic-search \
   -H "Content-Type: application/json" \
   -H "x-api-key: $CATALOG_API_KEY" \
@@ -272,7 +272,7 @@ print(f"Credits used: {data['meta']['credits_used']}")
 
 ## Response Schema and Enable Flags
 
-The `/v2/agentic-search` endpoint maintains a consistent response schema regardless of `enable_*` flag values. All fields are always present in product objects returned in the `data` array, but will be `null` when the corresponding flag is `false`.
+The `/v2/agentic-search` endpoint maintains a consistent response schema regardless of `enable_*` flag values. When you retrieve results via GET status, all fields are always present in the `product` object of each item in the `data` array, but will be `null` when the corresponding flag is `false`.
 
 **Field Mappings:**
 

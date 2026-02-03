@@ -92,9 +92,9 @@ The `/v1/products` endpoint maintains a consistent response schema regardless of
 | `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` |
 | `enable_image_tags` | `images[].attributes` |
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 curl -X POST https://api.getcatalog.ai/v1/products \
   -H "Content-Type: application/json" \
   -H "x-api-key: $CATALOG_API_KEY" \

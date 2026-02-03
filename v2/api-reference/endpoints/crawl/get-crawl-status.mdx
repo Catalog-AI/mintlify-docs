@@ -126,9 +126,9 @@ description: "Get crawl status and results for an asynchronous crawl job."
   </Expandable>
 </ResponseField>
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 # Check execution status
 curl -X GET "https://api.getcatalog.ai/v2/crawl/crawl-skims-com-a1b2c3d4" \
   -H "x-api-key: $CATALOG_API_KEY"
@@ -209,42 +209,6 @@ while True:
 
 <ResponseExample>
 
-```json Status: Running
-{
-  "execution_id": "crawl-skims-com-a1b2c3d4",
-  "status": "running",
-  "error": null,
-  "meta": {
-    "vendor": "skims.com",
-    "start_date": "2025-01-15T10:30:00.000Z",
-    "stop_date": null,
-    "duration_ms": 45000,
-    "progress": {
-      "collections_found": 12,
-      "listings_found": 456
-    },
-    "steps": [
-      {
-        "name": "Determining crawl method",
-        "status": "completed"
-      },
-      {
-        "name": "Discovering collections",
-        "status": "running"
-      },
-      {
-        "name": "Analyzing collections",
-        "status": "pending"
-      },
-      {
-        "name": "Extracting listings",
-        "status": "pending"
-      }
-    ]
-  }
-}
-```
-
 ```json Status: Completed
 {
   "execution_id": "crawl-skims-com-a1b2c3d4",
@@ -278,6 +242,42 @@ while True:
       "collections_total": 25,
       "listings_total": 1234
     }
+  }
+}
+```
+
+```json Status: Running
+{
+  "execution_id": "crawl-skims-com-a1b2c3d4",
+  "status": "running",
+  "error": null,
+  "meta": {
+    "vendor": "skims.com",
+    "start_date": "2025-01-15T10:30:00.000Z",
+    "stop_date": null,
+    "duration_ms": 45000,
+    "progress": {
+      "collections_found": 12,
+      "listings_found": 456
+    },
+    "steps": [
+      {
+        "name": "Determining crawl method",
+        "status": "completed"
+      },
+      {
+        "name": "Discovering collections",
+        "status": "running"
+      },
+      {
+        "name": "Analyzing collections",
+        "status": "pending"
+      },
+      {
+        "name": "Extracting listings",
+        "status": "pending"
+      }
+    ]
   }
 }
 ```

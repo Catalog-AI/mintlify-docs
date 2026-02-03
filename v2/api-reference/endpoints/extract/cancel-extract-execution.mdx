@@ -42,9 +42,9 @@ description: "Cancel a running extract. Stops an active extract job that is curr
   ISO 8601 timestamp when the execution was stopped (null if not available)
 </ResponseField>
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 # Cancel a running execution (urls input)
 curl -X DELETE "https://api.getcatalog.ai/v2/extract/extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7" \
   -H "x-api-key: $CATALOG_API_KEY"

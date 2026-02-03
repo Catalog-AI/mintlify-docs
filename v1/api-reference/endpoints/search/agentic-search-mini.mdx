@@ -44,7 +44,7 @@ description: "Fast synchronous search returning up to 10 products with AI-powere
 <ResponseField name="products" type="array">
   Array of discovered products with enriched data (up to 10 results). Fewer products may be returned if some cannot be processed or lack detailed product data.
   
-  <Expandable title="Product Properties">
+  <Expandable title="Product Properties" defaultOpen>
     <ResponseField name="url" type="string">
       Product URL (normalized and cleaned)
     </ResponseField>
@@ -115,9 +115,9 @@ description: "Fast synchronous search returning up to 10 products with AI-powere
   </Expandable>
 </ResponseField>
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 curl -X POST https://api.getcatalog.ai/v1/agentic-search-mini \
   -H "Content-Type: application/json" \
   -H "x-api-key: $CATALOG_API_KEY" \

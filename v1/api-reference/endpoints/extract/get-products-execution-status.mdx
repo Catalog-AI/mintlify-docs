@@ -90,11 +90,11 @@ description: "Get extract status and results for an asynchronous extract job."
 <ResponseField name="results" type="object" optional>
   Product results (only present when status is "completed")
   
-  <Expandable title="Results Properties">
+  <Expandable title="Results Properties" defaultOpen>
     <ResponseField name="products" type="array">
       Array of product results, one for each input URL
       
-      <Expandable title="Product Result">
+      <Expandable title="Product Result" defaultOpen>
         <ResponseField name="url" type="string">
           Original URL that was processed
         </ResponseField>
@@ -106,7 +106,7 @@ description: "Get extract status and results for an asynchronous extract job."
         <ResponseField name="product" type="object | null">
           Product data (null if processing failed)
           
-          <Expandable title="Product Properties">
+          <Expandable title="Product Properties" defaultOpen>
             <ResponseField name="id" type="string">
               Unique product identifier
             </ResponseField>
@@ -269,9 +269,9 @@ description: "Get extract status and results for an asynchronous extract job."
   </Expandable>
 </ResponseField>
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 # Check execution status
 curl -X GET "https://api.getcatalog.ai/v1/products/products-batch-550e8400-e29b-41d4-a716-446655440000" \
   -H "x-api-key: $CATALOG_API_KEY"
@@ -339,6 +339,130 @@ while True:
 
 <ResponseExample>
 
+```json Status: Completed
+{
+  "status": "completed",
+  "progress": {
+    "products_processed": 1,
+    "urls_completed": 1,
+    "total_urls": 1,
+    "percent_complete": 100
+  },
+  "error": null,
+  "credits_used": 5,
+  "results": {
+    "products": [
+      {
+        "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+        "product": {
+          "id": "6e6bd7bd-bfb5-4e05-85ee-4969628e741a",
+          "title": "Nike Air Force 1 '07",
+          "description": "Comfortable, durable and timeless—it’s number one for a reason. ... Style: CW2288-111",
+          "vendor": "nike.com",
+          "brand": "Nike",
+          "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+          "handle": "cw2288-111",
+          "is_available": true,
+          "attributes": {
+            "additional_attributes": [
+              "classic '80s construction",
+              "bold design details",
+              "smooth leather upper",
+              "... more ..."
+            ],
+            "age_group": "adult",
+            "gender": "unisex",
+            "summary": "Timeless Nike Air Force 1 '07 sneakers combining classic ’80s construction with smooth leather and durable, comfortable design.",
+            "features": "Durable construction, cushioned midsole for support, and iconic silhouette suitable for various occasions.",
+            "care_instructions": "Wipe clean with a damp cloth, avoid heavy cleaning solutions, air dry away from direct heat.",
+            "color": { "iscc_family": "white", "merchant_label": "White/White" },
+            "material": { "primary": "leather", "merchant_label": "Smooth Leather" },
+            "pattern": "solid",
+            "closure_type": "lace-up",
+            "season": ["year-round"],
+            "style": ["casual", "classic", "streetwear"],
+            "mood": ["confident", "timeless"],
+            "occasion": ["everyday", "casual", "sports-event"],
+            "additional_product_information": "Benefits: ...\nProduct details: ...\nFit note: Fits large; we recommend ordering a half size down."
+          },
+          "price": { "currency": "USD", "current_value": 115, "compare_at_value": 115 },
+          "images": [
+            {
+              "id": "img-1769639694151-0",
+              "url": "https://static.nike.com/a/images/t_default/.../AIR+FORCE+1+%2707.png",
+              "width": 400,
+              "height": 400,
+              "alt_text": "Nike Air Force 1 '07 product image (primary)",
+              "position": 1,
+              "variant_ids": ["variant-1769639694153-0", "..."],
+              "attributes": null
+            },
+            "..."
+          ],
+          "options": [
+            { "name": "Color", "values": ["White/White"], "position": 1 },
+            { "name": "Size", "values": ["6", "6.5", "7", "...", "18"], "position": 2 }
+          ],
+          "variants": [
+            {
+              "id": "variant-1769639694153-0",
+              "sku": "CW2288-111",
+              "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-jBrhbr/CW2288-111#size-6",
+              "image": {
+                "id": "img-variant-variant-1769639694153-0",
+                "url": "https://static.nike.com/a/images/t_default/.../AIR+FORCE+1+%2707.png",
+                "width": 400,
+                "height": 400,
+                "alt_text": "Nike Air Force 1 '07 - White/White - 6 variant image",
+                "position": 1,
+                "variant_ids": ["variant-1769639694153-0"]
+              },
+              "price": { "currency": "USD", "current_value": 115, "compare_at_value": null },
+              "title": "Nike Air Force 1 '07 - White/white - 6",
+              "option1": "White/White",
+              "option2": "6",
+              "is_available": true,
+              "affiliate_link": "https://wild.link/e?...#size-6"
+            },
+            "..."
+          ],
+          "store_canonical_url": "https://www.nike.com/",
+          "store_domain": "www.nike.com",
+          "platform": null,
+          "platform_id": "CW2288-111",
+          "description_html": "<html>...</html>",
+          "product_type": "FOOTWEAR",
+          "google_product_category_id": "187",
+          "google_product_category_path": "Apparel & Accessories > Shoes",
+          "tags": ["FOOTWEAR"],
+          "video_url": null,
+          "review_count": null,
+          "average_rating": null,
+          "rating_scale": null,
+          "faqs": null,
+          "reviews": null,
+          "updated_at": "2026-01-28T22:53:52.255Z",
+          "brand_pdp": null,
+          "similar_products": null,
+          "reddit_insights": null,
+          "affiliate_link": "https://wild.link/e?...CW2288-111"
+        },
+        "success": true
+      }
+    ],
+    "meta": { "total_successful": 1, "total_requested": 1, "total_failed": 0 }
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total_items": 1,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  }
+}
+```
+
 ```json Status: Running
 {
   "status": "running",
@@ -349,36 +473,6 @@ while True:
     "percent_complete": 45
   },
   "error": null
-}
-```
-
-```json Status: Completed
-{
-  "status": "completed",
-  "progress": null,
-  "error": null,
-  "results": {
-    "products": [
-      {
-        ...
-      },
-      {
-        ...
-      }
-    ],
-    "meta": {
-      "total_successful": 2,
-      "total_requested": 2,
-      "total_failed": 0
-    }
-  },
-  "pagination": {
-    "page": 1,
-    "limit": 50,
-    "total_items": 2,
-    "total_pages": 1,
-    "has_next": false
-  }
 }
 ```
 

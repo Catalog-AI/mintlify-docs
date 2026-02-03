@@ -49,9 +49,9 @@ description: "Get crawl status and results for an asynchronous crawl job."
   **Note:** This value is extracted from the execution output and may be `null` if the crawl is still running or if the count cannot be determined.
 </ResponseField>
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 # Check execution status
 curl -X GET "https://api.getcatalog.ai/v1/crawl/crawl-skims-com-a1b2c3d4" \
   -H "x-api-key: $CATALOG_API_KEY"
@@ -113,17 +113,17 @@ while True:
 
 <ResponseExample>
 
-```json Status: Running
-{
-  "status": "running",
-  "total_listings_found": null
-}
-```
-
 ```json Status: Completed
 {
   "status": "completed",
   "total_listings_found": 1234
+}
+```
+
+```json Status: Running
+{
+  "status": "running",
+  "total_listings_found": null
 }
 ```
 

@@ -4,6 +4,8 @@ api: "GET https://api.getcatalog.ai/v2/agentic-search/{execution_id}"
 description: "Get agentic search status and results for an asynchronous search job."
 ---
 
+import ProductProperties from "/snippets/v2-product-object.mdx";
+
 <Tip>
 **When to use:** After starting a search job with the POST endpoint, use this endpoint to:
 - Check if the search is complete
@@ -68,231 +70,25 @@ description: "Get agentic search status and results for an asynchronous search j
 </ResponseField>
 
 <ResponseField name="data" type="array" optional>
-  Array of products matching the search query (only present when status is "completed", up to 8 products).
+  Array of product results (only present when status is "completed", up to 8 items). Fewer items may be returned if some cannot be processed or don't meet quality requirements.
   
-  <Expandable title="Product Object">
+  <Expandable title="Product Result" defaultOpen>
     <ResponseField name="url" type="string">
-      Product URL
+      Original URL that was processed
     </ResponseField>
     
-    <ResponseField name="product" type="object">
-      Product details
+    <ResponseField name="success" type="boolean">
+      Whether the product was successfully processed
+    </ResponseField>
+    
+    <ResponseField name="product" type="object | null">
+      Product object
       
-      <Expandable title="Product Properties">
-        <ResponseField name="id" type="string">
-          Unique product identifier
-        </ResponseField>
-        
-        <ResponseField name="title" type="string">
-          Product title
-        </ResponseField>
-        
-        <ResponseField name="description" type="string">
-          Product description
-        </ResponseField>
-        
-        <ResponseField name="description_html" type="string">
-          Product description with HTML formatting
-        </ResponseField>
-        
-        <ResponseField name="brand" type="string">
-          Product brand name
-        </ResponseField>
-        
-        <ResponseField name="vendor" type="string">
-          Product vendor/retailer
-        </ResponseField>
-        
-        <ResponseField name="handle" type="string">
-          URL-friendly product identifier
-        </ResponseField>
-        
-        <ResponseField name="tags" type="array">
-          Product category tags
-        </ResponseField>
-        
-        <ResponseField name="product_type" type="string">
-          Main product category
-        </ResponseField>
-        
-        <ResponseField name="price" type="object">
-          Price information
-          
-          <Expandable title="Price Properties">
-            <ResponseField name="current_value" type="number">
-              Current product price as a number
-            </ResponseField>
-            
-            <ResponseField name="compare_at_value" type="number | null">
-              Original/compare-at price if on sale, otherwise `null`
-            </ResponseField>
-            
-            <ResponseField name="currency" type="string">
-              Currency code (e.g., "USD")
-            </ResponseField>
-          </Expandable>
-        </ResponseField>
-        
-        <ResponseField name="min_price" type="number">
-          Minimum price across all variants
-        </ResponseField>
-        
-        <ResponseField name="max_price" type="number">
-          Maximum price across all variants
-        </ResponseField>
-        
-        <ResponseField name="is_available" type="boolean">
-          Product availability status
-        </ResponseField>
-        
-        <ResponseField name="platform_id" type="string">
-          Platform-specific product ID
-        </ResponseField>
-        
-        <ResponseField name="store_domain" type="string">
-          Domain of the retailer
-        </ResponseField>
-        
-        <ResponseField name="store_canonical_url" type="string">
-          Canonical URL of the store
-        </ResponseField>
-        
-        <ResponseField name="google_product_category_id" type="string">
-          Google product category identifier
-        </ResponseField>
-        
-        <ResponseField name="google_product_category_path" type="string">
-          Full Google product category path
-        </ResponseField>
-        
-        <ResponseField name="updated_at" type="string">
-          Last update timestamp (ISO 8601 format)
-        </ResponseField>
-        
-        <ResponseField name="images" type="array">
-          Product images with metadata
-          
-          <Expandable title="Image Properties">
-            <ResponseField name="id" type="string">
-              Unique image identifier
-            </ResponseField>
-            
-            <ResponseField name="url" type="string">
-              Image URL
-            </ResponseField>
-            
-            <ResponseField name="width" type="number">
-              Image width in pixels
-            </ResponseField>
-            
-            <ResponseField name="height" type="number">
-              Image height in pixels
-            </ResponseField>
-            
-            <ResponseField name="altText" type="string">
-              Alt text for the image
-            </ResponseField>
-            
-            <ResponseField name="position" type="number">
-              Display position/order of the image
-            </ResponseField>
-          </Expandable>
-        </ResponseField>
-        
-        <ResponseField name="variants" type="array">
-          Product variants with pricing and availability
-          
-          <Expandable title="Variant Properties">
-            <ResponseField name="id" type="string">
-              Unique variant identifier
-            </ResponseField>
-            
-            <ResponseField name="SKU" type="string">
-              Stock Keeping Unit identifier
-            </ResponseField>
-            
-            <ResponseField name="price" type="string">
-              Variant price as string
-            </ResponseField>
-            
-            <ResponseField name="title" type="string">
-              Full variant title including options
-            </ResponseField>
-            
-            <ResponseField name="option1" type="string">
-              First option value (e.g., size)
-            </ResponseField>
-            
-            <ResponseField name="isAvailable" type="boolean">
-              Variant availability status
-            </ResponseField>
-            
-            <ResponseField name="compareAtPrice" type="string">
-              Compare at price (original/MSRP price)
-            </ResponseField>
-          </Expandable>
-        </ResponseField>
-        
-        <ResponseField name="options" type="array">
-          Available product options (size, color, etc.)
-          
-          <Expandable title="Option Properties">
-            <ResponseField name="name" type="string">
-              Option name (e.g., "Size", "Color")
-            </ResponseField>
-            
-            <ResponseField name="values" type="array">
-              Array of available values for this option
-            </ResponseField>
-            
-            <ResponseField name="position" type="number">
-              Display position of the option
-            </ResponseField>
-          </Expandable>
-        </ResponseField>
-        
-        <ResponseField name="attributes" type="object">
-          Rich product attributes including style, mood, color, material, season, occasion, and care instructions.
-          
-          <Expandable title="Common Attributes">
-            <ResponseField name="color" type="object">
-              Color information with merchant label and ISCC classification (when available)
-            </ResponseField>
-            
-            <ResponseField name="material" type="object">
-              Material information with primary material and merchant label (when available)
-            </ResponseField>
-            
-            <ResponseField name="style" type="array">
-              Style descriptors (e.g., ["casual", "relaxed-fit"])
-            </ResponseField>
-            
-            <ResponseField name="mood" type="array">
-              Mood descriptors (e.g., ["playful", "cheerful"])
-            </ResponseField>
-            
-            <ResponseField name="season" type="array">
-              Suitable seasons (e.g., ["spring", "summer", "fall"])
-            </ResponseField>
-            
-            <ResponseField name="occasion" type="array">
-              Suitable occasions (e.g., ["everyday", "casual", "weekend"])
-            </ResponseField>
-            
-            <ResponseField name="gender" type="string">
-              Gender classification (when available)
-            </ResponseField>
-            
-            <ResponseField name="summary" type="string">
-              Product summary
-            </ResponseField>
-          </Expandable>
-        </ResponseField>
-        
-        <ResponseField name="video_url" type="string | null">
-          Product video URL (if available)
-        </ResponseField>
-      </Expandable>
+      <ProductProperties />
+    </ResponseField>
+    
+    <ResponseField name="outcome" type="string" optional>
+      Machine-readable reason for failure (only present when success is false and a specific reason is available)
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -377,9 +173,9 @@ description: "Get agentic search status and results for an asynchronous search j
   </Expandable>
 </ResponseField>
 
-<RequestExample>
+<RequestExample dropdown>
 
-```bash cURL
+```powershell cURL
 # Check execution status
 curl -X GET "https://api.getcatalog.ai/v2/agentic-search/agentic-a1b2c3d4-1735123456789" \
   -H "x-api-key: $CATALOG_API_KEY"
@@ -453,6 +249,477 @@ while True:
 
 <ResponseExample>
 
+```json Status: Completed
+{
+  "execution_id": "agentic-589b1966-1770040673820",
+  "status": "completed",
+  "error": null,
+  "meta": {
+    "query": "A Barbour jacket suitable for the office",
+    "progress": {
+      "products_processed": 8,
+      "products_total": 8,
+      "percent_complete": 100
+    },
+    "start_date": "2026-02-02T13:57:54.099Z",
+    "stop_date": "2026-02-02T14:03:41.281Z",
+    "duration_ms": 347182,
+    "result": {
+      "products_returned": 8
+    },
+    "credits_used": 25
+  },
+  "data": [
+    {
+      "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+      "product": {
+        "id": "8a19462a-1499-4221-9fff-fca3f036cc27",
+        "title": "Cropped Beadnell Waxed Jacket",
+        "description": "The Beadnell waxed jacket has been a part of Barbour's signature waxed jacket selection since 2010, offering a feminine, tailored rendition of the best-selling men's Bedale waxed jacket to the collection. This season, the Beadnell takes on a modern new look as the Barbour Cropped Beadnell Waxed Jacket displays oversized details featured on the original style. With large, gold-tone, branded snap buttons and the traditional saddle pockets, this style is complete with a cord collar and exaggerated elasticated cuffs for a contemporary touch.",
+        "vendor": "barbour.com",
+        "brand": "Barbour",
+        "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+        "handle": "cropped-beadnell-waxed-jacket-lwx1403bk71",
+        "is_available": true,
+        "attributes": {
+          "additional_attributes": [
+            "cropped silhouette",
+            "feminine, tailored rendition of the Bedale",
+            "oversized details inspired by original style",
+            "large gold-tone branded snap buttons",
+            "traditional saddle pockets",
+            "cord collar",
+            "exaggerated elasticated cuffs",
+            "waxed finish"
+          ],
+          "age_group": "adult",
+          "gender": "female",
+          "summary": "Cropped, feminine waxed jacket offering a tailored take on Barbour's Bedale with oversized details and contemporary finishes.",
+          "features": "Cropped silhouette with oversized detailing; large gold-tone branded snap button closure; traditional saddle pockets; cord collar; exaggerated elasticated cuffs; waxed finish.",
+          "care_instructions": "null",
+          "color": {
+            "iscc_family": "black",
+            "merchant_label": "Black-Classic"
+          },
+          "closure_type": "snap",
+          "style": [
+            "tailored",
+            "heritage",
+            "modern"
+          ],
+          "mood": [
+            "feminine"
+          ],
+          "additional_product_information": "The Beadnell waxed jacket is a feminine, tailored rendition of the classic Bedale waxed jacket. Key features: large gold-tone branded snap buttons, traditional saddle pockets, cord collar and exaggerated elasticated cuffs for a contemporary touch. Part of Barbour's signature waxed jacket selection since 2010. SKU: LWX1403BK71. Price: $425.00 (USD). Full-product images (multiple angles and detail shots) are provided on the product page."
+        },
+        "price": {
+          "current_value": 425,
+          "compare_at_value": 425,
+          "currency": "USD"
+        },
+        "images": [
+          {
+            "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04ac0533/images/LWX1403BK71/LWX1403BK71_01front.jpg?sw=1500&q=70",
+            "alt_text": "Cropped Beadnell Waxed Jacket product image (primary)",
+            "position": 1,
+            "width": 1500,
+            "height": 1836,
+            "id": "img-1770040913273-0",
+            "variant_ids": [
+              "variant-1770040913275-0",
+              "variant-1770040913275-1",
+              "variant-1770040913275-2",
+              "variant-1770040913275-3",
+              "variant-1770040913275-4",
+              "variant-1770040913275-5",
+              "variant-1770040913275-6",
+              "variant-1770040913275-7"
+            ],
+            "attributes": null
+          },
+          {
+            "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw3435dec4/images/LWX1403BK71/LWX1403BK71_03getthelook.jpg?sw=1500&q=70",
+            "alt_text": "Cropped Beadnell Waxed Jacket product image 2",
+            "position": 2,
+            "width": 1500,
+            "height": 1836,
+            "id": "img-1770040913273-1",
+            "variant_ids": [
+              "variant-1770040913275-0",
+              "variant-1770040913275-1",
+              "variant-1770040913275-2",
+              "variant-1770040913275-3",
+              "variant-1770040913275-4",
+              "variant-1770040913275-5",
+              "variant-1770040913275-6",
+              "variant-1770040913275-7"
+            ],
+            "attributes": null
+          },
+          {
+            "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw433521eb/images/LWX1403BK71/LWX1403BK71_04back.jpg?sw=1500&q=70",
+            "alt_text": "Cropped Beadnell Waxed Jacket product image 3",
+            "position": 3,
+            "width": 1500,
+            "height": 1836,
+            "id": "img-1770040913273-2",
+            "variant_ids": [
+              "variant-1770040913275-0",
+              "variant-1770040913275-1",
+              "variant-1770040913275-2",
+              "variant-1770040913275-3",
+              "variant-1770040913275-4",
+              "variant-1770040913275-5",
+              "variant-1770040913275-6",
+              "variant-1770040913275-7"
+            ],
+            "attributes": null
+          },
+          {
+            "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dwb09d0c6f/images/LWX1403BK71/LWX1403BK71_05detaila.jpg?sw=1500&q=70",
+            "alt_text": "Cropped Beadnell Waxed Jacket product image 4",
+            "position": 4,
+            "width": 1500,
+            "height": 1836,
+            "id": "img-1770040913273-3",
+            "variant_ids": [
+              "variant-1770040913275-0",
+              "variant-1770040913275-1",
+              "variant-1770040913275-2",
+              "variant-1770040913275-3",
+              "variant-1770040913275-4",
+              "variant-1770040913275-5",
+              "variant-1770040913275-6",
+              "variant-1770040913275-7"
+            ],
+            "attributes": null
+          },
+          {
+            "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dwebbb5a93/images/LWX1403BK71/LWX1403BK71_05detailb.jpg?sw=1500&q=70",
+            "alt_text": "Cropped Beadnell Waxed Jacket product image 5",
+            "position": 5,
+            "width": 1500,
+            "height": 1836,
+            "id": "img-1770040913273-4",
+            "variant_ids": [
+              "variant-1770040913275-0",
+              "variant-1770040913275-1",
+              "variant-1770040913275-2",
+              "variant-1770040913275-3",
+              "variant-1770040913275-4",
+              "variant-1770040913275-5",
+              "variant-1770040913275-6",
+              "variant-1770040913275-7"
+            ],
+            "attributes": null
+          },
+          {
+            "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw6cc4cf07/images/LWX1403BK71/LWX1403BK71_05detailc.jpg?sw=1500&q=70",
+            "alt_text": "Cropped Beadnell Waxed Jacket product image 6",
+            "position": 6,
+            "width": 1500,
+            "height": 1836,
+            "id": "img-1770040913273-5",
+            "variant_ids": [
+              "variant-1770040913275-0",
+              "variant-1770040913275-1",
+              "variant-1770040913275-2",
+              "variant-1770040913275-3",
+              "variant-1770040913275-4",
+              "variant-1770040913275-5",
+              "variant-1770040913275-6",
+              "variant-1770040913275-7"
+            ],
+            "attributes": null
+          },
+          {
+            "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04f04054/images/LWX1403BK71/LWX1403BK71_05detaild.jpg?sw=1500&q=70",
+            "alt_text": "Cropped Beadnell Waxed Jacket product image 7",
+            "position": 7,
+            "width": 1500,
+            "height": 1836,
+            "id": "img-1770040913273-6",
+            "variant_ids": [
+              "variant-1770040913275-0",
+              "variant-1770040913275-1",
+              "variant-1770040913275-2",
+              "variant-1770040913275-3",
+              "variant-1770040913275-4",
+              "variant-1770040913275-5",
+              "variant-1770040913275-6",
+              "variant-1770040913275-7"
+            ],
+            "attributes": null
+          }
+        ],
+        "options": [
+          {
+            "name": "Color",
+            "position": 1,
+            "values": [
+              "Black-Classic"
+            ]
+          },
+          {
+            "name": "Size",
+            "position": 2,
+            "values": [
+              "US 2",
+              "US 4",
+              "US 6",
+              "US 8",
+              "US 10",
+              "US 12",
+              "US 14",
+              "US 16"
+            ]
+          }
+        ],
+        "variants": [
+          {
+            "id": "variant-1770040913275-0",
+            "title": "Cropped Beadnell Waxed Jacket - Black-Classic - Us 2",
+            "is_available": true,
+            "price": {
+              "current_value": 425,
+              "compare_at_value": null,
+              "currency": "USD"
+            },
+            "sku": "LWX1403BK71",
+            "option1": "Black-Classic",
+            "option2": "US 2",
+            "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+            "image": {
+              "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04ac0533/images/LWX1403BK71/LWX1403BK71_01front.jpg?sw=1500&q=70",
+              "alt_text": "Cropped Beadnell Waxed Jacket - Black-Classic - US 2 variant image",
+              "position": 1,
+              "width": 1500,
+              "height": 1836,
+              "id": "img-variant-variant-1770040913275-0",
+              "variant_ids": [
+                "variant-1770040913275-0"
+              ]
+            }
+          },
+          {
+            "id": "variant-1770040913275-1",
+            "title": "Cropped Beadnell Waxed Jacket - Black-Classic - Us 4",
+            "is_available": true,
+            "price": {
+              "current_value": 425,
+              "compare_at_value": null,
+              "currency": "USD"
+            },
+            "sku": "LWX1403BK71",
+            "option1": "Black-Classic",
+            "option2": "US 4",
+            "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+            "image": {
+              "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04ac0533/images/LWX1403BK71/LWX1403BK71_01front.jpg?sw=1500&q=70",
+              "alt_text": "Cropped Beadnell Waxed Jacket - Black-Classic - US 4 variant image",
+              "position": 2,
+              "width": 1500,
+              "height": 1836,
+              "id": "img-variant-variant-1770040913275-1",
+              "variant_ids": [
+                "variant-1770040913275-1"
+              ]
+            }
+          },
+          {
+            "id": "variant-1770040913275-2",
+            "title": "Cropped Beadnell Waxed Jacket - Black-Classic - Us 6",
+            "is_available": true,
+            "price": {
+              "current_value": 425,
+              "compare_at_value": null,
+              "currency": "USD"
+            },
+            "sku": "LWX1403BK71",
+            "option1": "Black-Classic",
+            "option2": "US 6",
+            "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+            "image": {
+              "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04ac0533/images/LWX1403BK71/LWX1403BK71_01front.jpg?sw=1500&q=70",
+              "alt_text": "Cropped Beadnell Waxed Jacket - Black-Classic - US 6 variant image",
+              "position": 3,
+              "width": 1500,
+              "height": 1836,
+              "id": "img-variant-variant-1770040913275-2",
+              "variant_ids": [
+                "variant-1770040913275-2"
+              ]
+            }
+          },
+          {
+            "id": "variant-1770040913275-3",
+            "title": "Cropped Beadnell Waxed Jacket - Black-Classic - Us 8",
+            "is_available": true,
+            "price": {
+              "current_value": 425,
+              "compare_at_value": null,
+              "currency": "USD"
+            },
+            "sku": "LWX1403BK71",
+            "option1": "Black-Classic",
+            "option2": "US 8",
+            "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+            "image": {
+              "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04ac0533/images/LWX1403BK71/LWX1403BK71_01front.jpg?sw=1500&q=70",
+              "alt_text": "Cropped Beadnell Waxed Jacket - Black-Classic - US 8 variant image",
+              "position": 4,
+              "width": 1500,
+              "height": 1836,
+              "id": "img-variant-variant-1770040913275-3",
+              "variant_ids": [
+                "variant-1770040913275-3"
+              ]
+            }
+          },
+          {
+            "id": "variant-1770040913275-4",
+            "title": "Cropped Beadnell Waxed Jacket - Black-Classic - Us 10",
+            "is_available": true,
+            "price": {
+              "current_value": 425,
+              "compare_at_value": null,
+              "currency": "USD"
+            },
+            "sku": "LWX1403BK71",
+            "option1": "Black-Classic",
+            "option2": "US 10",
+            "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+            "image": {
+              "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04ac0533/images/LWX1403BK71/LWX1403BK71_01front.jpg?sw=1500&q=70",
+              "alt_text": "Cropped Beadnell Waxed Jacket - Black-Classic - US 10 variant image",
+              "position": 5,
+              "width": 1500,
+              "height": 1836,
+              "id": "img-variant-variant-1770040913275-4",
+              "variant_ids": [
+                "variant-1770040913275-4"
+              ]
+            }
+          },
+          {
+            "id": "variant-1770040913275-5",
+            "title": "Cropped Beadnell Waxed Jacket - Black-Classic - Us 12",
+            "is_available": true,
+            "price": {
+              "current_value": 425,
+              "compare_at_value": null,
+              "currency": "USD"
+            },
+            "sku": "LWX1403BK71",
+            "option1": "Black-Classic",
+            "option2": "US 12",
+            "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+            "image": {
+              "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04ac0533/images/LWX1403BK71/LWX1403BK71_01front.jpg?sw=1500&q=70",
+              "alt_text": "Cropped Beadnell Waxed Jacket - Black-Classic - US 12 variant image",
+              "position": 6,
+              "width": 1500,
+              "height": 1836,
+              "id": "img-variant-variant-1770040913275-5",
+              "variant_ids": [
+                "variant-1770040913275-5"
+              ]
+            }
+          },
+          {
+            "id": "variant-1770040913275-6",
+            "title": "Cropped Beadnell Waxed Jacket - Black-Classic - Us 14",
+            "is_available": true,
+            "price": {
+              "current_value": 425,
+              "compare_at_value": null,
+              "currency": "USD"
+            },
+            "sku": "LWX1403BK71",
+            "option1": "Black-Classic",
+            "option2": "US 14",
+            "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+            "image": {
+              "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04ac0533/images/LWX1403BK71/LWX1403BK71_01front.jpg?sw=1500&q=70",
+              "alt_text": "Cropped Beadnell Waxed Jacket - Black-Classic - US 14 variant image",
+              "position": 7,
+              "width": 1500,
+              "height": 1836,
+              "id": "img-variant-variant-1770040913275-6",
+              "variant_ids": [
+                "variant-1770040913275-6"
+              ]
+            }
+          },
+          {
+            "id": "variant-1770040913275-7",
+            "title": "Cropped Beadnell Waxed Jacket - Black-Classic - Us 16",
+            "is_available": true,
+            "price": {
+              "current_value": 425,
+              "compare_at_value": null,
+              "currency": "USD"
+            },
+            "sku": "LWX1403BK71",
+            "option1": "Black-Classic",
+            "option2": "US 16",
+            "url": "https://www.barbour.com/us/cropped-beadnell-waxed-jacket-LWX1403BK71.html",
+            "image": {
+              "url": "https://www.barbour.com/dw/image/v2/BLCL_PRD/on/demandware.static/-/Sites-master-catalog/default/dw04ac0533/images/LWX1403BK71/LWX1403BK71_01front.jpg?sw=1500&q=70",
+              "alt_text": "Cropped Beadnell Waxed Jacket - Black-Classic - US 16 variant image",
+              "position": 8,
+              "width": 1500,
+              "height": 1836,
+              "id": "img-variant-variant-1770040913275-7",
+              "variant_ids": [
+                "variant-1770040913275-7"
+              ]
+            }
+          }
+        ],
+        "store_canonical_url": "https://www.barbour.com/",
+        "store_domain": "www.barbour.com",
+        "platform": null,
+        "platform_id": "LWX1403BK71",
+        "description_html": "*content*"
+        "product_type": "JACKETS",
+        "google_product_category_id": "5598",
+        "google_product_category_path": "Apparel & Accessories > Clothing > Outerwear > Coats & Jackets",
+        "tags": [
+          "JACKETS"
+        ],
+        "video_url": null,
+        "review_count": null,
+        "average_rating": null,
+        "rating_scale": 5,
+        "faqs": null,
+        "reviews": null,
+        "updated_at": "2026-02-02T14:02:32.789Z",
+        "enable_enrichment": true,
+        "enable_reviews": false,
+        "enable_image_tags": false,
+        "enable_full_html": false,
+        "brand_pdp": null,
+        "similar_products": null,
+        "reddit_insights": null,
+        "enable_brand_pdp": false,
+        "enable_similar_products": false,
+        "enable_reddit_insights": false
+      }
+    },
+    ...
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 50,
+    "total_items": 8,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  }
+}
+```
+
 ```json Status: Running
 {
   "execution_id": "agentic-a1b2c3d4-1735123456789",
@@ -468,112 +735,6 @@ while True:
     "start_date": "2025-01-15T10:30:00.000Z",
     "stop_date": null,
     "duration_ms": 15000
-  }
-}
-```
-
-```json Status: Completed
-{
-  "execution_id": "agentic-a1b2c3d4-1735123456789",
-  "status": "completed",
-  "error": null,
-  "data": [
-    {
-      "url": "https://www.barbour.com/us/safari-relaxed-long-sleeved-shirt-LSH1357MI5214.html",
-      "product": {
-        "id": "c9d57a2c-2017-4b67-94f0-65744d029e84",
-        "tags": ["SHIRTS"],
-        "brand": "Barbour",
-        "title": "Safari Relaxed Long-Sleeved Shirt",
-        "handle": "safari-relaxed-long-sleeved-shirt-lsh1357mi5214",
-        "vendor": "barbour",
-        "platform_id": "LSH1357MI5214",
-        "is_available": true,
-        "price": {
-          "current_value": 115,
-          "compare_at_value": null,
-          "currency": "USD"
-        },
-        "product_type": "SHIRTS",
-        "store_domain": "www.barbour.com",
-        "min_price": 115,
-        "max_price": 115,
-        "description": "Meet the Safari shirt with its 100% cotton construction and relaxed fit.",
-        "description_html": "Meet the Safari shirt with its 100% cotton construction and relaxed fit.",
-        "store_canonical_url": "https://www.barbour.com/",
-        "google_product_category_id": "212",
-        "google_product_category_path": "Apparel & Accessories > Clothing > Shirts & Tops",
-        "updated_at": "2025-08-05T12:27:51.896Z",
-        "video_url": null,
-        "images": [
-          {
-            "id": "img-1754396866999-0",
-            "url": "https://images.salsify.com/image/upload/s--qi5RyAOF--/a37a100905bd45f9069b666bf211c4b066532e33.jpg",
-            "width": 1500,
-            "height": 1836,
-            "altText": "Safari Relaxed Long-Sleeved Shirt product image (primary)",
-            "position": 1
-          }
-        ],
-        "variants": [
-          {
-            "id": "variant-1754396867009-0",
-            "SKU": "LSH1357MI5214",
-            "price": "115",
-            "title": "Safari Relaxed Long-Sleeved Shirt - Us 4",
-            "option1": "US 4",
-            "isAvailable": true,
-            "compareAtPrice": "115"
-          }
-        ],
-        "options": [
-          {
-            "name": "Size",
-            "values": ["US 4", "US 6", "US 8", "US 10", "US 12", "US 14"],
-            "position": 1
-          }
-        ],
-        "attributes": {
-          "mood": ["playful", "cheerful", "relaxed"],
-          "color": {
-            "iscc_shade": "null",
-            "iscc_family": "white",
-            "merchant_label": "all-over pattern"
-          },
-          "style": ["casual", "relaxed-fit"],
-          "gender": "female",
-          "season": ["spring", "summer", "fall", "year-round"],
-          "summary": "Feminine relaxed long-sleeved shirt made from 100% cotton.",
-          "material": {
-            "primary": "cotton",
-            "merchant_label": "100% cotton"
-          },
-          "occasion": ["everyday", "casual", "weekend"]
-        }
-      }
-    }
-  ],
-  "pagination": {
-    "page": 1,
-    "page_size": 50,
-    "total_items": 1,
-    "total_pages": 1,
-    "has_next": false,
-    "has_prev": false
-  },
-  "meta": {
-    "query": "A Barbour jacket suitable for the office",
-    "progress": {
-      "products_processed": 1,
-      "products_total": 1,
-      "percent_complete": 100
-    },
-    "start_date": "2025-01-15T10:30:00.000Z",
-    "stop_date": "2025-01-15T10:32:30.000Z",
-    "duration_ms": 150000,
-    "result": {
-      "products_returned": 1
-    }
   }
 }
 ```
