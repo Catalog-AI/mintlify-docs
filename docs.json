@@ -216,5 +216,10 @@
       "twitter:card": "summary_large_image",
       "twitter:site": "@getcatalogai"
     }
+  },
+  "integrations": {
+    "posthog": {
+      "apiKey": "phc_OcOCL4yN1sGcylXZWWjBs7WKqO6fSDiBVE6CbvVfsz6"
+    }
   }
 }
