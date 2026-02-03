@@ -207,6 +207,11 @@
       "claude"
     ]
   },
+  "api": {
+    "examples": {
+      "languages": ["curl", "javascript", "python"]
+    }
+  },
   "seo": {
     "indexing": "all",
     "metatags": {

@@ -2,6 +2,7 @@
 title: "Get Vendors"
 api: "GET https://api.getcatalog.ai/v2/vendors"
 description: "List all indexed vendors with listing counts, collection counts, and latest update timestamps."
+openapi: "openapi/v2-other.yaml GET /vendors"
 ---
 
 <Tip>
@@ -83,41 +84,6 @@ description: "List all indexed vendors with listing counts, collection counts, a
 <ResponseField name="meta" type="object">
   Response metadata (currently empty for this endpoint)
 </ResponseField>
-
-<RequestExample dropdown>
-
-```powershell cURL
-curl -X GET "https://api.getcatalog.ai/v2/vendors?page=1&page_size=5" \
-  -H "x-api-key: $CATALOG_API_KEY"
-```
-
-```javascript JavaScript
-const response = await fetch('https://api.getcatalog.ai/v2/vendors?page=1&page_size=5', {
-  headers: {
-    'x-api-key': 'YOUR_API_KEY'
-  }
-});
-
-const data = await response.json();
-console.log(`Found ${data.pagination.total_items} vendors`);
-console.log(`Page ${data.pagination.page} of ${data.pagination.total_pages}`);
-```
-
-```python Python
-import requests
-
-response = requests.get(
-    'https://api.getcatalog.ai/v2/vendors',
-    headers={'x-api-key': 'YOUR_API_KEY'},
-    params={'page': 1, 'page_size': 5}
-)
-
-data = response.json()
-print(f"Found {data['pagination']['total_items']} vendors")
-print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}")
-```
-
-</RequestExample>
 
 <ResponseExample>
 

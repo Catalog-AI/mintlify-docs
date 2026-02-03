@@ -2,6 +2,7 @@
 title: "Get Product Listings"
 api: "GET https://api.getcatalog.ai/v2/listings"
 description: "Get product listings from a vendor with pagination. Optionally filter by collection URL."
+openapi: "openapi/v2-other.yaml GET /listings"
 ---
 
 <Tip>
@@ -103,55 +104,6 @@ description: "Get product listings from a vendor with pagination. Optionally fil
 <ResponseField name="meta" type="object">
   Response metadata (currently empty for this endpoint)
 </ResponseField>
-
-
-<RequestExample dropdown>
-
-```powershell cURL
-curl -X GET "https://api.getcatalog.ai/v2/listings?vendor=skims.com&page=1&page_size=2&collection_url=https://www.skims.com/collections/skims-sale" \
-  -H "x-api-key: $CATALOG_API_KEY"
-```
-
-```javascript JavaScript
-const params = new URLSearchParams({
-  vendor: 'skims.com',
-  page: '1',
-  page_size: '2',
-  collection_url: 'https://www.skims.com/collections/skims-sale'
-});
-
-const response = await fetch(`https://api.getcatalog.ai/v2/listings?${params}`, {
-  method: 'GET',
-  headers: {
-    'x-api-key': 'YOUR_API_KEY'
-  }
-});
-
-const data = await response.json();
-console.log(`Found ${data.data.length} listings`);
-console.log(`Page ${data.pagination.page} of ${data.pagination.total_pages}`);
-```
-
-```python Python
-import requests
-
-response = requests.get(
-    'https://api.getcatalog.ai/v2/listings',
-    headers={'x-api-key': 'YOUR_API_KEY'},
-    params={
-        'vendor': 'skims.com',
-        'page': 1,
-        'page_size': 2,
-        'collection_url': 'https://www.skims.com/collections/skims-sale'
-    }
-)
-
-data = response.json()
-print(f"Found {len(data['data'])} listings")
-print(f"Page {data['pagination']['page']} of {data['pagination']['total_pages']}")
-```
-
-</RequestExample>
 
 <ResponseExample>
 

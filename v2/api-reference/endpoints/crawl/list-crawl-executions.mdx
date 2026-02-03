@@ -2,6 +2,7 @@
 title: "List Crawls"
 api: "GET https://api.getcatalog.ai/v2/crawl"
 description: "List all crawls with status. Shows all crawl jobs, their current status, and when they were created."
+openapi: "openapi/v2-crawl.yaml GET /crawl"
 ---
 
 <Tip>
@@ -92,49 +93,6 @@ description: "List all crawls with status. Shows all crawl jobs, their current s
 <ResponseField name="meta" type="object">
   Metadata object (currently empty for this endpoint)
 </ResponseField>
-
-<RequestExample dropdown>
-
-```powershell cURL
-# Get all executions
-curl -X GET "https://api.getcatalog.ai/v2/crawl" \
-  -H "x-api-key: $CATALOG_API_KEY"
-
-# Get only completed executions
-curl -X GET "https://api.getcatalog.ai/v2/crawl?status=completed" \
-  -H "x-api-key: $CATALOG_API_KEY"
-
-# Get first 50 executions
-curl -X GET "https://api.getcatalog.ai/v2/crawl?page_size=50" \
-  -H "x-api-key: $CATALOG_API_KEY"
-```
-
-```javascript JavaScript
-// Get all executions
-const response = await fetch('https://api.getcatalog.ai/v2/crawl', {
-  headers: {
-    'x-api-key': 'YOUR_API_KEY'
-  }
-});
-
-const data = await response.json();
-console.log(`Found ${data.data.length} executions`);
-```
-
-```python Python
-import requests
-
-# Get all executions
-response = requests.get(
-    'https://api.getcatalog.ai/v2/crawl',
-    headers={'x-api-key': 'YOUR_API_KEY'}
-)
-
-data = response.json()
-print(f"Found {len(data['data'])} executions")
-```
-
-</RequestExample>
 
 <ResponseExample>
 

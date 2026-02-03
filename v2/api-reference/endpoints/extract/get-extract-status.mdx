@@ -2,6 +2,7 @@
 title: "Get Extract Status"
 api: "GET https://api.getcatalog.ai/v2/extract/{execution_id}"
 description: "Get extract status and results for an asynchronous extract job."
+openapi: "openapi/v2-extract.yaml GET /extract/{execution_id}"
 ---
 
 import ProductProperties from "/snippets/v2-product-object.mdx";
@@ -172,89 +173,6 @@ import ProductProperties from "/snippets/v2-product-object.mdx";
     </ResponseField>
   </Expandable>
 </ResponseField>
-
-<RequestExample dropdown>
-
-```powershell cURL
-# Check execution status (urls input)
-curl -X GET "https://api.getcatalog.ai/v2/extract/extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7" \
-  -H "x-api-key: $CATALOG_API_KEY"
-
-
-# Get results with pagination
-curl -X GET "https://api.getcatalog.ai/v2/extract/extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7?page=1&page_size=50" \
-  -H "x-api-key: $CATALOG_API_KEY"
-```
-
-```javascript JavaScript
-// Check execution status
-const executionId = 'extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7';
-
-const response = await fetch(
-  `https://api.getcatalog.ai/v2/extract/${executionId}?page=1&page_size=50`,
-  {
-    headers: {
-      'x-api-key': 'YOUR_API_KEY'
-    }
-  }
-);
-
-const data = await response.json();
-
-if (data.status === 'completed') {
-  console.log('Results:', data.data);
-  console.log('Total successful:', data.meta.result.products_successful);
-  console.log('Duration:', data.meta.duration_ms, 'ms');
-} else if (data.status === 'running') {
-  const progress = data.meta.progress;
-  console.log(`Progress: ${progress.percent_complete}% (${progress.products_processed}/${progress.products_total})`);
-  console.log(`Started: ${data.meta.start_date}`);
-} else if (data.status === 'pending') {
-  if (data.meta.waiting_for) {
-    console.log(`Waiting for crawl to complete: ${data.meta.waiting_for}`);
-  } else {
-    console.log('Execution is pending');
-  }
-} else if (data.status === 'failed') {
-  console.error('Error:', data.error);
-}
-```
-
-```python Python
-import requests
-
-execution_id = 'extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7'
-
-# Check execution status
-response = requests.get(
-    f'https://api.getcatalog.ai/v2/extract/{execution_id}',
-    headers={'x-api-key': 'YOUR_API_KEY'},
-    params={'page': 1, 'page_size': 50},
-)
-
-data = response.json()
-
-if data['status'] == 'completed':
-    print('Results:', data['data'])
-    print('Total successful:', data['meta']['result']['products_successful'])
-    print('Duration:', data['meta']['duration_ms'], 'ms')
-elif data['status'] == 'running':
-    progress = data['meta']['progress']
-    print(
-        f"Progress: {progress['percent_complete']}% "
-        f"({progress['products_processed']}/{progress['products_total']})"
-    )
-    print(f"Started: {data['meta']['start_date']}")
-elif data['status'] == 'pending':
-    if data['meta'].get('waiting_for'):
-        print(f"Waiting for crawl to complete: {data['meta']['waiting_for']}")
-    else:
-        print('Execution is pending')
-elif data['status'] == 'failed':
-    print('Error:', data['error'])
-```
-
-</RequestExample>
 
 <ResponseExample>
 

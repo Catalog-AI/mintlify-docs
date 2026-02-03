@@ -2,6 +2,7 @@
 title: "Get Crawl Status"
 api: "GET https://api.getcatalog.ai/v2/crawl/{execution_id}"
 description: "Get crawl status and results for an asynchronous crawl job."
+openapi: "openapi/v2-crawl.yaml GET /crawl/{execution_id}"
 ---
 
 <Tip>
@@ -125,87 +126,6 @@ description: "Get crawl status and results for an asynchronous crawl job."
     </ResponseField>
   </Expandable>
 </ResponseField>
-
-<RequestExample dropdown>
-
-```powershell cURL
-# Check execution status
-curl -X GET "https://api.getcatalog.ai/v2/crawl/crawl-skims-com-a1b2c3d4" \
-  -H "x-api-key: $CATALOG_API_KEY"
-```
-
-```javascript JavaScript
-// Check execution status
-const executionId = 'crawl-skims-com-a1b2c3d4';
-
-const response = await fetch(
-  `https://api.getcatalog.ai/v2/crawl/${executionId}`,
-  {
-    headers: {
-      'x-api-key': 'YOUR_API_KEY'
-    }
-  }
-);
-
-const data = await response.json();
-
-if (data.status === 'completed') {
-  console.log(`Crawl completed!`);
-  console.log(`Collections: ${data.meta.result.collections_total}`);
-  console.log(`Listings: ${data.meta.result.listings_total}`);
-  console.log(`Duration: ${data.meta.duration_ms}ms`);
-} else if (data.status === 'running') {
-  console.log('Crawl is still running...');
-  if (data.meta.progress) {
-    console.log(`Progress: ${data.meta.progress.collections_found} collections, ${data.meta.progress.listings_found} listings`);
-  }
-  // Show step status
-  data.meta.steps.forEach(step => {
-    console.log(`${step.name}: ${step.status}`);
-  });
-  // Optionally cancel if needed: DELETE /v2/crawl/{executionId}
-} else if (data.status === 'failed') {
-  console.error(`Crawl failed: ${data.error}`);
-}
-```
-
-```python Python
-import requests
-import time
-
-execution_id = 'crawl-skims-com-a1b2c3d4'
-
-# Poll for completion
-while True:
-    response = requests.get(
-        f'https://api.getcatalog.ai/v2/crawl/{execution_id}',
-        headers={'x-api-key': 'YOUR_API_KEY'}
-    )
-    
-    data = response.json()
-    
-    if data['status'] == 'completed':
-        print(f"Crawl completed!")
-        print(f"Collections: {data['meta']['result']['collections_total']}")
-        print(f"Listings: {data['meta']['result']['listings_total']}")
-        print(f"Duration: {data['meta']['duration_ms']}ms")
-        break
-    elif data['status'] == 'running':
-        print('Crawl is still running...')
-        if data['meta'].get('progress'):
-            progress = data['meta']['progress']
-            print(f"Progress: {progress['collections_found']} collections, {progress['listings_found']} listings")
-        # Show step status
-        for step in data['meta']['steps']:
-            print(f"{step['name']}: {step['status']}")
-        # Optionally cancel if needed: DELETE /v2/crawl/{execution_id}
-        time.sleep(10)  # Wait 10 seconds before next poll
-    elif data['status'] == 'failed':
-        print(f"Crawl failed: {data['error']}")
-        break
-```
-
-</RequestExample>
 
 <ResponseExample>
 
