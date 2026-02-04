@@ -78,7 +78,7 @@ Response structures vary by endpoint:
 **Listings endpoints** (vendors, collections, listings) return:
 ```json
 {
-  "data": [...],
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {
     "page": 1,
     "page_size": 10,
@@ -94,10 +94,10 @@ Response structures vary by endpoint:
 **Search endpoints** (agentic-search, agentic-search-mini) return:
 ```json
 {
-  "products": [...],
+  "products": [{ "_truncated": "Additional items omitted for display" }],
   "meta": {
     "totalItems": 100,
-    "urls": [...]
+    "urls": ["_truncated"]
   }
 }
 ```
@@ -107,7 +107,7 @@ Response structures vary by endpoint:
 {
   "status": "completed",
   "results": {
-    "products": [...],
+    "products": [{ "_truncated": "Additional items omitted for display" }],
     "meta": {
       "total_requested": 100,
       "total_successful": 98,
@@ -134,7 +134,7 @@ Errors return appropriate HTTP status codes with structured error details:
   "error": {
     "code": "ERROR_CODE",
     "message": "Human-readable error description",
-    "request_id": "req_..."
+    "request_id": "req_truncated"
   }
 }
 ```

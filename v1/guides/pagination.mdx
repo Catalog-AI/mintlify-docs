@@ -11,7 +11,7 @@ Most paginated endpoints return a pagination object with the following structure
 
 ```json
 {
-  "data": [...],  // or "listings", "collections", etc.
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {  // or "meta" for some endpoints
     "page": 1,              // Current page number (or "current_page" for some endpoints)
     "page_size": 20,         // Items per page (or "limit" for execution endpoints)

@@ -14,7 +14,7 @@ All error responses follow a consistent structure:
   "error": {
     "code": "ERROR_CODE",
     "message": "Human-readable error description",
-    "request_id": "req_..."
+    "request_id": "req_truncated"
   }
 }
 ```
@@ -347,7 +347,7 @@ Some endpoints return `200 OK` even when individual items fail. Always check the
     {
       "url": "https://valid-store.com/product",
       "success": true,
-      "product": { ... }
+      "product": { "_truncated": "Product object omitted for display" }
     },
     {
       "url": "https://invalid-store.com/product",
