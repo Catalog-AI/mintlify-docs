@@ -80,7 +80,7 @@ All successful responses follow a consistent structure with a `data` array and `
 
 ```json
 {
-  "data": [...],
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {
     "page": 1,
     "page_size": 10,
@@ -96,9 +96,9 @@ All successful responses follow a consistent structure with a `data` array and `
 **`/{execution_id}`** endpoints also include `execution_id` and `status` fields:
 ```json
 {
-  "execution_id": "...",
+  "execution_id": "_truncated",
   "status": "completed",
-  "data": [...],
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {
     "page": 1,
     "page_size": 50,
@@ -108,7 +108,7 @@ All successful responses follow a consistent structure with a `data` array and `
     "has_prev": false
   },
   "meta": {
-    "progress": {...},
+    "progress": { "_truncated": "Progress fields omitted for display" },
     "result": {
       "products_requested": 100,
       "products_successful": 98,
@@ -127,7 +127,7 @@ Errors return appropriate HTTP status codes with structured error details:
   "error": {
     "code": "ERROR_CODE",
     "message": "Human-readable error description",
-    "request_id": "req_..."
+    "request_id": "req_truncated"
   }
 }
 ```
@@ -138,7 +138,7 @@ Additional fields may be included for specific error types. For example, validat
   "error": {
     "code": "VALIDATION_ERROR",
     "message": "One or more URLs have invalid format",
-    "request_id": "req_..."
+    "request_id": "req_truncated"
   },
   "invalid_urls": [
     "Index 0: https://invalid-url - invalid format"

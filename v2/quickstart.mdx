@@ -87,16 +87,18 @@ Use Python or JavaScript, or call the API directly with cURL.
       </Tab>
 
       <Tab title="Agentic Search">
-        AI-powered semantic search tailored to customer profiles.
+        AI-powered semantic search tailored to customer profiles. This endpoint is async: it returns an execution_id immediately; poll the status endpoint until completed to get results.
 
         ```python
         import os
         import requests
+        import time
         from dotenv import load_dotenv
 
         # Use .env to store your API key or paste it directly into the code
         load_dotenv()
 
+        # Start async search
         response = requests.post(
             'https://api.getcatalog.ai/v2/agentic-search',
             headers={
@@ -109,7 +111,31 @@ Use Python or JavaScript, or call the API directly with cURL.
         )
 
         data = response.json()
-        print(f"Found {len(data['data'])} products")
+        execution_id = data['execution_id']
+        print(f"Search started with execution ID: {execution_id}")
+
+        # Poll for results
+        while True:
+            status_response = requests.get(
+                f'https://api.getcatalog.ai/v2/agentic-search/{execution_id}',
+                headers={'x-api-key': os.getenv('CATALOG_API_KEY')}
+            )
+            status_data = status_response.json()
+
+            if status_data['status'] == 'completed':
+                products = status_data.get('data', [])
+                print(f"Found {len(products)} products")
+                for item in products[:3]:
+                    if item.get('product'):
+                        print(f"  - {item['product'].get('title', 'N/A')}")
+                break
+            elif status_data['status'] == 'failed':
+                print(f"Search failed: {status_data.get('error', 'Unknown error')}")
+                break
+            else:
+                progress = status_data.get('meta', {}).get('progress', {})
+                print(f"Progress: {progress.get('percent_complete', 0)}%")
+                time.sleep(5)  # Wait 5 seconds before next poll
         ```
       </Tab>
 
@@ -164,14 +190,11 @@ Use Python or JavaScript, or call the API directly with cURL.
                     print(f"Progress: {progress['collections_found']} collections, {progress['listings_found']} listings")
                 time.sleep(10)  # Wait 10 seconds before next poll
 
-        # Fetch the discovered listings
-        listings_response = requests.post(
+        # Fetch the discovered listings (GET with query params)
+        listings_response = requests.get(
             'https://api.getcatalog.ai/v2/listings',
-            headers={
-                'Content-Type': 'application/json',
-                'x-api-key': os.getenv('CATALOG_API_KEY')
-            },
-            json={
+            headers={'x-api-key': os.getenv('CATALOG_API_KEY')},
+            params={
                 'vendor': 'skims.com',
                 'page': 1,
                 'page_size': 5
@@ -292,13 +315,14 @@ Use Python or JavaScript, or call the API directly with cURL.
       </Tab>
 
       <Tab title="Agentic Search">
-        AI-powered semantic search tailored to customer profiles.
+        AI-powered semantic search tailored to customer profiles. This endpoint is async: it returns an execution_id immediately; poll the status endpoint until completed to get results.
 
         ```javascript
         import dotenv from 'dotenv';
 
         dotenv.config();
 
+        // Start async search
         const response = await fetch('https://api.getcatalog.ai/v2/agentic-search', {
           method: 'POST',
           headers: {
@@ -310,8 +334,37 @@ Use Python or JavaScript, or call the API directly with cURL.
           })
         });
 
-        const data = await response.json();
-        console.log(`Found ${data.data.length} products`);
+        const { execution_id } = await response.json();
+        console.log(`Search started with execution ID: ${execution_id}`);
+
+        // Poll for results
+        const pollStatus = async () => {
+          while (true) {
+            const statusResponse = await fetch(
+              `https://api.getcatalog.ai/v2/agentic-search/${execution_id}`,
+              { headers: { 'x-api-key': process.env.CATALOG_API_KEY } }
+            );
+            const statusData = await statusResponse.json();
+
+            if (statusData.status === 'completed') {
+              const products = statusData.data || [];
+              console.log(`Found ${products.length} products`);
+              products.slice(0, 3).forEach((item) => {
+                if (item.product) console.log(`  - ${item.product.title || 'N/A'}`);
+              });
+              break;
+            } else if (statusData.status === 'failed') {
+              console.error(`Search failed: ${statusData.error || 'Unknown error'}`);
+              break;
+            } else {
+              const progress = statusData.meta?.progress || {};
+              console.log(`Progress: ${progress.percent_complete || 0}%`);
+              await new Promise((r) => setTimeout(r, 5000));
+            }
+          }
+        };
+
+        pollStatus();
         ```
       </Tab>
 
@@ -358,19 +411,16 @@ Use Python or JavaScript, or call the API directly with cURL.
               console.log(`Collections found: ${result.collections_total}`);
               console.log(`Listings found: ${result.listings_total}`);
 
-              // Fetch the discovered listings
-              const listingsResponse = await fetch('https://api.getcatalog.ai/v2/listings', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'x-api-key': process.env.CATALOG_API_KEY
-                },
-                body: JSON.stringify({
-                  vendor: 'skims.com',
-                  page: 1,
-                  page_size: 5
-                })
+              // Fetch the discovered listings (GET with query params)
+              const listingsParams = new URLSearchParams({
+                vendor: 'skims.com',
+                page: '1',
+                page_size: '5'
               });
+              const listingsResponse = await fetch(
+                `https://api.getcatalog.ai/v2/listings?${listingsParams}`,
+                { headers: { 'x-api-key': process.env.CATALOG_API_KEY } }
+              );
 
               const listings = await listingsResponse.json();
               console.log(`\nFirst ${listings.data.length} listings:`);
@@ -456,15 +506,20 @@ Use Python or JavaScript, or call the API directly with cURL.
       </Tab>
 
       <Tab title="Agentic Search">
-        AI-powered semantic search tailored to customer profiles.
+        AI-powered semantic search tailored to customer profiles. This endpoint is async: it returns an execution_id; poll the status URL until status is "completed" to get results.
 
         ```bash
+        # Start async search (returns execution_id)
         curl -X POST https://api.getcatalog.ai/v2/agentic-search \
           -H "Content-Type: application/json" \
           -H "x-api-key: ${CATALOG_API_KEY}" \
           -d '{
             "query": "sustainable minimalist sneakers for everyday wear"
           }'
+
+        # Check status and get results (replace EXECUTION_ID with the execution_id from the response above)
+        curl -X GET "https://api.getcatalog.ai/v2/agentic-search/EXECUTION_ID" \
+          -H "x-api-key: ${CATALOG_API_KEY}"
         ```
       </Tab>
 
@@ -485,14 +540,8 @@ Use Python or JavaScript, or call the API directly with cURL.
           -H "x-api-key: ${CATALOG_API_KEY}"
 
         # Fetch the discovered listings (after crawl completes)
-        curl -X POST https://api.getcatalog.ai/v2/listings \
-          -H "Content-Type: application/json" \
-          -H "x-api-key: ${CATALOG_API_KEY}" \
-          -d '{
-            "vendor": "skims.com",
-            "page": 1,
-            "page_size": 5
-          }'
+        curl -X GET "https://api.getcatalog.ai/v2/listings?vendor=skims.com&page=1&page_size=5" \
+          -H "x-api-key: ${CATALOG_API_KEY}"
         ```
       </Tab>
 

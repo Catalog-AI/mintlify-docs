@@ -65,7 +65,7 @@ POST /v2/extract
     "price_amount": 29.99,
     "price_currency": "USD",
     "vendor": "example.com",
-    ...
+    "_truncated": "Additional fields omitted for display"
   },
   "meta": {
     "found": true,
@@ -113,7 +113,7 @@ POST /v2/extract
         "currency": "USD"
       },
       "vendor": "example.com",
-      ...
+      "_truncated": "Additional fields omitted for display"
     }
   ],
   "pagination": {
@@ -165,7 +165,7 @@ Since `/v2/extract` is asynchronous, you must poll for results:
 const response = await fetch('/api/products', {
   method: 'POST',
   headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
-  body: JSON.stringify({ urls: [...] })
+  body: JSON.stringify({ urls: ["_truncated"] })
 });
 const { products, meta } = await response.json();
 // Products are immediately available
@@ -177,7 +177,7 @@ const { products, meta } = await response.json();
 const postResponse = await fetch('/v2/extract', {
   method: 'POST',
   headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
-  body: JSON.stringify({ urls: [...] })
+  body: JSON.stringify({ urls: ["_truncated"] })
 });
 const { execution_id, status } = await postResponse.json();
 
@@ -251,7 +251,7 @@ POST /v2/agentic-search-mini
       "price_amount": 29.99,
       "price_currency": "USD",
       "vendor": "example.com",
-      ...
+      "_truncated": "Additional fields omitted for display"
     }
   ],
   "meta": {
@@ -276,7 +276,7 @@ POST /v2/agentic-search-mini
         "currency": "USD"
       },
       "vendor": "example.com",
-      ...
+      "_truncated": "Additional fields omitted for display"
     }
   ],
   "pagination": {
@@ -494,7 +494,7 @@ All v2 endpoints follow a consistent response structure:
 
 ```json
 {
-  "data": [...],           // Main response data (array or object)
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {          // Pagination metadata (when applicable)
     "page": 1,
     "page_size": 10,
