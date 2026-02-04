@@ -203,7 +203,7 @@ POST /v2/listings
 **v1:**
 ```json
 {
-  "listings": [...],
+  "listings": [{ "_truncated": "Additional items omitted for display" }],
   "meta": {
     "total_items": 1290,
     "total_pages": 645,
@@ -218,7 +218,7 @@ POST /v2/listings
 **v2:**
 ```json
 {
-  "data": [...],
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {
     "page": 1,
     "page_size": 2,
@@ -254,7 +254,7 @@ POST /v2/collections
 **v1:**
 ```json
 {
-  "collections": [...],
+  "collections": [{ "_truncated": "Additional items omitted for display" }],
   "meta": {
     "total_items": 50,
     "total_pages": 5,
@@ -269,7 +269,7 @@ POST /v2/collections
 **v2:**
 ```json
 {
-  "data": [...],
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {
     "page": 1,
     "page_size": 20,
@@ -504,7 +504,7 @@ GET /v2/extract/{execution_id}?page=1&page_size=50
   },
   "error": null,
   "results": {
-    "products": [...],
+    "products": [{ "_truncated": "Additional items omitted for display" }],
     "meta": {
       "total_requested": 100,
       "total_successful": 98,
@@ -527,7 +527,7 @@ GET /v2/extract/{execution_id}?page=1&page_size=50
   "execution_id": "extract-urls-965b1912-6af0-4ed8-b7e3-184b85e788b7",
   "status": "completed",
   "error": null,
-  "data": [...],
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {
     "page": 1,
     "page_size": 50,
@@ -630,10 +630,10 @@ POST /v2/agentic-search
 **v1 POST Response (Synchronous):**
 ```json
 {
-  "products": [...],
+  "products": [{ "_truncated": "Additional items omitted for display" }],
   "meta": {
     "totalItems": 100,
-    "urls": [...]
+    "urls": ["_truncated"]
   }
 }
 ```
@@ -692,7 +692,7 @@ When checking status in v2, the response format when `status` is `"completed"`:
   "execution_id": "agentic-a1b2c3d4-1735123456789",
   "status": "completed",
   "error": null,
-  "data": [...],
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {
     "page": 1,
     "page_size": 50,
@@ -783,7 +783,7 @@ POST /v2/affiliate
 **v1:**
 ```json
 {
-  "results": [...],
+  "results": [{ "_truncated": "Additional items omitted for display" }],
   "total_processed": 3,
   "successful": 2,
   "failed": 1
@@ -793,7 +793,7 @@ POST /v2/affiliate
 **v2:**
 ```json
 {
-  "data": [...],
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {
     "page": 1,
     "page_size": 3,
@@ -836,7 +836,7 @@ All v2 endpoints follow a consistent response structure:
 
 ```json
 {
-  "data": [...],           // Main response data (array or object)
+  "data": [{ "_truncated": "Additional items omitted for display" }],
   "pagination": {          // Pagination metadata (when applicable)
     "page": 1,
     "page_size": 10,
@@ -864,7 +864,7 @@ All v2 endpoints follow a consistent response structure:
   "error": {
     "code": "ERROR_CODE",
     "message": "Human-readable error description",
-    "request_id": "req_..."
+    "request_id": "req_truncated"
   }
 }
 ```
@@ -875,7 +875,7 @@ All v2 endpoints follow a consistent response structure:
   "error": {
     "code": "ERROR_CODE",
     "message": "Human-readable error description",
-    "request_id": "req_..."
+    "request_id": "req_truncated"
   },
   "invalid_urls": [  // Additional context for validation errors
     "Index 0: https://invalid-url - invalid format"
