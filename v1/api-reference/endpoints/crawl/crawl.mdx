@@ -36,6 +36,8 @@ This is ideal for initial discovery of a new vendor. Use [`POST /v1/products`](/
 
   
   **Note:** The URL will be normalized to a canonical form. If a crawl is already running for the same hostname, the existing execution ID will be returned.
+  
+  **URL sanitization:** URLs are sanitized and normalized on the backend; client-side sanitization is not required.
 </ParamField>
 
 ## Response
