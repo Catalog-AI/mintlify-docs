@@ -1,7 +1,7 @@
 ---
 title: "Agentic Search Mini"
 api: "POST https://api.getcatalog.ai/v2/agentic-search-mini"
-description: "Fast synchronous search returning up to 10 products with AI-powered attribute enrichment."
+description: "Fast synchronous search returning up to 10 products. Optional AI-powered attribute enrichment."
 ---
 
 <Tip>
@@ -84,34 +84,11 @@ description: "Fast synchronous search returning up to 10 products with AI-powere
         </ResponseField>
         
         <ResponseField name="attributes" type="object">
-          Comprehensive product attributes extracted through AI analysis and Google Shopping data. Attribute keys and values are dynamic and vary by product based on available information.
-          
-          <Expandable title="Common Attributes">
-            <ResponseField name="color" type="string">
-              Primary product color (when available)
-            </ResponseField>
-            
-            <ResponseField name="material" type="string">
-              Primary material composition (when available)
-            </ResponseField>
-            
-            <ResponseField name="category" type="string">
-              Product category classification (when available)
-            </ResponseField>
-            
-            <ResponseField name="brand" type="string">
-              Brand information (when available)
-            </ResponseField>
-            
-            <ResponseField name="features" type="string">
-              Key product features (when available)
-            </ResponseField>
-          </Expandable>
-          
-          <Note>
-            **Dynamic Attributes:** The attributes object contains dynamic keys and values that vary by product. Common attributes like `color`, `material`, `category`, `brand`, and `features` may be present, but the exact structure depends on the product and available data sources (Google Shopping features and AI enrichment when enabled).
-          </Note>
+          Product attributes when AI enrichment is enabled.
         </ResponseField>
+        <Expandable title="Attributes object">
+          Key-value object from AI enrichment. Structure is product-dependent; no fixed schema. May include semantic attributes (e.g. style, material, occasion) and other enriched fields.
+        </Expandable>
       </Expandable>
     </ResponseField>
   </Expandable>

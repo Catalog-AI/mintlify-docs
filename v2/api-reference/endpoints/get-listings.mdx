@@ -28,6 +28,8 @@ description: "Get product listings from a vendor with pagination. Optionally fil
 
 <ParamField query="collection_url" type="string" optional>
   Collection URL to filter by. If provided, only listings from this collection will be returned.
+  
+  **URL sanitization:** URLs are sanitized and normalized on the backend; client-side sanitization is not required.
 </ParamField>
 
 ## Response

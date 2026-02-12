@@ -40,6 +40,8 @@ description: "Async extraction of product data from product URLs (up to 1000). R
   ```
   
   **Note:** You can send a single URL in an array: `["https://example.com/product"]`
+  
+  **URL sanitization:** URLs are sanitized and normalized on the backend; client-side sanitization is not required.
 </ParamField>
 
 <ParamField body="enable_enrichment" type="boolean" default="true">
