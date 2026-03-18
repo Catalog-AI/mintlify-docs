@@ -108,10 +108,6 @@ These parameters apply to both input sources:
   Whether to enable AI-generated image tags and descriptions
 </ParamField>
 
-<ParamField body="enable_brand_pdp" type="boolean" default="false">
-  Whether to enable brand PDP (Product Detail Page) discovery for additional product information
-</ParamField>
-
 <ParamField body="enable_similar_products" type="boolean" default="false">
   Whether to enable similar products discovery to find related items
 </ParamField>
@@ -171,7 +167,6 @@ The `/v2/extract` endpoint maintains a consistent response schema regardless of 
 | `enable_reviews` | `reviews` |
 | `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` |
 | `enable_image_tags` | `images[].attributes` |
-| `enable_brand_pdp` | `brand_pdp` |
 | `enable_similar_products` | `similar_products` |
 | `enable_reddit_insights` | `reddit_insights` |
 
