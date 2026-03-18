@@ -212,33 +212,6 @@
       Reviewer name
     </ResponseField>
   </Expandable>
-  <ResponseField name="brand_pdp" type="object | null">
-    Brand PDP data when brand PDP discovery is enabled.
-  </ResponseField>
-  <Expandable title="Brand PDP object">
-    Present when brand PDP discovery is enabled.
-    <ResponseField name="success" type="boolean">
-      Whether brand PDP was found
-    </ResponseField>
-    <ResponseField name="brand_pdp_url" type="string | null">
-      Brand PDP URL
-    </ResponseField>
-    <ResponseField name="brand_domain" type="string | null">
-      Brand domain
-    </ResponseField>
-    <ResponseField name="brand_name" type="string | null">
-      Brand name
-    </ResponseField>
-    <ResponseField name="product_title" type="string | null">
-      Product title used for matching
-    </ResponseField>
-    <ResponseField name="confidence" type="string | null">
-      "high" | "medium" | "low"
-    </ResponseField>
-    <ResponseField name="error" type="string | null">
-      Error message if success is false
-    </ResponseField>
-  </Expandable>
   <ResponseField name="similar_products" type="array | null">
     Similar products when similar products discovery is enabled.
   </ResponseField>
