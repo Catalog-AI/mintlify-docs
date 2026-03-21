@@ -217,26 +217,81 @@ description: "Get extract status and results for an asynchronous extract job."
           </Expandable>
         </ResponseField>
         
-        <ResponseField name="outcome" type="string" optional>
-          Machine-readable reason for failure (only present when success is false and a specific reason is available)
+        <ResponseField name="outcome" type="string">
+          The outcome category for this URL.
+          
+          **Possible values:**
+          - `"success"` — Product data was extracted successfully
+          - `"non_product_url"` — The URL does not point to a product page (e.g. category page, 404, homepage redirect)
+          - `"malformed_url"` — The URL format is invalid or unparseable
+          - `"automated_access_not_permitted"` — The site's bot protection blocked automated access
+          - `"other"` — A temporary error occurred during processing
+        </ResponseField>
+        
+        <ResponseField name="retry" type="boolean">
+          Whether retrying this URL may produce a successful result. When `true`, the failure is likely transient — resubmit the URL in a new request. When `false`, the URL itself needs fixing — check `message` for specifics.
+        </ResponseField>
+        
+        <ResponseField name="message" type="string">
+          A human-readable description of the outcome with recommended next steps. Empty string on success.
+        </ResponseField>
+        
+        <ResponseField name="final_url" type="string" optional>
+          The URL the browser landed on after following redirects. Only present when the final URL differs from the input `url`. Useful for diagnosing `non_product_url` outcomes caused by redirects.
         </ResponseField>
       </Expandable>
     </ResponseField>
     
     <ResponseField name="meta" type="object">
-      Processing metadata and summary statistics
+      Processing metadata and summary statistics. The following invariant always holds: `total_successful + total_failed + total_invalid + total_pending = total_requested`.
       
       <Expandable title="Meta Properties">
         <ResponseField name="total_requested" type="number">
-          Total number of URLs requested for processing
+          Total number of URLs submitted in the extraction request
         </ResponseField>
         
         <ResponseField name="total_successful" type="number">
-          Number of URLs successfully processed
+          Number of URLs where product data was extracted successfully
         </ResponseField>
         
         <ResponseField name="total_failed" type="number">
-          Number of URLs that failed to process
+          Number of URLs where extraction failed due to retriable issues. Equal to the sum of values in `total_failed_by_reason`.
+        </ResponseField>
+        
+        <ResponseField name="total_failed_by_reason" type="object">
+          Breakdown of retriable failures by outcome. Keys are only present when their count is greater than zero. Resubmitting these URLs in a new extraction request may succeed.
+          
+          <Expandable title="Failed Breakdown">
+            <ResponseField name="automated_access_not_permitted" type="number">
+              URLs where the site's bot protection blocked automated access. This is often transient — retrying typically succeeds. If it persists for a specific site, contact support.
+            </ResponseField>
+            
+            <ResponseField name="other" type="number">
+              URLs that encountered a temporary processing error (e.g. timeout, unexpected page state). Safe to retry immediately.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="total_invalid" type="number">
+          Number of URLs with input problems that cannot be resolved by retrying. Equal to the sum of values in `total_invalid_by_reason`.
+        </ResponseField>
+        
+        <ResponseField name="total_invalid_by_reason" type="object">
+          Breakdown of invalid URLs by outcome. Keys are only present when their count is greater than zero. These URLs need to be corrected before resubmitting — retrying the same URL will produce the same result.
+          
+          <Expandable title="Invalid Breakdown">
+            <ResponseField name="non_product_url" type="number">
+              URLs that did not resolve to a product page. Common causes include category pages, 404s, and homepage redirects. Check the per-URL `final_url` field to see where the browser ended up.
+            </ResponseField>
+            
+            <ResponseField name="malformed_url" type="number">
+              URLs with invalid format (e.g. missing protocol, unencoded characters). Fix the URL and resubmit.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="total_pending" type="number">
+          URLs still being processed. Always present; `0` when extraction is complete.
         </ResponseField>
       </Expandable>
     </ResponseField>
@@ -297,8 +352,19 @@ const response = await fetch(
 const data = await response.json();
 
 if (data.status === 'completed') {
-  console.log('Results:', data.results.products);
-  console.log('Total successful:', data.results.meta.total_successful);
+  const meta = data.results.meta;
+  console.log(`Successful: ${meta.total_successful}, Failed: ${meta.total_failed}, Invalid: ${meta.total_invalid}`);
+
+  const retriableUrls = data.results.products
+    .filter(item => item.retry)
+    .map(item => item.url);
+  if (retriableUrls.length > 0) {
+    console.log('Retriable URLs:', retriableUrls);
+  }
+
+  data.results.products
+    .filter(item => !item.success && !item.retry)
+    .forEach(item => console.warn(`${item.outcome}: ${item.url} — ${item.message}`));
 } else if (data.status === 'running') {
   console.log(`Progress: ${data.progress.percent_complete}%`);
 } else if (data.status === 'failed') {
@@ -323,8 +389,16 @@ while True:
     data = response.json()
     
     if data['status'] == 'completed':
-        print('Results:', data['results']['products'])
-        print('Total successful:', data['results']['meta']['total_successful'])
+        meta = data['results']['meta']
+        print(f"Successful: {meta['total_successful']}, Failed: {meta['total_failed']}, Invalid: {meta['total_invalid']}")
+
+        retriable = [item for item in data['results']['products'] if item.get('retry')]
+        if retriable:
+            print('Retriable URLs:', [item['url'] for item in retriable])
+
+        for item in data['results']['products']:
+            if not item['success'] and not item.get('retry'):
+                print(f"{item['outcome']}: {item['url']} — {item['message']}")
         break
     elif data['status'] == 'running':
         progress = data.get('progress', {})
@@ -446,10 +520,21 @@ while True:
           "reddit_insights": null,
           "affiliate_link": "https://wild.link/e?...CW2288-111"
         },
-        "success": true
+        "success": true,
+        "outcome": "success",
+        "retry": false,
+        "message": ""
       }
     ],
-    "meta": { "total_successful": 1, "total_requested": 1, "total_failed": 0 }
+    "meta": {
+      "total_requested": 1,
+      "total_successful": 1,
+      "total_failed": 0,
+      "total_failed_by_reason": {},
+      "total_invalid": 0,
+      "total_invalid_by_reason": {},
+      "total_pending": 0
+    }
   },
   "pagination": {
     "page": 1,
@@ -462,6 +547,75 @@ while True:
 }
 ```
 
+```json Status: Completed (Mixed Results)
+{
+  "status": "completed",
+  "progress": {
+    "products_processed": 3,
+    "urls_completed": 3,
+    "total_urls": 3,
+    "percent_complete": 100
+  },
+  "error": null,
+  "credits_used": 5,
+  "results": {
+    "products": [
+      {
+        "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+        "product": {
+          "id": "6e6bd7bd-bfb5-4e05-85ee-4969628e741a",
+          "title": "Nike Air Force 1 '07",
+          "_truncated": "Full product object omitted for display"
+        },
+        "success": true,
+        "outcome": "success",
+        "retry": false,
+        "message": ""
+      },
+      {
+        "url": "https://www.example.com/products/limited-edition",
+        "product": null,
+        "success": false,
+        "outcome": "non_product_url",
+        "retry": false,
+        "message": "This URL does not point to a product page.",
+        "final_url": "https://www.example.com/collections/all"
+      },
+      {
+        "url": "https://protected-store.com/products/item-42",
+        "product": null,
+        "success": false,
+        "outcome": "automated_access_not_permitted",
+        "retry": true,
+        "message": "The site could not be reached. Please retry this URL."
+      }
+    ],
+    "meta": {
+      "total_requested": 3,
+      "total_successful": 1,
+      "total_failed": 1,
+      "total_failed_by_reason": {
+        "automated_access_not_permitted": 1
+      },
+      "total_invalid": 1,
+      "total_invalid_by_reason": {
+        "non_product_url": 1
+      },
+      "total_pending": 0
+    }
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "total_items": 3,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  }
+}
+```
+
+
 ```json Status: Running
 {
   "status": "running",
@@ -471,7 +625,24 @@ while True:
     "total_urls": 100,
     "percent_complete": 45
   },
-  "error": null
+  "error": null,
+  "results": {
+    "meta": {
+      "total_requested": 100,
+      "total_successful": 40,
+      "total_failed": 3,
+      "total_failed_by_reason": {
+        "automated_access_not_permitted": 2,
+        "other": 1
+      },
+      "total_invalid": 2,
+      "total_invalid_by_reason": {
+        "non_product_url": 1,
+        "malformed_url": 1
+      },
+      "total_pending": 55
+    }
+  }
 }
 ```
 
@@ -484,7 +655,23 @@ while True:
     "total_urls": 100,
     "percent_complete": 12
   },
-  "error": "The operation failed. Please retry or contact support with this execution ID."
+  "error": "The operation failed. Please retry or contact support with this execution ID.",
+  "results": {
+    "meta": {
+      "total_requested": 100,
+      "total_successful": 8,
+      "total_failed": 3,
+      "total_failed_by_reason": {
+        "automated_access_not_permitted": 2,
+        "other": 1
+      },
+      "total_invalid": 1,
+      "total_invalid_by_reason": {
+        "non_product_url": 1
+      },
+      "total_pending": 88
+    }
+  }
 }
 ```
 
