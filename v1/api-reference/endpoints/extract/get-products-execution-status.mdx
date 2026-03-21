@@ -229,7 +229,7 @@ description: "Get extract status and results for an asynchronous extract job."
         </ResponseField>
         
         <ResponseField name="retry" type="boolean">
-          Whether retrying this URL may produce a successful result. When `true`, the failure is likely transient. When `false`, the URL itself needs fixing.
+          Whether retrying this URL may produce a successful result. When `true`, the failure is likely transient — resubmit the URL in a new request. When `false`, the URL itself needs fixing — check `message` for specifics.
         </ResponseField>
         
         <ResponseField name="message" type="string">
@@ -243,7 +243,7 @@ description: "Get extract status and results for an asynchronous extract job."
     </ResponseField>
     
     <ResponseField name="meta" type="object">
-      Processing metadata and summary statistics
+      Processing metadata and summary statistics. The following invariant always holds: `total_successful + total_failed + total_invalid + total_pending = total_requested`.
       
       <Expandable title="Meta Properties">
         <ResponseField name="total_requested" type="number">
@@ -259,15 +259,15 @@ description: "Get extract status and results for an asynchronous extract job."
         </ResponseField>
         
         <ResponseField name="total_failed_by_reason" type="object">
-          Breakdown of retriable failures by outcome
+          Breakdown of retriable failures by outcome. Keys are only present when their count is greater than zero. Resubmitting these URLs in a new extraction request may succeed.
           
           <Expandable title="Failed Breakdown">
             <ResponseField name="automated_access_not_permitted" type="number">
-              URLs where the site blocked automated access
+              URLs where the site's bot protection blocked automated access. This is often transient — retrying typically succeeds. If it persists for a specific site, contact support.
             </ResponseField>
             
             <ResponseField name="other" type="number">
-              URLs that encountered a temporary processing error
+              URLs that encountered a temporary processing error (e.g. timeout, unexpected page state). Safe to retry immediately.
             </ResponseField>
           </Expandable>
         </ResponseField>
@@ -277,15 +277,15 @@ description: "Get extract status and results for an asynchronous extract job."
         </ResponseField>
         
         <ResponseField name="total_invalid_by_reason" type="object">
-          Breakdown of invalid URLs by outcome
+          Breakdown of invalid URLs by outcome. Keys are only present when their count is greater than zero. These URLs need to be corrected before resubmitting — retrying the same URL will produce the same result.
           
           <Expandable title="Invalid Breakdown">
             <ResponseField name="non_product_url" type="number">
-              URLs that did not point to product pages
+              URLs that did not resolve to a product page. Common causes include category pages, 404s, and homepage redirects. Check the per-URL `final_url` field to see where the browser ended up.
             </ResponseField>
             
             <ResponseField name="malformed_url" type="number">
-              URLs with invalid format
+              URLs with invalid format (e.g. missing protocol, unencoded characters). Fix the URL and resubmit.
             </ResponseField>
           </Expandable>
         </ResponseField>
@@ -626,7 +626,24 @@ while True:
     "total_urls": 100,
     "percent_complete": 45
   },
-  "error": null
+  "error": null,
+  "results": {
+    "meta": {
+      "total_requested": 100,
+      "total_successful": 40,
+      "total_failed": 3,
+      "total_failed_by_reason": {
+        "automated_access_not_permitted": 2,
+        "other": 1
+      },
+      "total_invalid": 2,
+      "total_invalid_by_reason": {
+        "non_product_url": 1,
+        "malformed_url": 1
+      },
+      "total_pending": 55
+    }
+  }
 }
 ```
 
@@ -639,7 +656,23 @@ while True:
     "total_urls": 100,
     "percent_complete": 12
   },
-  "error": "The operation failed. Please retry or contact support with this execution ID."
+  "error": "The operation failed. Please retry or contact support with this execution ID.",
+  "results": {
+    "meta": {
+      "total_requested": 100,
+      "total_successful": 8,
+      "total_failed": 3,
+      "total_failed_by_reason": {
+        "automated_access_not_permitted": 2,
+        "other": 1
+      },
+      "total_invalid": 1,
+      "total_invalid_by_reason": {
+        "non_product_url": 1
+      },
+      "total_pending": 88
+    }
+  }
 }
 ```
 
