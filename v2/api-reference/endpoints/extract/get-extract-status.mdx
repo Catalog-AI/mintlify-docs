@@ -79,8 +79,27 @@ import ProductProperties from "/snippets/v2-product-object.mdx";
       <ProductProperties />
     </ResponseField>
     
-    <ResponseField name="outcome" type="string" optional>
-      Machine-readable reason for failure (only present when success is false and a specific reason is available)
+    <ResponseField name="outcome" type="string">
+      The outcome category for this URL.
+      
+      **Possible values:**
+      - `"success"` — Product data was extracted successfully
+      - `"non_product_url"` — The URL does not point to a product page (e.g. category page, 404, homepage redirect)
+      - `"malformed_url"` — The URL format is invalid or unparseable
+      - `"automated_access_not_permitted"` — The site's bot protection blocked automated access
+      - `"other"` — A temporary error occurred during processing
+    </ResponseField>
+    
+    <ResponseField name="retry" type="boolean">
+      Whether retrying this URL may produce a successful result. When `true`, the failure is likely transient — resubmit the URL in a new request. When `false`, the URL itself needs fixing — check `message` for specifics.
+    </ResponseField>
+    
+    <ResponseField name="message" type="string">
+      A human-readable description of the outcome with recommended next steps. Empty string on success.
+    </ResponseField>
+    
+    <ResponseField name="final_url" type="string" optional>
+      The URL the browser landed on after following redirects. Only present when the final URL differs from the input `url`. Useful for diagnosing `non_product_url` outcomes caused by redirects.
     </ResponseField>
   </Expandable>
 </ResponseField>
@@ -154,19 +173,55 @@ import ProductProperties from "/snippets/v2-product-object.mdx";
     </ResponseField>
     
     <ResponseField name="result" type="object" optional>
-      Processing result statistics (only present when status is "completed")
+      Processing result statistics (only present when status is "completed" or "running"). The following invariant always holds: `products_successful + products_failed + products_invalid + products_pending = products_requested`.
       
       <Expandable title="Result Properties">
         <ResponseField name="products_requested" type="number">
-          Total number of products requested for processing
+          Total number of URLs submitted in the extraction request
         </ResponseField>
         
         <ResponseField name="products_successful" type="number">
-          Number of products successfully processed
+          Number of URLs where product data was extracted successfully
         </ResponseField>
         
         <ResponseField name="products_failed" type="number">
-          Number of products that failed to process
+          Number of URLs where extraction failed due to retriable issues. Equal to the sum of values in `products_failed_by_reason`.
+        </ResponseField>
+        
+        <ResponseField name="products_failed_by_reason" type="object">
+          Breakdown of retriable failures by outcome. Keys are only present when their count is greater than zero. Resubmitting these URLs in a new extraction request may succeed.
+          
+          <Expandable title="Failed Breakdown">
+            <ResponseField name="automated_access_not_permitted" type="number">
+              URLs where the site's bot protection blocked automated access. This is often transient — retrying typically succeeds. If it persists for a specific site, contact support.
+            </ResponseField>
+            
+            <ResponseField name="other" type="number">
+              URLs that encountered a temporary processing error (e.g. timeout, unexpected page state). Safe to retry immediately.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="products_invalid" type="number">
+          Number of URLs with input problems that cannot be resolved by retrying. Equal to the sum of values in `products_invalid_by_reason`.
+        </ResponseField>
+        
+        <ResponseField name="products_invalid_by_reason" type="object">
+          Breakdown of invalid URLs by outcome. Keys are only present when their count is greater than zero. These URLs need to be corrected before resubmitting — retrying the same URL will produce the same result.
+          
+          <Expandable title="Invalid Breakdown">
+            <ResponseField name="non_product_url" type="number">
+              URLs that did not resolve to a product page. Common causes include category pages, 404s, and homepage redirects. Check the per-URL `final_url` field to see where the browser ended up.
+            </ResponseField>
+            
+            <ResponseField name="malformed_url" type="number">
+              URLs with invalid format (e.g. missing protocol, unencoded characters). Fix the URL and resubmit.
+            </ResponseField>
+          </Expandable>
+        </ResponseField>
+        
+        <ResponseField name="products_pending" type="number">
+          URLs still being processed. Always present; `0` when extraction is complete.
         </ResponseField>
       </Expandable>
     </ResponseField>
@@ -202,9 +257,19 @@ const response = await fetch(
 const data = await response.json();
 
 if (data.status === 'completed') {
-  console.log('Results:', data.data);
-  console.log('Total successful:', data.meta.result.products_successful);
-  console.log('Duration:', data.meta.duration_ms, 'ms');
+  const result = data.meta.result;
+  console.log(`Successful: ${result.products_successful}, Failed: ${result.products_failed}, Invalid: ${result.products_invalid}`);
+
+  const retriableUrls = data.data
+    .filter(item => item.retry)
+    .map(item => item.url);
+  if (retriableUrls.length > 0) {
+    console.log('Retriable URLs:', retriableUrls);
+  }
+
+  data.data
+    .filter(item => !item.success && !item.retry)
+    .forEach(item => console.warn(`${item.outcome}: ${item.url} — ${item.message}`));
 } else if (data.status === 'running') {
   const progress = data.meta.progress;
   console.log(`Progress: ${progress.percent_complete}% (${progress.products_processed}/${progress.products_total})`);
@@ -235,9 +300,16 @@ response = requests.get(
 data = response.json()
 
 if data['status'] == 'completed':
-    print('Results:', data['data'])
-    print('Total successful:', data['meta']['result']['products_successful'])
-    print('Duration:', data['meta']['duration_ms'], 'ms')
+    result = data['meta']['result']
+    print(f"Successful: {result['products_successful']}, Failed: {result['products_failed']}, Invalid: {result['products_invalid']}")
+
+    retriable = [item for item in data['data'] if item.get('retry')]
+    if retriable:
+        print('Retriable URLs:', [item['url'] for item in retriable])
+
+    for item in data['data']:
+        if not item['success'] and not item.get('retry'):
+            print(f"{item['outcome']}: {item['url']} — {item['message']}")
 elif data['status'] == 'running':
     progress = data['meta']['progress']
     print(
@@ -275,7 +347,11 @@ elif data['status'] == 'failed':
     "result": {
       "products_requested": 1,
       "products_successful": 1,
-      "products_failed": 0
+      "products_failed": 0,
+      "products_failed_by_reason": {},
+      "products_invalid": 0,
+      "products_invalid_by_reason": {},
+      "products_pending": 0
     },
     "credits_used": 5
   },
@@ -353,13 +429,88 @@ elif data['status'] == 'failed':
         "reddit_insights": null,
         "affiliate_link": "https://wild.link/e?..."
       },
-      "success": true
+      "success": true,
+      "outcome": "success",
+      "retry": false,
+      "message": ""
     }
   ],
   "pagination": {
     "page": 1,
     "page_size": 50,
     "total_items": 1,
+    "total_pages": 1,
+    "has_next": false,
+    "has_prev": false
+  }
+}
+```
+
+
+```json Status: Completed (Mixed Results)
+{
+  "execution_id": "extract-urls-a12b3c4d-5678-9012-abcd-ef3456789012",
+  "status": "completed",
+  "error": null,
+  "meta": {
+    "progress": {
+      "products_processed": 3,
+      "products_total": 3,
+      "percent_complete": 100
+    },
+    "start_date": "2026-03-20T10:00:00.000Z",
+    "stop_date": "2026-03-20T10:05:00.000Z",
+    "duration_ms": 300000,
+    "result": {
+      "products_requested": 3,
+      "products_successful": 1,
+      "products_failed": 1,
+      "products_failed_by_reason": {
+        "automated_access_not_permitted": 1
+      },
+      "products_invalid": 1,
+      "products_invalid_by_reason": {
+        "non_product_url": 1
+      },
+      "products_pending": 0
+    },
+    "credits_used": 5
+  },
+  "data": [
+    {
+      "url": "https://www.nike.com/t/air-force-1-07-mens-shoes-5QFp5Z/CW2288-111",
+      "product": {
+        "id": "6e6bd7bd-bfb5-4e05-85ee-4969628e741a",
+        "title": "Nike Air Force 1 '07",
+        "_truncated": "Full product object omitted for display"
+      },
+      "success": true,
+      "outcome": "success",
+      "retry": false,
+      "message": ""
+    },
+    {
+      "url": "https://www.example.com/products/limited-edition",
+      "product": null,
+      "success": false,
+      "outcome": "non_product_url",
+      "retry": false,
+      "message": "This URL does not point to a product page.",
+      "final_url": "https://www.example.com/collections/all"
+    },
+    {
+      "url": "https://protected-store.com/products/item-42",
+      "product": null,
+      "success": false,
+      "outcome": "automated_access_not_permitted",
+      "retry": true,
+      "message": "The site could not be reached. Please retry this URL."
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "page_size": 50,
+    "total_items": 3,
     "total_pages": 1,
     "has_next": false,
     "has_prev": false
@@ -381,7 +532,22 @@ elif data['status'] == 'failed':
     },
     "start_date": "2025-01-15T10:30:00.000Z",
     "stop_date": null,
-    "duration_ms": 125000
+    "duration_ms": 125000,
+    "result": {
+      "products_requested": 100,
+      "products_successful": 40,
+      "products_failed": 3,
+      "products_failed_by_reason": {
+        "automated_access_not_permitted": 2,
+        "other": 1
+      },
+      "products_invalid": 2,
+      "products_invalid_by_reason": {
+        "non_product_url": 1,
+        "malformed_url": 1
+      },
+      "products_pending": 55
+    }
   }
 }
 ```
@@ -400,7 +566,21 @@ elif data['status'] == 'failed':
     },
     "start_date": "2025-01-15T10:30:00.000Z",
     "stop_date": "2025-01-15T10:31:15.000Z",
-    "duration_ms": 75000
+    "duration_ms": 75000,
+    "result": {
+      "products_requested": 100,
+      "products_successful": 8,
+      "products_failed": 3,
+      "products_failed_by_reason": {
+        "automated_access_not_permitted": 2,
+        "other": 1
+      },
+      "products_invalid": 1,
+      "products_invalid_by_reason": {
+        "non_product_url": 1
+      },
+      "products_pending": 88
+    }
   }
 }
 ```
