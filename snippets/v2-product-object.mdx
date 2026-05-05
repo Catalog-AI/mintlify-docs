@@ -20,8 +20,35 @@
   <ResponseField name="handle" type="string | null">
     Product handle/slug
   </ResponseField>
+  <ResponseField name="item_id" type="string | null">
+    Internal item identifier
+  </ResponseField>
+  <ResponseField name="product_identifier" type="string | null">
+    Canonical product identifier used for deduplication and matching
+  </ResponseField>
+  <ResponseField name="gtin" type="string | null">
+    Global Trade Item Number (UPC, EAN, ISBN, etc.)
+  </ResponseField>
+  <ResponseField name="mpn" type="string | null">
+    Manufacturer Part Number
+  </ResponseField>
+  <ResponseField name="condition" type="string | null">
+    Product condition (e.g. `"new"`, `"used"`, `"refurbished"`)
+  </ResponseField>
+  <ResponseField name="product_category" type="string | null">
+    Full product category breadcrumb path (e.g. `"Home &gt; Furniture &gt; Living Room Furniture &gt; Accent Chair"`)
+  </ResponseField>
   <ResponseField name="is_available" type="boolean">
     Product availability status
+  </ResponseField>
+  <ResponseField name="availability" type="string | null">
+    Availability status string (e.g. `"in_stock"`, `"out_of_stock"`, `"preorder"`, `"backorder"`)
+  </ResponseField>
+  <ResponseField name="availability_date" type="string | null">
+    Date when the product becomes available (ISO 8601 or retailer-formatted date)
+  </ResponseField>
+  <ResponseField name="expiration_date" type="string | null">
+    Product listing expiration date
   </ResponseField>
   <ResponseField name="price" type="object | null">
     Object with price information.
@@ -37,6 +64,24 @@
       Currency code (e.g. "USD")
     </ResponseField>
   </Expandable>
+  <ResponseField name="sale_price" type="object | null">
+    Sale price when the product is on sale. Same shape as the Price object.
+  </ResponseField>
+  <ResponseField name="sale_price_start_date" type="string | null">
+    Start date of the sale price period
+  </ResponseField>
+  <ResponseField name="sale_price_end_date" type="string | null">
+    End date of the sale price period
+  </ResponseField>
+  <ResponseField name="unit_pricing_measure" type="string | null">
+    The measure and dimension of the product as it is sold (e.g. `"100ml"`, `"750g"`)
+  </ResponseField>
+  <ResponseField name="unit_pricing_base_measure" type="string | null">
+    The denominator for unit pricing (e.g. `"100ml"`, `"1kg"`)
+  </ResponseField>
+  <ResponseField name="pricing_trend" type="string | null">
+    Historical pricing trend indicator
+  </ResponseField>
   <ResponseField name="images" type="array">
     Array of image objects.
   </ResponseField>
@@ -66,6 +111,12 @@
       Variant IDs linked to this image (Shopify-style images only)
     </ResponseField>
   </Expandable>
+  <ResponseField name="video_url" type="string | null">
+    Product video URL (if available)
+  </ResponseField>
+  <ResponseField name="model_3d_url" type="string | null">
+    URL to a 3D model of the product (if available)
+  </ResponseField>
   <ResponseField name="options" type="array">
     Array of option objects.
   </ResponseField>
@@ -130,6 +181,63 @@
       Quantity available (Shopify-style variants only)
     </ResponseField>
   </Expandable>
+  <ResponseField name="group_id" type="string | null">
+    Item group ID for grouping product variants across separate listings (Google Merchant Center `item_group_id`)
+  </ResponseField>
+  <ResponseField name="item_group_title" type="string | null">
+    Title of the item group this product belongs to
+  </ResponseField>
+  <ResponseField name="listing_has_variations" type="string | null">
+    Whether this listing has multiple variations. `"true"` or `"false"`.
+  </ResponseField>
+  <ResponseField name="material" type="string | null">
+    Product material description (e.g. `"Bouclé or velvet fabric upholstery; polyfill cushion fill"`)
+  </ResponseField>
+  <ResponseField name="dimensions" type="string | null">
+    Formatted dimensions string (e.g. `"45.00 x 50.40 x 34.00 in"`)
+  </ResponseField>
+  <ResponseField name="length" type="string | null">
+    Product length value
+  </ResponseField>
+  <ResponseField name="width" type="string | null">
+    Product width value
+  </ResponseField>
+  <ResponseField name="height" type="string | null">
+    Product height value
+  </ResponseField>
+  <ResponseField name="dimensions_unit" type="string | null">
+    Unit for dimension values (e.g. `"in"`, `"cm"`)
+  </ResponseField>
+  <ResponseField name="weight" type="string | null">
+    Product weight value
+  </ResponseField>
+  <ResponseField name="item_weight_unit" type="string | null">
+    Unit for weight value (e.g. `"lb"`, `"kg"`)
+  </ResponseField>
+  <ResponseField name="age_group" type="string | null">
+    Target age group (e.g. `"adult"`, `"kids"`, `"toddler"`, `"infant"`, `"newborn"`)
+  </ResponseField>
+  <ResponseField name="gender" type="string | null">
+    Target gender (e.g. `"male"`, `"female"`, `"unisex"`)
+  </ResponseField>
+  <ResponseField name="size_system" type="string | null">
+    Size system used (e.g. `"US"`, `"UK"`, `"EU"`)
+  </ResponseField>
+  <ResponseField name="age_restriction" type="number | null">
+    Minimum age requirement for the product (0 if no restriction)
+  </ResponseField>
+  <ResponseField name="shipping" type="object | null">
+    Shipping information. May be a structured object or a descriptive string depending on the source.
+  </ResponseField>
+  <ResponseField name="is_digital" type="string | null">
+    Whether the product is a digital/downloadable item. `"true"` or `"false"`.
+  </ResponseField>
+  <ResponseField name="pickup_method" type="string | null">
+    Available pickup method (e.g. `"buy"`, `"reserve"`, `"not_supported"`)
+  </ResponseField>
+  <ResponseField name="pickup_sla" type="string | null">
+    Pickup service-level agreement (e.g. `"same_day"`, `"next_day"`)
+  </ResponseField>
   <ResponseField name="store_canonical_url" type="string | null">
     Canonical store URL
   </ResponseField>
@@ -148,6 +256,9 @@
   <ResponseField name="product_type" type="string | null">
     Product type/category
   </ResponseField>
+  <ResponseField name="collection_handle" type="string | null">
+    Collection handle/slug the product belongs to
+  </ResponseField>
   <ResponseField name="google_product_category_id" type="string | null">
     Google product category identifier
   </ResponseField>
@@ -157,8 +268,17 @@
   <ResponseField name="tags" type="array">
     Array of product tags (strings)
   </ResponseField>
-  <ResponseField name="video_url" type="string | null">
-    Product video URL (if available)
+  <ResponseField name="target_countries" type="string | null">
+    Target countries for the product (e.g. `"US"`)
+  </ResponseField>
+  <ResponseField name="country_code" type="string | null">
+    Country code for localized product data (e.g. `"us"`)
+  </ResponseField>
+  <ResponseField name="geo_price" type="string | null">
+    Geographic price override for the target country
+  </ResponseField>
+  <ResponseField name="geo_availability" type="string | null">
+    Geographic availability override for the target country
   </ResponseField>
   <ResponseField name="updated_at" type="string">
     Last update timestamp (ISO 8601)
@@ -169,6 +289,18 @@
   <Expandable title="Attributes object">
     Key-value object from AI enrichment. Structure is product-dependent; no fixed schema. May include semantic attributes (e.g. style, material, occasion) and other enriched fields.
   </Expandable>
+  <ResponseField name="popularity_score" type="number | null">
+    Popularity score for the product
+  </ResponseField>
+  <ResponseField name="return_rate" type="number | null">
+    Product return rate
+  </ResponseField>
+  <ResponseField name="warning" type="string | null">
+    Product safety or regulatory warning text (e.g. Prop 65)
+  </ResponseField>
+  <ResponseField name="warning_url" type="string | null">
+    URL with additional warning information
+  </ResponseField>
   <ResponseField name="review_count" type="number | null">
     Review count (when reviews enabled)
   </ResponseField>
@@ -229,4 +361,42 @@
       "high" | "medium" | "low"
     </ResponseField>
   </Expandable>
+  <ResponseField name="related_product_id" type="array | null">
+    Array of related product identifiers
+  </ResponseField>
+  <ResponseField name="relationship_type" type="string | null">
+    Type of relationship to the related products (e.g. `"accessory"`, `"variant"`)
+  </ResponseField>
+  <ResponseField name="brand_pdp" type="object | null">
+    Brand product detail page lookup result, identifying the original brand's listing for this product.
+  </ResponseField>
+  <Expandable title="Brand PDP object">
+    <ResponseField name="success" type="boolean">
+      Whether a brand PDP was found
+    </ResponseField>
+    <ResponseField name="brandName" type="string">
+      Brand name
+    </ResponseField>
+    <ResponseField name="brandDomain" type="string">
+      Brand website domain
+    </ResponseField>
+    <ResponseField name="brandPdpUrl" type="string">
+      URL to the product on the brand's own website
+    </ResponseField>
+    <ResponseField name="productTitle" type="string">
+      Product title on the brand's website
+    </ResponseField>
+    <ResponseField name="confidence" type="string">
+      Match confidence: `"high"`, `"medium"`, or `"low"`
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="raw_data" type="object | null">
+    Raw unprocessed product data from the source page
+  </ResponseField>
+  <ResponseField name="deep_research" type="object | null">
+    In-depth product research organized by dimension (e.g. ergonomics, materials, competitive analysis). Structure varies by product category.
+  </ResponseField>
+  <ResponseField name="affiliate_link" type="string | null">
+    Affiliate link URL for the product
+  </ResponseField>
 </Expandable>
