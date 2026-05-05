@@ -112,10 +112,6 @@ These parameters apply to both input sources:
   Whether to enable similar products discovery to find related items
 </ParamField>
 
-<ParamField body="enable_reddit_insights" type="boolean" default="false">
-  Whether to enable Reddit insights gathering for product context and discussions
-</ParamField>
-
 ## Response
 
 <ResponseField name="execution_id" type="string">
@@ -168,7 +164,6 @@ The `/v2/extract` endpoint maintains a consistent response schema regardless of 
 | `enable_enrichment` | `attributes`, `product_type`, `google_product_category_id`, `google_product_category_path` |
 | `enable_image_tags` | `images[].attributes` |
 | `enable_similar_products` | `similar_products` |
-| `enable_reddit_insights` | `reddit_insights` |
 
 <RequestExample dropdown>
 

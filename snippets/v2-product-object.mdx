@@ -229,28 +229,4 @@
       "high" | "medium" | "low"
     </ResponseField>
   </Expandable>
-  <ResponseField name="reddit_insights" type="object | null">
-    Reddit consumer voice when Reddit insights are enabled.
-  </ResponseField>
-  <Expandable title="Reddit insights object">
-    Present when Reddit insights are enabled. Nested structure from Reddit consumer voice.
-    <ResponseField name="status" type="string">
-      "ok" | "error" | "no_results"
-    </ResponseField>
-    <ResponseField name="generated_at" type="string">
-      ISO timestamp
-    </ResponseField>
-    <ResponseField name="match" type="object">
-      confidence (number 0–1), matched_terms (string[]), notes (string)
-    </ResponseField>
-    <ResponseField name="coverage" type="object">
-      threads_used (number), subreddits (string[])
-    </ResponseField>
-    <ResponseField name="conversation_summary" type="object">
-      one_liner (string), sentiment (object), top_themes (array), use_cases (array), comparisons (array), common_questions (array), gotchas (array)
-    </ResponseField>
-    <ResponseField name="evidence" type="object">
-      items (array of evidence items: ref_id, type, title, excerpt, author, subreddit, thread { title, subreddit, url })
-    </ResponseField>
-  </Expandable>
 </Expandable>
