@@ -20,6 +20,12 @@
   <ResponseField name="handle" type="string | null">
     Product handle/slug
   </ResponseField>
+  <ResponseField name="item_id" type="string | null">
+    Internal item identifier
+  </ResponseField>
+  <ResponseField name="product_identifier" type="string | null">
+    Canonical product identifier used for deduplication and matching
+  </ResponseField>
   <ResponseField name="gtin" type="string | null">
     Global Trade Item Number (UPC, EAN, ISBN, etc.)
   </ResponseField>
@@ -384,6 +390,9 @@
       Match confidence: `"high"`, `"medium"`, or `"low"`
     </ResponseField>
   </Expandable>
+  <ResponseField name="raw_data" type="object | null">
+    Raw unprocessed product data from the source page
+  </ResponseField>
   <ResponseField name="deep_research" type="object | null">
     In-depth product research organized by dimension (e.g. ergonomics, materials, competitive analysis). Structure varies by product category.
   </ResponseField>
