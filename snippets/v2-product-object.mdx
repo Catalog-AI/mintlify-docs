@@ -355,4 +355,39 @@
       "high" | "medium" | "low"
     </ResponseField>
   </Expandable>
+  <ResponseField name="related_product_id" type="array | null">
+    Array of related product identifiers
+  </ResponseField>
+  <ResponseField name="relationship_type" type="string | null">
+    Type of relationship to the related products (e.g. `"accessory"`, `"variant"`)
+  </ResponseField>
+  <ResponseField name="brand_pdp" type="object | null">
+    Brand product detail page lookup result, identifying the original brand's listing for this product.
+  </ResponseField>
+  <Expandable title="Brand PDP object">
+    <ResponseField name="success" type="boolean">
+      Whether a brand PDP was found
+    </ResponseField>
+    <ResponseField name="brandName" type="string">
+      Brand name
+    </ResponseField>
+    <ResponseField name="brandDomain" type="string">
+      Brand website domain
+    </ResponseField>
+    <ResponseField name="brandPdpUrl" type="string">
+      URL to the product on the brand's own website
+    </ResponseField>
+    <ResponseField name="productTitle" type="string">
+      Product title on the brand's website
+    </ResponseField>
+    <ResponseField name="confidence" type="string">
+      Match confidence: `"high"`, `"medium"`, or `"low"`
+    </ResponseField>
+  </Expandable>
+  <ResponseField name="deep_research" type="object | null">
+    In-depth product research organized by dimension (e.g. ergonomics, materials, competitive analysis). Structure varies by product category.
+  </ResponseField>
+  <ResponseField name="affiliate_link" type="string | null">
+    Affiliate link URL for the product
+  </ResponseField>
 </Expandable>
